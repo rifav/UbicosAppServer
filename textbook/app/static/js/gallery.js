@@ -753,6 +753,18 @@ var openImageView = function(galleryView, image){
     // Get image element and add it to the DOM
     var image = image.clone();
     image.css({"margin-top":"15px"})
+    //hovering effect-start
+    image.hover(function(){
+    $(this).css({ "-webkit-transform": "scale(1.5)",
+           "transform":"scale(1.5) " ,
+           "transition":"transform 0.25s ease"
+           });
+    }, function(){ //remove hovering effect
+        $(this).css({ "-webkit-transform": "scale(1)",
+               "transform":"scale(1)" ,
+               "transition":"transform 0.25s ease"});
+    });
+    //hovering effect-end
 
     //remove previous single image before adding new one
     $('.section').children('img').remove();
