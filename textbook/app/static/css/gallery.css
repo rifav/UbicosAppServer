@@ -319,6 +319,11 @@ button {
     justify-content: space-between;
 }
 
+.span_timestamp {
+    font-size: x-small;
+    padding: 15px;
+}
+
 
 
 

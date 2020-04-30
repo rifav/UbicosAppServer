@@ -116,6 +116,7 @@ function postMessage(){
 }
 
 function loadFeed(type){
+    alert("calling loadFeed method");
     //clear existing html so the new ones dont get appended
     $('#activity-feed').empty();
 

@@ -58,6 +58,9 @@ $(function(){
             var p = $('<p/>', {
                     text: data.message}).appendTo(li);
 
+
+
+
              //add timestamp to the message
 //             var spanTimestamp = $('<span/>', {
 //                text: 'timestamp'}).appendTo(div);
@@ -247,7 +250,7 @@ $(function(){
                         //$('#default').attr('src', "pics/default.png");
 
 
-
+                        alert("successfully uploaded")
                         //TODO: update user with a 'success' message on the screen
 
                         //update gallery with newly uploaded image

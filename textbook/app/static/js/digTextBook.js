@@ -55,7 +55,6 @@ $(function(){
     });
 
 
-
     //update activity feed with history of messages
     loadFeed(0); //call function from activity.js //0 means all; 1 means todays chat
 
