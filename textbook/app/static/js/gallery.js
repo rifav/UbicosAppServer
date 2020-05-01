@@ -54,16 +54,13 @@ $(function(){
             var span = $('<span/>', {
                 text: data.name}).appendTo(div);
 
-
+            var div_msg = $("<div/>").appendTo(li);
             var p = $('<p/>', {
-                    text: data.message}).appendTo(li);
+                    text: data.message}).appendTo(div_msg);
+             var span_timestap = $('<span/>', {
+                            text: "add timestamp"}).appendTo(div_msg);
+                        span_timestap.addClass('msg-timestamp');
 
-
-
-
-             //add timestamp to the message
-//             var spanTimestamp = $('<span/>', {
-//                text: 'timestamp'}).appendTo(div);
         }
 
 
@@ -931,9 +928,16 @@ var openImageView = function(galleryView, image){
                         var span = $('<span/>', {
                             text: value.fields['posted_by'][0]}).appendTo(div);
 
+                        var div_msg = $("<div/>").appendTo(li);
                         var p = $('<p/>', {
-                                text: value.fields['content']}).appendTo(li);
+                                text: value.fields['content']}).appendTo(div_msg);
+                        var span_timestap = $('<span/>', {
+                            text: "add timestamp"}).appendTo(div_msg);
+                           span_timestap.addClass('msg-timestamp')
+                           
                         });
+
+
 
 
                      var element = document.getElementById("image-feed");

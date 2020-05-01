@@ -3,6 +3,9 @@ var host_url = window.location.host
 $(function(){
 
     loadActivityFeed();
+    messageHover();
+
+
 
 })
 
@@ -53,8 +56,14 @@ function loadActivityFeed(){
         var span = $('<span/>', {
             text: data.name}).appendTo(div);
 
+
+        var div_msg = $("<div/>").appendTo(li);
         var p = $('<p/>', {
-                text: data.message}).appendTo(li);
+                text: data.message}).appendTo(div_msg);
+
+        var span_timestap = $('<span/>', {
+                text: "add_timestamp"}).appendTo(div_msg);
+             span_timestap.addClass('msg-timestamp');
 
         // Scroll view
         $('#dynamic-content').animate({ scrollTop: $('#activity-feed').height() }, 400);
@@ -73,6 +82,7 @@ function loadActivityFeed(){
           return false;
         }
       });
+
 }
 
 function postMessage(){
@@ -116,7 +126,7 @@ function postMessage(){
 }
 
 function loadFeed(type){
-    alert("calling loadFeed method");
+    //alert("calling loadFeed method");
     //clear existing html so the new ones dont get appended
     $('#activity-feed').empty();
 
@@ -150,12 +160,25 @@ function loadFeed(type){
                     var span = $('<span/>', {
                         text: value.fields['posted_by'][0]}).appendTo(div);
 
+                    var div_msg = $("<div/>").appendTo(li);
                     var p = $('<p/>', {
-                            text: value.fields['content']}).appendTo(li);
+                            text: value.fields['content']}).appendTo(div_msg);
+                    var span_timestap = $('<span/>', {
+                            text: "add timestamp"}).appendTo(div_msg);
+                        span_timestap.addClass('msg-timestamp');
                 });
 
                 // Scroll page to bottom
                 $('#dynamic-content').animate({ scrollTop: $('#activity-feed').height() }, 400);
             }
         });
+}
+
+//TODO: move to general js file: add action related to message hover.
+function messageHover(){
+    $("ul.feed").on('mouseenter', 'li p', function(){
+       //add action here
+    }).on('mouseleave', function(){
+       //add action here
+    });
 }
