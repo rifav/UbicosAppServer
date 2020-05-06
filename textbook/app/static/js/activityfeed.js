@@ -56,14 +56,16 @@ function loadActivityFeed(){
         var span = $('<span/>', {
             text: data.name}).appendTo(div);
 
-
-        var div_msg = $("<div/>").appendTo(li);
         var p = $('<p/>', {
-                text: data.message}).appendTo(div_msg);
+                text: data.message}).appendTo(li);
 
-        var span_timestap = $('<span/>', {
+         var div_msg = $("<div/>").appendTo(li);
+
+         div_msg.addClass('msg-timestamp');
+
+         var span_timestap = $('<span/>', {
                 text: "add_timestamp"}).appendTo(div_msg);
-             span_timestap.addClass('msg-timestamp');
+
 
         // Scroll view
         $('#dynamic-content').animate({ scrollTop: $('#activity-feed').height() }, 400);
@@ -160,12 +162,16 @@ function loadFeed(type){
                     var span = $('<span/>', {
                         text: value.fields['posted_by'][0]}).appendTo(div);
 
-                    var div_msg = $("<div/>").appendTo(li);
                     var p = $('<p/>', {
-                            text: value.fields['content']}).appendTo(div_msg);
+                            text: value.fields['content']}).appendTo(li);
+
+
+                    var div_msg = $("<div/>").appendTo(li);
+                    div_msg.addClass('msg-timestamp');
+
                     var span_timestap = $('<span/>', {
                             text: "add timestamp"}).appendTo(div_msg);
-                        span_timestap.addClass('msg-timestamp');
+
                 });
 
                 // Scroll page to bottom

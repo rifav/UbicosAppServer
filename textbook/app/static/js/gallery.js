@@ -54,12 +54,15 @@ $(function(){
             var span = $('<span/>', {
                 text: data.name}).appendTo(div);
 
+             var p = $('<p/>', {
+                    text: data.message}).appendTo(li);
+
             var div_msg = $("<div/>").appendTo(li);
-            var p = $('<p/>', {
-                    text: data.message}).appendTo(div_msg);
+            div_msg.addClass('msg-timestamp');
+
              var span_timestap = $('<span/>', {
                             text: "add timestamp"}).appendTo(div_msg);
-                        span_timestap.addClass('msg-timestamp');
+
 
         }
 
@@ -928,13 +931,16 @@ var openImageView = function(galleryView, image){
                         var span = $('<span/>', {
                             text: value.fields['posted_by'][0]}).appendTo(div);
 
+
+                         var p = $('<p/>', {
+                                text: value.fields['content']}).appendTo(li);
+
                         var div_msg = $("<div/>").appendTo(li);
-                        var p = $('<p/>', {
-                                text: value.fields['content']}).appendTo(div_msg);
+                        div_msg.addClass("msg-timestamp");
+
                         var span_timestap = $('<span/>', {
                             text: "add timestamp"}).appendTo(div_msg);
-                           span_timestap.addClass('msg-timestamp')
-                           
+
                         });
 
 

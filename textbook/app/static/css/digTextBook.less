@@ -36,7 +36,6 @@ html, body {
     overflow: hidden;
 }
 
-
 h1 {
     margin: 0;
     padding: 0;
@@ -149,10 +148,6 @@ a {
     outline:0;
 }
 
-a {
-    cursor: pointer;
-}
-
 
 /*
     BOOK PAGE STYLING
@@ -160,6 +155,8 @@ a {
 .page {
     position: absolute;
     padding-right: 80px;
+    margin-top: 8%;
+    border-top: dotted;
     width: 100%;
     box-sizing: border-box;
     transition: all 0.5s;
@@ -601,7 +598,7 @@ a {
     backdrop-filter: blur(10px); */
     overflow: hidden;
     position: fixed;
-    bottom: -3%;
+    bottom: -1%;
     left: 50%;
     right: 14px;
     height: 30px;
@@ -616,6 +613,7 @@ a {
         border-radius: 20px;
         width: calc(100% - 70px);
         padding-left: 10px;
+        outline: none;
     }
 
     .message-input a {
@@ -654,7 +652,7 @@ a {
     .feed li {
         position: relative;
         padding: 5px 0 0 70px;
-        min-height: 60px;
+        min-height: 70px;
         margin-bottom: 10px;
     }
 
@@ -662,10 +660,10 @@ a {
         padding: 5px 70px 0 0;
     }
 
-.feed p {
-    border-radius: 30px;
-    margin: 0;
-}
+    .feed p {
+        border-radius: 30px;
+        margin: 0;
+    }
 
 .message p {
     background: linear-gradient(#BCE3EF, #81D3D3);
@@ -678,13 +676,17 @@ a {
     background: linear-gradient(#9AE6BF, #67CCBC);
 }
 
-.feed .msg-timestamp {
+.msg-timestamp {
+    position: relative;
     display: block;
     font-size: x-small;
-    margin-left: 450px;
-    color: darkcyan;
 }
-
+  .msg-timestamp span{
+    position: absolute;
+    left: 85%;
+    display: block;
+    color: darkcyan;
+  }
 
 .feed .user-image {
     position: absolute;
@@ -707,6 +709,15 @@ a {
     text-align: center;
 }
 
+ .user-image span {
+        position: absolute;
+        bottom: -23px;
+        left: 0;
+        width: 100%;
+        display: inline-block;
+        color: black;
+    }
+
 .user-image-posted-by {
     position: relative;
     display: inline-block;
@@ -716,15 +727,6 @@ a {
     border-radius: 40px;
     text-align: center;
 }
-
-    .user-image span {
-        position: absolute;
-        bottom: -23px;
-        left: 0;
-        width: 100%;
-        display: inline-block;
-        color: black;
-    }
 
 .feed a {
     color: #1F87FF;
@@ -982,8 +984,6 @@ a {
         margin-bottom: 0;
         overflow-y:auto;
         -webkit-overflow-scrolling: touch;
-
-
     }
 
     .section {
@@ -998,17 +998,17 @@ a {
         }
     }
 
-
-
     .message-input {
         position: fixed;
         border-radius: 20px;
         width: 49%;
-        bottom: 0;
+        bottom: 0%;
         left: 50%;
+        height: 38px;
+        outline: none;
         padding: 10px 0 10px 5px;
         margin: 0;
-        height: 38px;
+
     }
 }
 

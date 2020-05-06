@@ -67,7 +67,7 @@ function displayAllBadges(){
         $(src).append(divBnrHeader);
     }
 
-    hoverBadge();
+    //hoverBadge();
    // src.append("</center>");
   }
 
