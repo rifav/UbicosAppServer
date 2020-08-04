@@ -521,52 +521,55 @@ $(function(){
     //function called from digTextBook.js
 
      function postImageMessage(){
-        //get the user name who posted
-        var user_name = $("input[name='username']").val()
-        console.log(user_name);
 
         //get the currently typed message
         var inputEl = $("#image-msg-text");
         var message = inputEl.val();
-        //inputEl.prop('disabled', true);
-        console.log('user message :: '+message)
+        if(!message){
+        //empty;
+            //TODO: display a message for students
+            //entry into user log -- TODO fix the language
+            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber)
+            return;
+        }
+        //console.log('user message :: '+message)
 
-        console.log("call show prompt here")
+        //get the user name who posted
+        var user_name = $("input[name='username']").val()
+        //console.log(user_name);
+
+        //console.log("call show prompt here")
         showPrompt(message, "gallery");
 
         //get the gallery id of the image
         var gallery_id = $("input[name='act-id']").val();
-        console.log('image gallery id :: ', gallery_id)
+        //console.log('image gallery id :: ', gallery_id)
 
         var imagePk = $("input[name='image-db-pk']").val();
-        console.log('image pk :: ',imagePk)
+        //console.log('image pk :: ',imagePk)
 
-        if(message == ""){
-            console.log('empty input gallery')
-            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber)
-        }
-        else{
-            enterLogIntoDatabase('input button click', 'image-feed message input' , message, current_pagenumber)
-            
-            //posts student comment in database - can be extracted using image primary key.
-            $.post({
-                url: '/ajax/imageComment/',
-                data: {
-                'username': user_name,
-                'message':  message,
-                'imagePk': imagePk,
-                'discussion-type': middleGroupDiscussion,
-                },
-                success: function (data) {
-                    //empty the message pane
-                    $("input[name='image-msg-text']").val('');
-                    //inputEl.prop('disabled', false);
-                },
-                error: function(data){
-                    //inputEl.prop('disabled', false);
-                }
-            });
-        }
+
+        enterLogIntoDatabase('input button click', 'image-feed message input' , message, current_pagenumber)
+
+        //posts student comment in database - can be extracted using image primary key.
+        $.post({
+            url: '/ajax/imageComment/',
+            data: {
+            'username': user_name,
+            'message':  message,
+            'imagePk': imagePk,
+            'discussion-type': middleGroupDiscussion,
+            },
+            success: function (data) {
+                //empty the message pane
+                $("input[name='image-msg-text']").val('');
+                //inputEl.prop('disabled', false);
+            },
+            error: function(data){
+                //inputEl.prop('disabled', false);
+            }
+        });
+
     }
 
 

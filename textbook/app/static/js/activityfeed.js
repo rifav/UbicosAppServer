@@ -88,42 +88,45 @@ function loadActivityFeed(){
 }
 
 function postMessage(){
-    //get the user name who posted
-    var user_name = $("input[name='username']").val()
 
     //get the currently typed message
     var inputEl = $("input[name='msg-text']");
-    //inputEl.prop('disabled', true);
     var message = inputEl.val();
-    console.log('user message :: '+message)
+    if(!message){
+        //empty;
+            //TODO: display a message for students
+            //entry into user log -- TODO fix the language
+            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber)
+            return;
+        }
+
+    //get the user name who posted
+    var user_name = $("input[name='username']").val()
 
     //defined in keywordMatching.js
     showPrompt(message, "gm");
 
-        if(message == ""){
-            console.log('empty input activity feed')
-            enterLogIntoDatabase('click', 'activity-feed empty message input' , message, current_pagenumber)
-        }else{
 
-            enterLogIntoDatabase('click', 'activity-feed message input' , message, current_pagenumber)
-            //triggers the event in views.py
-            $.post({
-                url: '/ajax/chat/',
-                data: {
-                'username': user_name,
-                'message': message
-                },
-                success: function (data) {
-                    //empty the message pane
-                    inputEl.val('');
-                    //inputEl.prop('disabled', false);
-                },
-                error: function(){
-                    //inputEl.prop('disabled', false);
-                }
-            });
 
+    enterLogIntoDatabase('click', 'activity-feed message input' , message, current_pagenumber)
+    //triggers the event in views.py
+    $.post({
+        url: '/ajax/chat/',
+        data: {
+        'username': user_name,
+        'message': message
+        },
+        success: function (data) {
+            //empty the message pane
+            inputEl.val('');
+            //inputEl.prop('disabled', false);
+        },
+        error: function(){
+            //inputEl.prop('disabled', false);
         }
+    });
+
+
 
 }
 
