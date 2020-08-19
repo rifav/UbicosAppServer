@@ -138,13 +138,8 @@ def login(request):
             return HttpResponseRedirect('/index/')
         else:
             #return invalid login message
-            userLog = userLogTable(username=request.user, action="user click login button", type="invalid login",
-                                   input=request.POST.get('username'), pagenumber=0000)
-            userLog.save();
-
-
-
-            return render(request, 'app/login.html', {})
+            print("entered wrong username"); #TODO: enter into user log database
+            return render(request, 'app/login.html', {'errorMsg': "Invalid Username/Password"});
     else:
         return render(request, 'app/login.html', {})
 

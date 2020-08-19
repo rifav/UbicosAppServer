@@ -7,13 +7,17 @@
         <meta charset="UTF-8">
         <title>LOGIN</title>
           <link rel="stylesheet" type="text/css" href="{% static 'css/gallery.css' %}">
+
     </head>
 
     <body>
 
+
+
         <form id="login-form" method="post"
                class="center">
             {% csrf_token %}
+            <span id="login_error">{{errorMsg}}</span>
             <table class="container">
                 <tr>
                     <td><label for="id_username" style="font-family:verdana; font-size:16px">Username</label></td>
@@ -33,6 +37,7 @@
             <button id="login-user" type="submit" formaction="/login" value="login-user" class="user-input-submit-button" style="display: block; margin: 0 auto;">Login</button>
             <button id="create-user" disabled type="submit" formaction="/registerUser" value="Register-user" class="user-input-submit-button" style="display: block; margin: 0 auto;">Register User</button>
             <input type="hidden" name="next" value="{{ next }}"/>
+
         </form>
 
 

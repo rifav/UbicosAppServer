@@ -3,10 +3,19 @@
 .center {
   position: absolute;
 	width: 340px; /*size of the div */
-	height: 230px;
+	height: 250px;
     left: 550px; /*location of the div */
     top: 110px;
 	background: #F0F8FF;
+
+}
+
+#login_error{
+    margin-left: 25%;
+    color: red;
+    font-family: 'Open Sans', sans-serif;
+    display: inline-block;
+    margin-top: 3%;
 
 }
 
@@ -24,7 +33,6 @@
 	box-shadow: 0 2px 0 0 #498C25;
 	cursor: pointer;
 	outline:0;
-
 
 }
 
@@ -84,7 +92,6 @@ input[type="file"] {
 
 
 /* delete button notes */
-
 .object_delete {
     position: absolute;
         top: 2px;
