@@ -65,10 +65,9 @@ $(function(){
         }
 
 
-         //Scroll panel to bottom
-        // $('#dynamic-content').animate({ scrollTop: $('#activity-feed').height() }, 400);
-
-        $("#image-feed").animate({ scrollTop: $('#image-feed').prop("scrollHeight")}, 1000);
+        // Scroll panel to bottom
+        //var imageFeedParent = $('#image-feed').closest('.row');
+        //imageFeedParent.scrollTop(imageFeedParent[0].scrollHeight);
 
 
     });

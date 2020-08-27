@@ -1,0 +1,37 @@
+{% load static %}
+<div id="upload-view">
+
+    <div  class="gallery-panel">
+         <h1></h1>
+
+        <p id="upload-description">
+            Take a picture of your solution using "Open Camera". It will be downloaded to the "Downloads" folder. Upload the picture in your gallery.
+        </p>
+
+        <div id="gallery-user-submission" class="section">
+            <div>
+                <img id="default" src="{% static 'pics/default.png' %}" alt="">
+                <!--<span class="badge"></span>-->
+            </div>
+
+            <form id="upload-img" enctype="multipart/form-data" method="post" action="">
+                <label for="file-upload" class="btn">
+                    Choose
+                </label>
+                <input type="file" name="gallery_img" class="btn" id="file-upload" />
+                <input type="hidden" name="act-id" value=""/> <!--pass gallery id number from digTextBook.js-->
+                <input type="hidden" name="group-id" value=""/> <!--pass group id number from distextBook.js/gallery.js-->
+            </form>
+
+        </div>
+
+           <div id="add-new-gallery-post">
+                <a class="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank"></a>
+                <!--<a class="openCamera" href="http://127.0.0.1:8000/camera/" target="_blank"></a>-->
+         </div>
+
+
+    </div>
+
+</div>
+

@@ -151,9 +151,11 @@ def uploadImage(request):
 
         #get the gallery ID
         gallery_id = request.POST.get('act-id')
+        print('gallery_id :: ', gallery_id)
 
         #get the group ID
         group_id = request.POST.get('group-id')
+        print('group_id :: ', group_id)
 
         # print(type(request.FILES['gallery_img'].name))
         # django.core.files.uploadedfile.InMemoryUploadedFile

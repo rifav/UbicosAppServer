@@ -23,10 +23,7 @@ var NUM_PAGES = 18;
 $(function(){
 
     //localStorage.clear();
-
     var host_url = window.location.host
-
-    console.log('page load');
 
     $('.close-card').on('touch click', function(){
 
@@ -106,12 +103,6 @@ $(function(){
             }
      });
 
-     //left-right key press event -- page transition -- not working right, check later
-//     $('html').keydown(function(e){
-//       if(e.which == 39) movePage(true); //go right
-//       else movePage(false);
-//     });
-
 
     //check localstorage - used for refresh
 
@@ -149,7 +140,6 @@ $(function(){
 
 var movePage = function(moveToNext){
 
-
     var container = $('#textbook-content'),
         pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
         pageToShow, // This is the page that will be shown next
@@ -175,8 +165,9 @@ var movePage = function(moveToNext){
         replacePageNum = currentPageNum - 1;
         noMoreClass = 'first';
     }
+
     // Replace page number
-    console.log("current page", currentPageNum)
+    //console.log("current page", currentPageNum)
     current_pagenumber = currentPageNum
     localStorage.setItem("pageToBeRefreshed", currentPageNum);
     $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
@@ -186,8 +177,6 @@ var movePage = function(moveToNext){
     if(type!=''){
         $('.card.' + type).removeClass('active');
     }
-
-
 
     // Do swaps
     pageToHide.attr('class','page').addClass(currentNewClass); // Turn the current page into either next or previous
@@ -251,7 +240,6 @@ var loadHTML = function(url, successFn, errorFn){
 };
 
 
-
 var bindActivityButtons = function(){
 
     $('.page a').off().on('touch click', function(){
@@ -263,24 +251,14 @@ var bindActivityButtons = function(){
 
         //type of activity - gallery/brainstorm/video etc
         type = activityButton.attr('class').replace('activity-button','').trim();
-        console.log('type', type)
-
-        //for brainstorm different instances - start
-        if(type.indexOf("msf")>=0){
-            console.log(type)
-            type = type.split(" ")[0]
-        }
-        if(type.indexOf("bs")>=0){
-            console.log(type)
-            type = type.split(" ")[0]
-        }
-        //for brainstorm different instances - start
+        console.log('type::', type)
 
 
-        //id of each each activity - based on page no
+        //id of each each activity
         var id = activityButton.attr('data-id');
-        activity_id = id; //passing it to teacherindex.js
-        //console.log('id', id)
+        console.log('activity id::', id)
+
+        //activity_id = id; //passing it to teacherindex.js
 
         // Disable current card and enable new card
         $('.card.active').removeClass('active');
@@ -317,47 +295,69 @@ var bindActivityButtons = function(){
 //        ------------------------------TABLE-----------------------
         //if the table tab is active
         if($('.card.table').hasClass('active')){
-              lastOpenedTool = 'table';
-
-
+             lastOpenedTool = 'table';
 
              $('input[name="table-id"]').attr('value', id)
              $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
 
-              //persistence checker and populate or clear the table according to that
+             //persistence checker and populate or clear the table according to that
+             if(localStorage.getItem('table'+$('input[name="table-id"]').val())){
+                 var points = localStorage.getItem('table'+$('input[name="table-id"]').val());
 
-
-              if(localStorage.getItem('table'+$('input[name="table-id"]').val())){
-                var points = localStorage.getItem('table'+$('input[name="table-id"]').val());
-
-                //if table 3 has 3 pairs, and table 2 has 2 pairs, coming back to table 2 from table 3 shows the third coloumn from table3
-                //so clear everything and populate with the values
-                clearTableStatus();
-                //table already populated before, so display them in the table
-                persistTableStatus(points)
-
+                 //if table 3 has 3 pairs, and table 2 has 2 pairs, coming back to table 2 from table 3 shows the third coloumn from table3
+                 //so clear everything and populate with the values
+                 clearTableStatus();
+                 //table already populated before, so display them in the table
+                 persistTableStatus(points)
 
               }else{
+
                 //used to clear the table for different instance of the table
                 clearTableStatus();
               }
 
-              //
-              //$('div#graph-container').css("display", "none");
 
               //if the card is already extended, put it back to normal
               card_extension_close();
 
         }
-//        ------------------------------GALLERY-----------------------
+
+//        ---------------------image upload card-----------------------
+        if($('.card.upload').hasClass('active')){
+
+             //if the card is already extended, put it back to normal
+             card_extension_close();
+
+             //TODO Fix with correct id values
+             $('#upload-img input[name="act-id"]').attr('value', id);
+             $("input[name='group-id']").attr('value', 1);
+
+             //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
+             $('img#default').attr('src', API_URL.picsBase + "/default.png");
+             // end of the solution
+
+
+        }
+//        ---------------------individual discussion-----------------------
+
+         if($('.card.individual').hasClass('active')){
+
+             //if the card is already extended, put it back to normal
+            card_extension_close();
+
+        }
+//       ------------------------------ GALLERY (group discussion) -----------------------
         // if gallery div is active, load the gallery
         if($('.card.gallery').hasClass('active')){
 
+            card_extension();
+
             lastOpenedTool = 'gallery';
 
-            // pass id to gallery activity - to upload image form in gallery.html
-            $('#upload-img input[name="act-id"]').attr('value', id)
+             //todo: need to fix this activity id value passing
+             $('#upload-img input[name="act-id"]').attr('value', id);
 
+            //todo: can we make it global? move to utility.js?
             var user_group_id
             $.ajax({
                 type:'GET',
@@ -365,17 +365,20 @@ var bindActivityButtons = function(){
                 async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
                 success: function(e){
                     user_group_id = e;
-                    console.log("my group id (digtextBook.js),", e)
+                    console.log("my group id (from digtextBook.js)::", e)
                 }
             });
 
-            console.log(activityButton.attr('data-heading'));
+            //get data heading from the <a> tags
+            //console.log(activityButton.attr('data-heading'));
 
-            //update the heading
+            //update the heading in the card
             $('.card.' + type + ' h1').text(activityButton.attr('data-heading') + ' Group ' + groupArray[user_group_id-1]);
 
-           //update the description
-           console.log(activityButton.attr('data-description'));
+           //get the data description from the <a> tag
+           //console.log(activityButton.attr('data-description'));
+
+            //update the description in the card
            if(activityButton.attr('data-description')){
                 $('.card.' + type + ' p#gallery-description').text(activityButton.attr('data-description'));
             }
@@ -386,9 +389,9 @@ var bindActivityButtons = function(){
             //update the submission heading
             $('#gallery-group-heading').text('My Submissions')
 
+            //todo: clean up this part later
             //highlight the all submission  button and unhighlight the my submission
             $("#mySubmission").css('background-color', '#006600');
-            $("#allSubmission").css('background-color', '#2DB872');
             $("#groupSubmission").css('background-color', '#2DB872');
 
             //since the card opens to my submission -- show user upload options
@@ -403,15 +406,8 @@ var bindActivityButtons = function(){
             $('#single-image-view').hide();
 
 
-            //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
-            $('img#default').attr('src', API_URL.picsBase + "/default.png");
-            // end of the solution
-
-
             var view = activityButton.attr('data-view');
             console.log('view: ', view)
-
-            //var user_group_id = activityButton.attr('data-group');
 
             //call function from gallery.js
             $("input[name='group-id']").attr('value', user_group_id);
@@ -437,130 +433,24 @@ var bindActivityButtons = function(){
                 });
             }
 
-
-
-            //if the card is already extended, put it back to normal
-            card_extension_close();
+            //if the card is already extended, put it back to normal -- we don't want to close the expansion for this card.
+            //card_extension_close();
         }
 
 //        ------------------------------ANSWER-----------------------
         if($('.card.multQues').hasClass('active')){
 
-            //get which question clicked.
-            console.log(id)
-
-            //hide its siblings
-            $('#'+id).siblings().hide();
-            //show the div
-            $('#'+id).show();
-
-            var divid = '#'+id
-            console.log('line 456',divid)
-
-            if(divid === '#nested-circle'){
-                 $('.card.' + type + ' h1').text('Vocabulary Graphic Organizer');
-                 $('.card.' + type + ' h4').text('');
-
-            }else if(divid === '#model-of-functions'){
-                $('.card.' + type + ' h1').text('Model of Functions');
-                $('.card.' + type + ' h4').text('');
-
-            }else if(divid === '#day4graph'){
-                $('.card.' + type + ' h1').text('Conceptual Graph');
-
-                //show new problems based on face-to-face group; check user logged in
-                if(logged_in === 'giraffe' || logged_in === 'raccoon'){
-                    $('.card.' + type + ' h4').text('Group A');
-                    $('#day4group1').show();
-                }else if(logged_in === 'sheep' || logged_in === 'ant' || logged_in === 'tiger'){
-                     $('.card.' + type + ' h4').text('Group B');
-                     $('#day4group2').show();
-                }else if(logged_in === 'deer' || logged_in === 'panda' || logged_in === 'liger'){
-                     $('.card.' + type + ' h4').text('Group C');
-                     $('#day4group3').show();
-                }else if(logged_in === 'fox' || logged_in === 'hippo' || logged_in === 'alligator'){
-                     $('.card.' + type + ' h4').text('Group D');
-                     $('#day4group3').show();
-                }else if(logged_in === 'dog' || logged_in === 'dolphin' || logged_in === 'eagle'){
-                     $('.card.' + type + ' h4').text('Group E');
-                     $('#day4group3').show();
-                }else if(logged_in === 'zebra' || logged_in === 'rabbit' || logged_in === 'bear'){
-                     $('.card.' + type + ' h4').text('Group F');
-                     $('#day4group3').show();
-                }else if(logged_in === 'monkey' || logged_in === 'leopard' || logged_in === 'frog'){
-                     $('.card.' + type + ' h4').text('Group G');
-                     $('#day4group3').show();
-                }else if(logged_in === 'squirrel' || logged_in === 'elephant' || logged_in === 'bee'){
-                     $('.card.' + type + ' h4').text('Group H');
-                     $('#day4group3').show();
-                }else if(logged_in === 'fish' || logged_in === 'bat'){
-                     $('.card.' + type + ' h4').text('Group J');
-                     $('#day4group3').show();
-                }else if(logged_in === 'kangaroo' || logged_in === 'penguin' || logged_in === 'duck'){
-                     $('.card.' + type + ' h4').text('Group I');
-                     $('#day4group3').show();
-                }
-            }
-            else
-            { //divid === #day2hw
-                $('.card.' + type + ' h1').text('Homework Problem');
-
-                //show homework problem for all groups
-                $('#homework').show();
-
-                //show new problems based on face-to-face group; check user logged in
-                if(logged_in === 'giraffe' || logged_in === 'raccoon'){
-                    $('.card.' + type + ' h4').text('Group A');
-                    $('#day2group1').show();
-                }else if(logged_in === 'sheep' || logged_in === 'ant' || logged_in === 'tiger'){
-                     $('.card.' + type + ' h4').text('Group B');
-                     $('#day2group2').show();
-                }else if(logged_in === 'deer' || logged_in === 'panda' || logged_in === 'liger'){
-                     $('.card.' + type + ' h4').text('Group C');
-                     $('#day2group3').show();
-                }else if(logged_in === 'fox' || logged_in === 'hippo' || logged_in === 'alligator'){
-                     $('.card.' + type + ' h4').text('Group D');
-                     $('#day2group4').show();
-                }else if(logged_in === 'dog' || logged_in === 'dolphin' || logged_in === 'eagle'){
-                     $('.card.' + type + ' h4').text('Group E');
-                     $('#day2group5').show();
-                }else if(logged_in === 'zebra' || logged_in === 'rabbit' || logged_in === 'bear'){
-                     $('.card.' + type + ' h4').text('Group F');
-                     $('#day2group6').show();
-                }else if(logged_in === 'monkey' || logged_in === 'leopard' || logged_in === 'frog'){
-                     $('.card.' + type + ' h4').text('Group G');
-                     $('#day2group7').show();
-                }else if(logged_in === 'squirrel' || logged_in === 'elephant' || logged_in === 'bee'){
-                     $('.card.' + type + ' h4').text('Group H');
-                     $('#day2group8').show();
-                }else if(logged_in === 'fish' || logged_in === 'bat'){
-                     $('.card.' + type + ' h4').text('Group J');
-                     $('#day2group10').show();
-                }else if(logged_in === 'kangaroo' || logged_in === 'penguin' || logged_in === 'duck'){
-                     $('.card.' + type + ' h4').text('Group I');
-                     $('#day2group9').show();
-                }
-
-
-                //$('.card.' + type + ' h4').text('Type your answers to the questions below. When you are done, hit submit. ');
-
-                //update description
-            }
-
-
+            //update this section based on curriculum
 
             //if the card is already extended, put it back to normal
             card_extension_close();
-
         }
 
 //        ------------------------------MORE INFO (TALK MOVES)-----------------------
         if($('.card.moreinfo').hasClass('active')){
 
-             //$('input[name="table-id"]').attr('value', id)
-             $('.card.' + type + ' h1').text("Talk Moves"); //update the title of each page
-
-            //if the card is already extended, put it back to normal
+             //update this section based on curriculum
+             //if the card is already extended, put it back to normal
              card_extension_close();
         }
 
@@ -568,17 +458,17 @@ var bindActivityButtons = function(){
         if($('.card.brainstorm').hasClass('active')){
 
             //update the heading
-            console.log('brainstorm heading:: ', activityButton.attr('data-heading'))
+            //console.log('brainstorm heading:: ', activityButton.attr('data-heading'))
             $('.card.' + type + ' h1').text(activityButton.attr('data-heading')); //update the title of each page
 
 
             //update the description
-           console.log(activityButton.attr('data-description'));
+           //console.log(activityButton.attr('data-description'));
            if(activityButton.attr('data-description')){
                 $('.card.' + type + ' p#brainstorm-description').text(activityButton.attr('data-description'));
             }
 
-            console.log($(this))
+            //update the id
             $('input[name="brainstorm-id"]').attr('value', id)
 
             loadIdeaToWorkspace();
@@ -586,44 +476,6 @@ var bindActivityButtons = function(){
             //if the card is already extended, put it back to normal
             card_extension_close();
         }
-
-//        ------------------------------Khan Academy-----------------------
-        if($('.card.khanacademy').hasClass('active')){
-            $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
-
-            //at all times the card will be expanded; so no call to card expansion method
-            $('.card').css({'width':'100%'});
-
-            $('input[name="ka-act-id"]').attr('value', id)
-            //pass the ka-url and heading
-            //console.log('ka-url-passing to html', activityButton.attr('data-video-url'))
-            $('a#ka-form-url').attr('href', activityButton.attr('data-video-url'))
-            $('a#ka-form-url').text(activityButton.attr('data-video-topic'))
-            //if khan academy tool has two urls then --
-            if(activityButton.attr('data-video-url2')){
-                console.log(activityButton.attr('data-video-url2'))
-                $('a#ka-form-url2').attr('href', activityButton.attr('data-video-url2'))
-                $('a#ka-form-url2').text(activityButton.attr('data-video-topic2'))
-                $('a#ka-form-url2').show();
-            }else{
-                console.log("no second url")
-                //hide that link
-                $('a#ka-form-url2').hide();
-            }
-
-            lastOpenedTool = 'khan_academy';
-
-             //check for persistence
-             $.get({
-               async: false,
-               url:'/checkKAAnswer/'+activity_id,
-               success: function(response){
-
-                  persistence_check(response.success)
-                }
-
-            });
-      }
 
         //user logging
         enterLogIntoDatabase('activity select', type , 'activity-id-'+id, current_pagenumber)
@@ -643,11 +495,13 @@ var card_extension = function(){
     width = width/2;
     console.log('width ::', width);
 
-    if (width == 50){
-        $('.card').css({'width':'100%'});
-    }else{
-        $('.card').css({'width':'50%'});
-    }
+    $('.card').css({'width':'100%'});
+
+//    if (width == 50){
+//        $('.card').css({'width':'100%'});
+//    }else{
+//        $('.card').css({'width':'50%'});
+//    }
 
 }
 
@@ -662,23 +516,3 @@ var card_extension_close = function(){
 
 }
 
-function openCity(evt, cityName) {
-  // Declare all variables
-  var i, tabcontent, tablinks;
-
-  // Get all elements with class="tabcontent" and hide them
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-
-  // Get all elements with class="tablinks" and remove the class "active"
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-
-  // Show the current tab, and add an "active" class to the button that opened the tab
-  document.getElementById(cityName).style.display = "block";
-  evt.currentTarget.className += " active";
-}

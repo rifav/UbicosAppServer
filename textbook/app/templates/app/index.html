@@ -95,15 +95,22 @@
             <!-- 
                 Ideally we'd only have one div.card, whose content is loaded dynamically on click.
             -->
+
+            <div class="card upload">
+                <a class="close-card"></a>
+                {% include 'app/upload.html' %}
+            </div>
+
             <div class="card gallery">
                 <a class="close-card"></a>
-                <a class="extend-card"></a>
-                {% ifequal user.get_username 'AW' %}
-                <a class="teacher-view-toggle"></a>
-                {%  endifequal %}
-
-                <a class="back-to-gallery"></a>
+<!--                <a class="extend-card"></a>-->
+<!--                <a class="back-to-gallery"></a>-->
                 {% include 'app/gallery.html' %}
+            </div>
+
+            <div class="card individual">
+                <a class="close-card"></a>
+                {% include 'app/individual_gallery.html' %}
             </div>
 
             <div class="card video">
@@ -117,21 +124,16 @@
                 {% include 'app/brainstorm.html' %}
             </div>
 
+            <div class="card table">
+                <a class="close-card"></a>
+                {% include 'app/table.html' %}
+            </div>
+
             <div class="card group">
                 <a class="close-card"></a>
                 {% include 'app/group.html' %}
             </div>
 
-            <div class="card convert">
-                <a class="close-card"></a>
-                {% include 'app/convert.html' %}
-            </div>
-
-            <div class="card table">
-                <a class="close-card"></a>
-                {% include 'app/table.html' %}
-            </div>
-            
             <div class="card moreinfo">
                 <a class="close-card"></a>
                 {% include 'app/talkmoves.html' %}
@@ -142,13 +144,6 @@
                 {% include 'app/multQues.html' %}
             </div>
 
-             <div class="card khanacademy">
-                <a class="close-card"></a>
-                {% include 'app/kaform.html' %}
-                 {% ifequal user.get_username 'AW' %}
-                    <a class="teacher-view-toggle"></a>
-                 {%  endifequal %}
-            </div>
 
             <div class="card teacher">
                 <!--<a class="close-card"></a>-->
@@ -170,6 +165,7 @@
     <script src="{% static 'js/utility.js' %}"></script>
     <script src="{% static 'js/keywordMatching.js' %}"></script>
     <script src="{% static 'js/awardbanner.js' %}"></script>
+    <script src="{% static 'js/upload.js' %}"></script>
     <script src="{% static 'js/gallery.js' %}"></script>
     <script src="{% static 'js/activityfeed.js' %}"></script>
     <script src="{% static 'js/brainstorm.js' %}"></script>

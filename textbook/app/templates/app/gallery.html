@@ -1,63 +1,22 @@
 {% load static %}
 <div id="gallery-view">
 
+
+
     <div id="gallery-panel" class="gallery-panel">
          <h1></h1>
 
         <p id="gallery-description">
-            Take a picture of your solution using "Open Camera". It will be downloaded to the "Downloads" folder. Upload the picture in your gallery.
+            Make at least one comment on each of the five images.
         </p>
-
-        <!--<h2>Your submission</h2>-->
-        <!--<div id="gallery-camera-div" style="right: 10px">-->
-            <!--<a id="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank">Open Camera</a>-->
-            <!--&lt;!&ndash;<a id="openCamera" href="http://127.0.0.1:8000/camera/" target="_blank">Open Camera</a>&ndash;&gt;-->
-        <!--</div>-->
-
-
-        <div id="gallery-view-only">
-            <a id="mySubmission" class="gallery-submission" href="#" style="margin-left:130px;">My Submissions</a>  <!--<h2>defined in gallery.js</h2>-->
-            <!--<a id="allSubmission" class="gallery-submission" href="#">Class Submissions</a>  &lt;!&ndash;<h2>defined in gallery.js</h2>&ndash;&gt;-->
-            <a id="groupSubmission" class="gallery-submission" href="#" style="margin-right:130px;">Group Discussions</a>  <!--<h2>defined in gallery.js</h2>-->
-
-        </div>
-
-
-        <div id="gallery-user-submission" class="section">
-            <div>
-                <img id="default" src="{% static 'pics/default.png' %}" alt="">
-                <!--<span class="badge"></span>-->
-            </div>
-
-            <form id="upload-img" enctype="multipart/form-data" method="post" action="">
-                <label for="file-upload" class="btn">
-                    Choose
-                </label>
-                <!--<a class="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank"></a>-->
-                <input type="file" name="gallery_img" class="btn" id="file-upload" />
-                <input type="hidden" name="act-id" value=""/> <!--pass gallery id number from digTextBook.js-->
-                <input type="hidden" name="group-id" value=""/> <!--pass group id number from distextBook.js/gallery.js-->
-            </form>
-
-        </div>
-
-         <div id="add-new-gallery-post">
-                <a class="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank"></a>
-                <!--<a class="openCamera" href="http://127.0.0.1:8000/camera/" target="_blank"></a>-->
-         </div>
-
-        <h2 id="gallery-group-heading">All Submissions</h2>
 
         <ul id="gallery">
             <!--<li>-->
                 <!--<img  src="https://tinyurl.com/y72rf9lz" alt="">-->
                 <!--<span class="badge">3</span>-->
             <!--</li>-->
-
         </ul>
-        <ul class="teacher-view">
 
-        </ul>
     </div>
 
     <div id="single-image-view" class="gallery-panel" style="display:none">
@@ -65,8 +24,6 @@
             <div id="row-left">
                  <!--functionality defined in gallery.js; css defined in digTextBook.less-->
                 <div class="section">
-                    <h4 class="extendedHeading"></h4>
-                    <p class="gallery-instruction"> </p>
 
                     <a href="" class="previous-image"></a>
                     <a href="" class="next-image"></a>
@@ -79,20 +36,20 @@
 
             <div id="row-right">
                 <a id="backToGallery" href=""></a>
-                 <div class="award-holder"   style="margin-left:0px;">
-                <div class = "badge-description">Testing</div>
-                </div>
-                <ul id="image-feed" class="feed" style="margin-top: 100px;">
+<!--                 <div class="award-holder"   style="margin-left:0px;">-->
+<!--                    <div class = "badge-description">Testing</div>-->
+<!--                </div>-->
+                <ul id="image-feed" class="feed" style="margin-top: 60px;margin-bottom:110px">
                 </ul>
 
-                    
-                <div class="prompt-card prompt">
-                    <a class="prompt-close-card"></a>
-                    <!--<span id="prompt-p"></span>-->
-                    <!--<img id="badge-default" src="{% static 'pics/default.png' %}" alt="">-->
-                    <img id="prompt-badge-img" src="{% static 'pics/default.png' %}" alt="" >
-                    <p id="prompt-p" ></p>
-                </div>
+
+<!--                <div class="prompt-card prompt">-->
+<!--                    <a class="prompt-close-card"></a>-->
+<!--                    &lt;!&ndash;<span id="prompt-p"></span>&ndash;&gt;-->
+<!--                    &lt;!&ndash;<img id="badge-default" src="{% static 'pics/default.png' %}" alt="">&ndash;&gt;-->
+<!--                    <img id="prompt-badge-img" src="{% static 'pics/default.png' %}" alt="" >-->
+<!--                    <p id="prompt-p" ></p>-->
+<!--                </div>-->
 
                 <div class="message-input">
                     <input type="text" id="image-msg-text" name="image-msg-text" placeholder="Comment on this picture">
