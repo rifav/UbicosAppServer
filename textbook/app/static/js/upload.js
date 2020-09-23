@@ -3,8 +3,6 @@ var host_url = window.location.host
 
 $(function(){
 
-
-
         $("#file-upload").change(function(event){
 
                 enterLogIntoDatabase('upload image', 'gallery image upload attempted' , '', current_pagenumber)
@@ -32,8 +30,9 @@ $(function(){
                         //$('#default').attr('src', "pics/default.png");
 
 
-                        alert("successfully uploaded")
+                        //alert("successfully uploaded")
                         //TODO: update user with a 'success' message on the screen
+                        $('.upload-success-msg').show();
 
                         //update gallery with newly uploaded image
                         img_data = response.success;
@@ -103,6 +102,10 @@ $(function(){
 
                         enterLogIntoDatabase('upload image', 'gallery image upload successful' , 'image-upload-' + obj.image_id, current_pagenumber)
 
+                    }, error: function(response){
+                           //TODO: log this
+                           alert(data);
+                           $( ".upload-success-msg-p" ).text( "Something went wrong, try again" );
                     }
 
                   });
@@ -113,6 +116,13 @@ $(function(){
              //update preview image
             $("#file-upload").change(function(){
                 readURL(this);
+            });
+
+            //event for success message close button
+            $(".upload-success-msg-closebtn").on('click', function(){
+                var div = this.parentElement;
+                div.style.opacity = "0";
+                setTimeout(function(){ div.style.display = "none"; }, 600);
             });
 
 

@@ -136,18 +136,6 @@ a {
     overflow-x: hidden;
 }
 
-.btn {
-    display: inline-block;
-    padding: 0.7rem 1.5rem;
-    padding-left: 15px;
-    background: white;
-    /* border: solid 1px #007BFF; */
-    color: @linkColor;
-    border-radius: 70px;
-    text-decoration: none;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    outline:0;
-}
 
 
 /*
@@ -845,16 +833,64 @@ position: relative;
     margin-right: 1rem;
 }
 
-.section {
+//upload.html css starts here
+.btn {
+    display: inline-block;
+    padding: 0.7rem 1.5rem;
+    margin-left: 15px;
+    background: white;
+    /* border: solid 1px #007BFF; */
+    color: @linkColor;
+    border-radius: 70px;
+    text-decoration: none;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    outline:0;
+}
+
+#gallery-upload-div .btn {
+    top: 50%;
+}
+
+.gallery-upload-section {
     background: rgba(255,255,255,0.5);
     padding: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 0;
-    position: relative;
+    position: absolute;
+    top: 25%;
+    width: 100%;
+}
+
+.upload-success-msg{
+
+     padding: 5px 20px 0px;
+     background-color: #909497; //background color of the success message
+     color: white;
+     opacity: 1;
+     transition: opacity 0.6s;
+     margin-bottom: 15px;
+     width: 90%
 
 }
+
+.upload-success-msg-closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.upload-success-msg-closebtn:hover {
+  color: black;
+}
+
+//upload.html css end here
 
 .sectionh1 {
 
@@ -866,9 +902,7 @@ position: relative;
     margin: 0 20px;
 }
 
-#gallery-user-submission .btn {
-    top: 50%;
-}
+
 
 .gallery img {
 //     max-width: 100%;

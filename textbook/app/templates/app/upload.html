@@ -2,21 +2,21 @@
 <div id="upload-view">
 
     <div  class="gallery-panel">
-         <h1></h1>
+         <h1>sample header</h1>
 
-        <p id="upload-description">
-            Take a picture of your solution using "Open Camera". It will be downloaded to the "Downloads" folder. Upload the picture in your gallery.
-        </p>
+         <p>Use the Upload button to select the image you want to upload in the gallery. You will see a success message once your image is uploaded. </p>
 
-        <div id="gallery-user-submission" class="section">
+
+
+        <div id="gallery-upload-div" class="gallery-upload-section">
             <div>
-                <img id="default" src="{% static 'pics/default.png' %}" alt="">
+                <img id="default" src="{% static 'pics/default.png' %}" alt="" style="height:300px;">
                 <!--<span class="badge"></span>-->
             </div>
 
             <form id="upload-img" enctype="multipart/form-data" method="post" action="">
                 <label for="file-upload" class="btn">
-                    Choose
+                    Upload
                 </label>
                 <input type="file" name="gallery_img" class="btn" id="file-upload" />
                 <input type="hidden" name="act-id" value=""/> <!--pass gallery id number from digTextBook.js-->
@@ -25,10 +25,16 @@
 
         </div>
 
-           <div id="add-new-gallery-post">
-                <a class="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank"></a>
-                <!--<a class="openCamera" href="http://127.0.0.1:8000/camera/" target="_blank"></a>-->
-         </div>
+        <div class="upload-success-msg" style="display:none">
+          <span class="upload-success-msg-closebtn">&times;</span>
+          <p id="upload-success-msg-p"><strong>Your selected image was successfully uploaded.</strong></p>
+        </div>
+
+
+<!--           <div id="add-new-gallery-post">-->
+<!--                <a class="openCamera" href="https://hcilabasu.pythonanywhere.com/camera/" target="_blank"></a>-->
+<!--                &lt;!&ndash;<a class="openCamera" href="http://127.0.0.1:8000/camera/" target="_blank"></a>&ndash;&gt;-->
+<!--         </div>-->
 
 
     </div>

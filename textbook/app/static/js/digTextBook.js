@@ -329,7 +329,7 @@ var bindActivityButtons = function(){
              card_extension_close();
 
              //TODO Fix with correct id values
-             $('#upload-img input[name="act-id"]').attr('value', id);
+             $('#upload-img input[name="act-id"]').attr('value', 1);
              $("input[name='group-id']").attr('value', 1);
 
              //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
