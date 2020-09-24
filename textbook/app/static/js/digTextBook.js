@@ -134,6 +134,16 @@ $(function(){
 
       }
 
+        //side navigation bar click events -- start
+        $('#right-side-menu').click(function(e){
+            $("#mySidenav").css("width", "250px");
+        });
+
+        $('.right-menu-closebtn').click(function(e){
+             $("#mySidenav").css("width", "0px");
+        });
+        //side navigation bar click events -- end
+
 
 });
 

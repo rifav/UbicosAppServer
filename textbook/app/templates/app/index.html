@@ -48,11 +48,28 @@
 
         <div id="textbook-content" class="first">
 
+<!--            related to right side menu html start
+                source: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_sidenav -->
+
+            <span id="right-side-menu">&#9776;</span>
+
+            <div id="mySidenav" class="sidenav" >
+                <a href="javascript:void(0)" class="right-menu-closebtn">&times;</a>
+                <a href="#">Create A Model</a>
+                <a href="#">Discuss Your Model</a>
+                <a href="#">Synchronous Day</a>
+                <a href="#">Refine your Model</a>
+                <a href="#">Teach an Agent</a>
+
+            </div>
+
+<!--            related to right side menu html end -->
 
             <div class="page previous">
             </div>
             <div class="page" data-page="1">
             </div>
+
             <div class="page next" data-page="2">
             </div>
             <div id="page-controls">
@@ -108,7 +125,7 @@
                 {% include 'app/gallery.html' %}
             </div>
 
-            <div class="card individual active">
+            <div class="card individual">
                 <a class="close-card"></a>
                 {% include 'app/individual_gallery.html' %}
             </div>
@@ -169,16 +186,16 @@
     <script src="{% static 'js/gallery.js' %}"></script>
     <script src="{% static 'js/activityfeed.js' %}"></script>
     <script src="{% static 'js/brainstorm.js' %}"></script>
-    <script src="{% static 'js/convert.js' %}"></script>
+<!--    <script src="{% static 'js/convert.js' %}"></script>-->
     <script src="{% static 'js/kaform.js' %}"></script>
     <script src="{% static 'js/table.js' %}"></script>
     <script src="{% static 'js/userlog.js' %}"></script>
     <script src="{% static 'js/activityindex.js' %}"></script>
     <script src="{% static 'js/multQues.js' %}"></script>
-    <script src="{% static 'js/jqPlot/jquery.jqplot.js' %}"></script>
-    <script src="{% static 'js/jqPlot/jquery.jqplot.min.js' %}"></script>
-    <script src="{% static 'js/jqPlot/plugins/jqplot.barRenderer.js' %}"></script>
-    <script src="{% static 'js/jqPlot/plugins/jqplot.categoryAxisRenderer.js' %}"></script>
+<!--    <script src="{% static 'js/jqPlot/jquery.jqplot.js' %}"></script>-->
+<!--    <script src="{% static 'js/jqPlot/jquery.jqplot.min.js' %}"></script>-->
+<!--    <script src="{% static 'js/jqPlot/plugins/jqplot.barRenderer.js' %}"></script>-->
+<!--    <script src="{% static 'js/jqPlot/plugins/jqplot.categoryAxisRenderer.js' %}"></script>-->
 </body>
 </html>
 
