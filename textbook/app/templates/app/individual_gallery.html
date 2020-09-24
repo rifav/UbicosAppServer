@@ -1,17 +1,17 @@
 {% load static %}
 <div>
     <h1> new page for individual discussion </h1>
-    <p> add instruction here </p>
+    <p> Make at least one comment on each of the five images </p>
 </div>
 
 <div class="slider" style="margin-left:100px; margin-top: 40px;">
 
   <div class="slides">
     <div id="slide-1">
-     <img  src="{% static 'pics/default.png' %}" alt="">
+        <img  src="{% static 'pics/default.png' %}" alt="">
     </div>
     <div id="slide-2">
-     <img  src="{% static 'pics/default.png' %}" alt="">
+        <img  src="{% static 'pics/default.png' %}" alt="">
     </div>
     <div id="slide-3">
       <img src="{% static 'pics/default.png' %}" alt="">
@@ -29,4 +29,14 @@
     <a href="#slide-3">3</a>
     <a href="#slide-4">4</a>
     <a href="#slide-5">5</a>
+</div>
+
+<ul id="ind-feed">
+    <li> this is an example </li>
+</ul>
+
+<div class="individual-message-input">
+     <input type="text" name="ind-msg-text" id="ind-msg-text" placeholder="Type a message to your class here">
+     <input type="hidden" name="username" value={{ user.get_username }}>
+     <a href="" id="ind-msg-send-btn"></a>
 </div>

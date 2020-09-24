@@ -526,7 +526,7 @@ position: relative;
     bottom: -1%;
     left: 50%;
     right: 14px;
-    height: 30px;
+    height: 65px;
     border-radius: 30px;
     padding: 12px 10px 14px 9px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -536,14 +536,14 @@ position: relative;
         height: 100%;
         border: none;
         border-radius: 20px;
-        width: calc(100% - 70px);
+        width: calc(100% - 55px);
         padding-left: 10px;
         outline: none;
     }
 
     .message-input a {
         position: absolute;
-        top: 0px;
+        top: 5px;
         right: 10px;
         display: inline-block;
         height: 50px;
@@ -1849,9 +1849,44 @@ position: relative;
     }
 
 .gallery_projection_number{
-
-
   display: block;
-
-
 }
+
+//tooltip related css start
+.tooltip-ex { /* Container for our tooltip */
+ position: relative;
+ display: inline-block;
+ cursor: help;
+ color: black;
+ margin-right: 20px;
+ float: left;
+}
+
+.tooltip-ex-top {
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip-ex-text {
+ visibility: hidden;
+ position: absolute;
+ width: 120px;
+ background-color: #555;
+ color: #fff;
+ text-align: center;
+ padding: 5px 0;
+ border-radius: 6px;
+ z-index: 1;
+ opacity: 0;
+ transition: opacity .6s;
+}
+
+.tooltip-ex:hover .tooltip-ex-text { /* Makes tooltip visible when hovered on */
+ visibility: visible;
+ opacity: 1;
+}
+
+//tooltip related css end
+
+

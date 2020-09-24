@@ -11,7 +11,6 @@
 
     <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/gallery.css' %}">
-<!--    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">-->
     <link rel="stylesheet" href="{% static 'css/individual_gallery.css' %}"/>
     <link rel="stylesheet/less" type="text/css" href="{% static 'css/digTextBook.less' %}">
     <link rel="stylesheet/less" type="text/css" href="{% static 'js/jqPlot/jquery.jqplot.css' %}">
@@ -109,7 +108,7 @@
                 {% include 'app/gallery.html' %}
             </div>
 
-            <div class="card individual">
+            <div class="card individual active">
                 <a class="close-card"></a>
                 {% include 'app/individual_gallery.html' %}
             </div>

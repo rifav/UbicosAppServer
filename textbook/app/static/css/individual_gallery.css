@@ -95,5 +95,40 @@
   }
 }
 
+.individual-message-input {
+    background: rgba(201, 221, 228, 1);
+    /* -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); */
+    overflow: hidden;
+    position: fixed;
+    bottom: -1%;
+    left: 0;
+    right: 14px;
+    height: 65px;
+    width: 95%;
+    border-radius: 30px;
+    padding: 12px 10px 14px 9px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 
+    .individual-message-input input {
+        margin: 10px 0px 10px 0px;
+        height: 85%;
+        border: none;
+        border-radius: 20px;
+        width: calc(100% - 55px);
+        padding-left: 10px;
+        outline: none;
+    }
 
+    .individual-message-input a {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        display: inline-block;
+        height: 50px;
+        width: 50px;
+        background: url('/static/pics/plane.png') no-repeat;
+        background-size: 40px 40px;
+        background-position: 3px 6px;
+    }
