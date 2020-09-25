@@ -2,58 +2,55 @@
 $(function(){
 
         //side navigation bar click events -- start
+
+        //open the right-side-menu
         $('#right-side-menu').click(function(e){
-            $("#mySidenav").css("width", "250px");
+            $("#mySidenav").css("width", "350px");
         });
 
+        //close the right-side-menu
         $('.right-menu-closebtn').click(function(e){
              $("#mySidenav").css("width", "0px");
         });
 
-        $('.showGeneralLink').click(function (e) {
-                $(this).next('.general').toggle();
+        //event handler for all four higher level tabs e.g., general, week1, week2, week3
+        $('.showLinkgeneral, .showLinkweek1, .showLinkweek2, .showLinkweek3 ').click(function (e) {
+                var className = $(this).attr('class').replace('showLink','').trim();
+                //alert(className);
+                //toggle the currently selected <ul> tag element
+                $(this).next('.'+className).toggle();
+                //remove active class for other <a> links
                 $(this).toggleClass('active').siblings().removeClass('active');
+                //remove active class for module <a> links
                 $("#mySidenav a.nav").removeClass('active');
 
-            }
-        );
-        $('.showWeek1Link').click(function (e) {
-                $(this).next('.week1').toggle();
-                $(this).toggleClass('active').siblings().removeClass('active');
-                 $("#mySidenav a.nav").removeClass('active');
+                //console.log($('#mySidenav ul').not('.'+className));
+                //untoggle the other <ul> tag element
+                $('#mySidenav ul').not('.'+className).each(function(id,element){
+                    //if they are open, then untoggle them..else no need
+                    if($(element).is(':visible')) {
+                        $(element).toggle();
+                    }
+                });
 
             }
         );
-        $('.showWeek2Link').click(function (e) {
-                $(this).next('.week2').toggle();
-                $(this).toggleClass('active').siblings().removeClass('active');
-                $("#mySidenav a.nav").removeClass('active');
 
-            }
-        );
-        $('.showWeek3Link').click(function (e) {
-                $(this).next('.week3').toggle();
-                $(this).toggleClass('active').siblings().removeClass('active');
-                 $("#mySidenav a.nav").removeClass('active');
-            }
-        );
-
-        //side navigation bar click events -- end
-
-        //binding side navigation bar button actions
+        //event handler for each modules within each higher levels
         $('#mySidenav a.nav').off().on('touch click', function(){
 
-            //highlight one module one at a time within <ul> tag
-            //$(this).toggleClass('active').siblings().removeClass('active');
+            //highlight one module one at a time within respective <ul> tag
             //remove all the active class so far
-            $("#mySidenav a.nav").not($(this)).removeClass('active');
+            $("#mySidenav a.nav").removeClass('active');
+            //then add active class in the current selected <a> tag
             $(this).toggleClass('active');
-
             var pageID = $(this).attr("data-pageId");
             //second parameter doesn't matter in this version
             loadPage(pageID, $('.page:not(.previous):not(.next)'));
 
         });
+
+        //side navigation bar click events -- end
 
 })
 
