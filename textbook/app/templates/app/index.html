@@ -51,32 +51,22 @@
 <!--            related to right side menu html start
                 source: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_sidenav -->
 
-            <span id="right-side-menu">&#9776;</span>
-
-            <div id="mySidenav" class="sidenav" >
-                <a href="javascript:void(0)" class="right-menu-closebtn">&times;</a>
-                <a href="#">Create A Model</a>
-                <a href="#">Discuss Your Model</a>
-                <a href="#">Synchronous Day</a>
-                <a href="#">Refine your Model</a>
-                <a href="#">Teach an Agent</a>
-
-            </div>
+                {% include 'app/sideNavigation.html' %}
 
 <!--            related to right side menu html end -->
 
-            <div class="page previous">
-            </div>
+<!--            <div class="page previous">-->
+<!--            </div>-->
             <div class="page" data-page="1">
             </div>
 
-            <div class="page next" data-page="2">
-            </div>
-            <div id="page-controls">
-                <span id="page-control-number">Page 1/18</span>
-                <a id="page-control-previous" onclick="movePage(false);">Previous page</a>
-                <a id="page-control-next" onclick="movePage(true);">Next page</a>
-            </div>
+<!--            <div class="page next" data-page="2">-->
+<!--            </div>-->
+<!--            <div id="page-controls">-->
+<!--                <span id="page-control-number">Page 1/18</span>-->
+<!--                <a id="page-control-previous" onclick="movePage(false);">Previous page</a>-->
+<!--                <a id="page-control-next" onclick="movePage(true);">Next page</a>-->
+<!--            </div>-->
         </div>
 
         <div id="dynamic-content">
@@ -89,9 +79,9 @@
                 {% endif %}
             </div>
         
-            <a id="main-view-toggle"></a>
+<!--            <a id="main-view-toggle"></a>-->
 
-            <a id="feed-toggle"></a>
+<!--            <a id="feed-toggle"></a>-->
 
             {% ifequal user.get_username 'AW' %}
                 <a id="teacher-toggle"></a>
@@ -103,9 +93,9 @@
                 <div id ="suggestion_text"></div>
             </div>
 
-            <div id="activity-index-view" class="main-view" style="display: none;">
-                {% include 'app/activityindex.html' %}
-            </div>
+<!--            <div id="activity-index-view" class="main-view" style="display: none;">-->
+<!--                {% include 'app/activityindex.html' %}-->
+<!--            </div>-->
 
 
             

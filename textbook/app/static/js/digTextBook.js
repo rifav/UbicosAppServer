@@ -3,7 +3,7 @@ var type = '' //card type
 var groupArray = ['A', 'B','C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 var activity_id
 var lastOpenedTool
-
+ var host_url = window.location.host
 
 window.onerror = function(message, file, line) {
   console.log('An error occured at line ' + line + ' of ' + file + ': ' + message);
@@ -17,13 +17,11 @@ window.onerror = function(message, file, line) {
     It is also used in:
     * activityindex.js
 */
+
 var NUM_PAGES = 18;
 
 
 $(function(){
-
-    //localStorage.clear();
-    var host_url = window.location.host
 
     $('.close-card').on('touch click', function(){
 
@@ -53,18 +51,17 @@ $(function(){
 
 
     //update activity feed with history of messages
-    loadFeed(0); //call function from activity.js //0 means all; 1 means todays chat
+    //call function from activity.js //0 means all; 1 means todays chat
+    loadFeed(0);
 
 
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
     loadPage(1, $('.page:not(.previous):not(.next)'));
-    loadPage(2, $('.page.next'));
+    //loadPage(2, $('.page.next'));
 
     // If we start loading the cards dynamically, this needs to be called after the brainstorm card is built
     setupBrainstorm();
-
-    loadActivityIndex();
 
     //toggle between activity feed and index
     $('#main-view-toggle').click(function(){
@@ -104,45 +101,37 @@ $(function(){
      });
 
 
-    //check localstorage - used for refresh
+//    //delete the followin if no error occurs or make it a separate function
+//
+//      if(localStorage.getItem("pageToBeRefreshed")){
+//
+//        var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
+//
+//        var gotoPage = pageToBeRefreshed;
+//        var container = $('#textbook-content');
+//
+//        // Update current page
+//        loadPage(
+//            gotoPage,
+//            $('.page:not(.previous):not(.next)'),
+//            function(){
+//                // Update container class if this is the last or the first page
+//                var containerClass = ''
+//                if(gotoPage == 1) containerClass = 'first';
+//                else if(gotoPage == NUM_PAGES) containerClass = 'last'; // NUM_PAGES is defined in digTtextBook.js
+//                container.attr('class',containerClass);
+//                // Change page number
+//                $("#page-control-number").text('Page ' + gotoPage + '/' + NUM_PAGES);
+//            });
+//        // Update previous and next
+//        loadPage(parseInt(gotoPage)+1, $('.page.next'));
+//        loadPage(gotoPage-1, $('.page.previous'));
+//
+//      }else{
+//
+//      }
 
-      if(localStorage.getItem("pageToBeRefreshed")){
 
-        var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
-
-        var gotoPage = pageToBeRefreshed;
-        var container = $('#textbook-content');
-
-        // Update current page
-        loadPage(
-            gotoPage,
-            $('.page:not(.previous):not(.next)'),
-            function(){
-                // Update container class if this is the last or the first page
-                var containerClass = ''
-                if(gotoPage == 1) containerClass = 'first';
-                else if(gotoPage == NUM_PAGES) containerClass = 'last'; // NUM_PAGES is defined in digTtextBook.js
-                container.attr('class',containerClass);
-                // Change page number
-                $("#page-control-number").text('Page ' + gotoPage + '/' + NUM_PAGES);
-            });
-        // Update previous and next
-        loadPage(parseInt(gotoPage)+1, $('.page.next'));
-        loadPage(gotoPage-1, $('.page.previous'));
-
-      }else{
-
-      }
-
-        //side navigation bar click events -- start
-        $('#right-side-menu').click(function(e){
-            $("#mySidenav").css("width", "250px");
-        });
-
-        $('.right-menu-closebtn').click(function(e){
-             $("#mySidenav").css("width", "0px");
-        });
-        //side navigation bar click events -- end
 
 
 });
@@ -385,30 +374,6 @@ var bindActivityButtons = function(){
             //update the heading in the card
             $('.card.' + type + ' h1').text(activityButton.attr('data-heading') + ' Group ' + groupArray[user_group_id-1]);
 
-           //get the data description from the <a> tag
-           //console.log(activityButton.attr('data-description'));
-
-            //update the description in the card
-           if(activityButton.attr('data-description')){
-                $('.card.' + type + ' p#gallery-description').text(activityButton.attr('data-description'));
-            }
-            else{
-                $('.card.' + type + ' p#gallery-description').text('Take a picture of your solution using "Open Camera". It will be downloaded to the "Downloads" folder. Upload the picture in your gallery.');
-            }
-
-            //update the submission heading
-            $('#gallery-group-heading').text('My Submissions')
-
-            //todo: clean up this part later
-            //highlight the all submission  button and unhighlight the my submission
-            $("#mySubmission").css('background-color', '#006600');
-            $("#groupSubmission").css('background-color', '#2DB872');
-
-            //since the card opens to my submission -- show user upload options
-            //display upload image from here
-             $('#gallery-user-submission').hide();
-             $('#add-new-gallery-post').show();
-
 
             //gallery 1 card stays open if explicitly not closed and you go to gallery 2.
             //with each click hide the single image view
@@ -492,12 +457,10 @@ var bindActivityButtons = function(){
 
 
     });
+
+
 };
 
-var loadActivityIndex = function(){
-    //TODO: call the parser here using ajax request, parse the files and build activity index
-
-}
 
 var card_extension = function(){
 

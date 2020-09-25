@@ -1,107 +1,59 @@
 
 $(function(){
 
-    // Move to a given page if header is clicked
-    $("#activity-index p, #activity-index ul li").click(function(){
-        // Get page number
-        console.log("clicked activity index header");
+        //side navigation bar click events -- start
+        $('#right-side-menu').click(function(e){
+            $("#mySidenav").css("width", "250px");
+        });
 
-        var header = $(this);
-        var gotoPage = parseInt(header.data('page'));
-        var container = $('#textbook-content');
-        
-        // Update current page
-        loadPage(
-            gotoPage, 
-            $('.page:not(.previous):not(.next)'),
-            function(){
-                // Update container class if this is the last or the first page
-                var containerClass = ''
-                if(gotoPage == 1) containerClass = 'first';
-                else if(gotoPage == NUM_PAGES) containerClass = 'last'; // NUM_PAGES is defined in digTtextBook.js
-                container.attr('class',containerClass);
-                // Change page number
-                $("#page-control-number").text('Page ' + gotoPage + '/' + NUM_PAGES);
-            });
+        $('.right-menu-closebtn').click(function(e){
+             $("#mySidenav").css("width", "0px");
+        });
 
-        localStorage.setItem("pageToBeRefreshed", gotoPage);
-        // Update previous and next
-        loadPage(gotoPage+1, $('.page.next'));
-        loadPage(gotoPage-1, $('.page.previous'));
-    });
+        $('.showGeneralLink').click(function (e) {
+                $(this).next('.general').toggle();
+                $(this).toggleClass('active').siblings().removeClass('active');
+                $("#mySidenav a.nav").removeClass('active');
 
-    $('#activity-index a').off().on('touch click', function(){
-
-        // Get button type to open appropriate view
-        //console.log('this', this)
-        //console.log('$(this)', $(this))
-
-        var activityButton = $(this);
-
-        //type of activity - gallery/brainstorm/video etc
-        var type = activityButton.attr('class').replace('activity-button','').trim();
-        console.log('type', type)
-
-        //id of each each activity - based on page no
-        var id = activityButton.attr('data-id');
-        console.log('id', id)
-
-        // Disable current card and enable new card
-        $('.card.active').removeClass('active');
-        $('.card.' + type).addClass('active');
-
-        // based on the activity type, update titles in html
-        $('.card.' + type + ' h1').text(type + ' #'+id); //update the title of each page
-
-        // TODO: make the following if dynamic
-        // if video tab is active get the video url and display in video.html
-        if($('.card.video').hasClass('active')){
-
-            var video_url = activityButton.attr('data-video-url');
-            console.log(video_url);
-            $('#videoFrame').attr('src', video_url); //display in video.html
-        }
-
-        // if gallery div is active, load the gallery
-        if($('.card.gallery').hasClass('active')){
-
-            // pass id to gallery activity - to upload image form in gallery.html
-            $('#upload-img input[name="act-id"]').attr('value', id)
-
-            var view = activityButton.attr('data-view');
-            console.log('view: ', view)
-
-            var number_of_group
-            if(view == 'group'){
-                number_of_group = activityButton.attr('data-group-number');
-               // console.log('number of group:' , number_of_group)
             }
+        );
+        $('.showWeek1Link').click(function (e) {
+                $(this).next('.week1').toggle();
+                $(this).toggleClass('active').siblings().removeClass('active');
+                 $("#mySidenav a.nav").removeClass('active');
 
-            //call function from gallery.js
-            viewDiv(view, number_of_group);
-        }
+            }
+        );
+        $('.showWeek2Link').click(function (e) {
+                $(this).next('.week2').toggle();
+                $(this).toggleClass('active').siblings().removeClass('active');
+                $("#mySidenav a.nav").removeClass('active');
 
+            }
+        );
+        $('.showWeek3Link').click(function (e) {
+                $(this).next('.week3').toggle();
+                $(this).toggleClass('active').siblings().removeClass('active');
+                 $("#mySidenav a.nav").removeClass('active');
+            }
+        );
 
-        if($('.card.multQues').hasClass('active')){
+        //side navigation bar click events -- end
 
-            //hide questions previously added in the DOM
-            $('.act2ques').hide()
+        //binding side navigation bar button actions
+        $('#mySidenav a.nav').off().on('touch click', function(){
 
-            //get which question is clicked and activate that div for question
-            var quesno = activityButton.attr('data-quesid');
-            $('div[data-quesno="'+quesno+'"]').show
+            //highlight one module one at a time within <ul> tag
+            //$(this).toggleClass('active').siblings().removeClass('active');
+            //remove all the active class so far
+            $("#mySidenav a.nav").not($(this)).removeClass('active');
+            $(this).toggleClass('active');
 
-            //TODO: call loadHTML() from here
+            var pageID = $(this).attr("data-pageId");
+            //second parameter doesn't matter in this version
+            loadPage(pageID, $('.page:not(.previous):not(.next)'));
 
-        }
+        });
 
-        if($('.card.brainstorm').hasClass('active')){
-            loadIdeaToWorkspace();
-        }
-
-        //user logging
-        enterLogIntoDatabase('click', type , 'none', 1111)
-
-   });
 })
 
