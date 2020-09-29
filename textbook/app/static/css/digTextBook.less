@@ -773,6 +773,13 @@ position: relative;
     padding: 1rem;
 }
 
+.chat_prompt_p {
+    position: fixed;
+    top: 4.5%;
+    z-index: 1;
+    font-size: smaller;
+}
+
 #activity-index {
     margin-top: 90px !important;
 
@@ -1966,3 +1973,87 @@ position: relative;
     background-color: #4CB7B7;
 }
 //first page left side menu bar related CSS -- end
+
+//personality question page css - start
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 90px;
+  height: 34px;
+}
+
+.switch input {display:none;}
+
+.response-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ca2222;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+
+}
+
+.response-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+
+}
+
+input:checked + .response-slider {
+  background-color: #2ab934;
+}
+
+input:focus + .response-slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .response-slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(55px);
+}
+
+.response-slider:after
+{
+ content:'NO';
+ color: white;
+ display: block;
+ position: absolute;
+ transform: translate(-50%,-50%);
+ top: 50%;
+ left: 50%;
+ font-size: 10px;
+ font-family: Verdana, sans-serif;
+}
+
+input:checked + .response-slider:after
+{
+  content:'YES';
+}
+
+
+/* Rounded sliders */
+.response-slider.round {
+  border-radius: 34px;
+}
+
+.response-slider.round:before {
+  border-radius: 50%;
+}
+
+
+//personality question page css - end
