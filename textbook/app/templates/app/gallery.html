@@ -1,41 +1,48 @@
 {% load static %}
 <div id="gallery-view">
 
+<!--    <div id="gallery-panel" class="gallery-panel">-->
+<!--         <h1></h1>-->
 
+<!--        <p id="gallery-description">-->
+<!--            Make at least one comment on each of the five images.-->
+<!--        </p>-->
 
-    <div id="gallery-panel" class="gallery-panel">
-         <h1></h1>
+<!--        <ul id="gallery">-->
+<!--            &lt;!&ndash;<li>&ndash;&gt;-->
+<!--                &lt;!&ndash;<img  src="https://tinyurl.com/y72rf9lz" alt="">&ndash;&gt;-->
+<!--                &lt;!&ndash;<span class="badge">3</span>&ndash;&gt;-->
+<!--            &lt;!&ndash;</li>&ndash;&gt;-->
+<!--        </ul>-->
 
-        <p id="gallery-description">
-            Make at least one comment on each of the five images.
-        </p>
+<!--    </div>-->
 
-        <ul id="gallery">
-            <!--<li>-->
-                <!--<img  src="https://tinyurl.com/y72rf9lz" alt="">-->
-                <!--<span class="badge">3</span>-->
-            <!--</li>-->
-        </ul>
-
-    </div>
-
-    <div id="single-image-view" class="gallery-panel" style="display:none">
+    <div id="single-image-view" class="gallery-panel">
         <div class="verticalDivider">
             <div id="row-left">
+                <h1>Gallery Name</h1>
+                <p id="gallery-description">
+                        Discuss about the images as a group.
+                </p>
                  <!--functionality defined in gallery.js; css defined in digTextBook.less-->
                 <div class="section">
 
-                    <a href="" class="previous-image"></a>
-                    <a href="" class="next-image"></a>
+<!--                    <a href="" class="previous-image"></a>-->
+<!--                    <a href="" class="next-image"></a>-->
+                    <img  src="{% static 'pics/default.png' %}" alt="">
+                    <span> Image upload by </span>
                     <!--<a href="#" class="gallery_image_user_name">here i am</a>-->
                     <input type="hidden" name="image-index" value=""/>
                     <input type="hidden" name="image-db-pk" value=""/>
                     <!--<div class = "posted_by_image"></div>-->
                 </div>
+                <div>
+
+                </div>
             </div>
 
             <div id="row-right">
-                <a id="backToGallery" href=""></a>
+<!--                <a id="backToGallery" href=""></a>-->
 <!--                 <div class="award-holder"   style="margin-left:0px;">-->
 <!--                    <div class = "badge-description">Testing</div>-->
 <!--                </div>-->

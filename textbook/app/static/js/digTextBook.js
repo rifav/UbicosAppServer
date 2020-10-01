@@ -378,35 +378,35 @@ var bindActivityButtons = function(){
             //gallery 1 card stays open if explicitly not closed and you go to gallery 2.
             //with each click hide the single image view
             $('#gallery-panel').show();
-            $('#single-image-view').hide();
+            //$('#single-image-view').hide();
 
 
-            var view = activityButton.attr('data-view');
-            console.log('view: ', view)
-
-            //call function from gallery.js
-            $("input[name='group-id']").attr('value', user_group_id);
-            viewDiv("class", user_group_id);
-
-            //indicate that its not a middleGroupDiscussion -- variable used to extract comments as needed
-            //defined in gallery.js (top)
-            middleGroupDiscussion = 'no';
-
-            //teacher-view handle
-            //TODO: Can transfar ajax request to gallery.js inside populate function
-            if(logged_in == 'AW'){
-                $(".teacher-view").css("display", "block");
-                 $.ajax({
-                    type:'GET',
-                    url:'http://'+ host_url +'/randomDiscussionList', //fetches number of groups
-                    async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
-                    success: function(e){
-
-                        console.log(e.list);
-                        populateTeacherViewDiv(e.list); //defined in gallery.js
-                    }
-                });
-            }
+//            var view = activityButton.attr('data-view');
+//            console.log('view: ', view)
+//
+//            //call function from gallery.js
+//            $("input[name='group-id']").attr('value', user_group_id);
+//            viewDiv("class", user_group_id);
+//
+//            //indicate that its not a middleGroupDiscussion -- variable used to extract comments as needed
+//            //defined in gallery.js (top)
+//            middleGroupDiscussion = 'no';
+//
+//            //teacher-view handle
+//            //TODO: Can transfar ajax request to gallery.js inside populate function
+//            if(logged_in == 'AW'){
+//                $(".teacher-view").css("display", "block");
+//                 $.ajax({
+//                    type:'GET',
+//                    url:'http://'+ host_url +'/randomDiscussionList', //fetches number of groups
+//                    async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
+//                    success: function(e){
+//
+//                        console.log(e.list);
+//                        populateTeacherViewDiv(e.list); //defined in gallery.js
+//                    }
+//                });
+//            }
 
             //if the card is already extended, put it back to normal -- we don't want to close the expansion for this card.
             //card_extension_close();

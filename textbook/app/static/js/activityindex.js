@@ -47,6 +47,8 @@ $(function(){
             var pageID = $(this).attr("data-pageId");
             //second parameter doesn't matter in this version
             loadPage(pageID, $('.page:not(.previous):not(.next)'));
+            //close the side navigation bar once a module is selected
+            $("#mySidenav").css("width", "0px");
 
         });
 
