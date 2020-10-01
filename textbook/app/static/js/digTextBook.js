@@ -85,20 +85,20 @@ $(function(){
             }
      });
 
-     $('#teacher-toggle').click(function() {
-            $(this).toggleClass('pressedf');
-            if ($(this).hasClass("pressedf")){
-                var conf = confirm("You are about to view student information, are you sure?!");
-                if(conf){
-                    window.location.href = "http://"+host_url+"/getDashboard";
-                }else{
-                    $(this).removeClass("pressedf");
-                }
-
-            }else{
-
-            }
-     });
+//     $('#teacher-toggle').click(function() {
+//            $(this).toggleClass('pressedf');
+//            if ($(this).hasClass("pressedf")){
+//                var conf = confirm("You are about to view student information, are you sure?!");
+//                if(conf){
+//                    window.location.href = "http://"+host_url+"/getDashboard";
+//                }else{
+//                    $(this).removeClass("pressedf");
+//                }
+//
+//            }else{
+//
+//            }
+//     });
 
 
 //    //delete the followin if no error occurs or make it a separate function
@@ -137,62 +137,62 @@ $(function(){
 });
 
 
-var movePage = function(moveToNext){
-
-    var container = $('#textbook-content'),
-        pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
-        pageToShow, // This is the page that will be shown next
-        pageToReplace, // this is the page whose content will need to be updated
-        currentNewClass, // this is the new class that will be applied to the current page
-        currentPageNum, // Page number of the page that will be shown
-        replacePageNum, // Number of the new page to be dynamically loaded
-        noMoreClass; // Class that will be added to container if 
-    if(moveToNext === true){
-        pageToShow = $('.page.next', container);
-        pageToReplace = $('.page.previous', container);
-        currentNewClass = 'previous';
-        replaceNewClass = 'next';
-        currentPageNum = parseInt(pageToShow.data('page'));
-        replacePageNum = currentPageNum + 1;
-        noMoreClass = 'last';
-    } else {
-        pageToShow = $('.page.previous', container);
-        pageToReplace = $('.page.next', container);
-        currentNewClass = 'next';
-        replaceNewClass = 'previous';
-        currentPageNum = parseInt(pageToShow.data('page'));
-        replacePageNum = currentPageNum - 1;
-        noMoreClass = 'first';
-    }
-
-    // Replace page number
-    //console.log("current page", currentPageNum)
-    current_pagenumber = currentPageNum
-    localStorage.setItem("pageToBeRefreshed", currentPageNum);
-    $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
-
-
-    //close any card with page navigation
-    if(type!=''){
-        $('.card.' + type).removeClass('active');
-    }
-
-    // Do swaps
-    pageToHide.attr('class','page').addClass(currentNewClass); // Turn the current page into either next or previous
-    pageToShow.attr('class','page');
-    pageToReplace.attr('class','page').addClass(replaceNewClass);
-
-    // Replace page to replace content
-    loadPage(
-        replacePageNum, 
-        pageToReplace, 
-        function(){
-            container.attr('class','');
-        },
-        function(){
-            container.attr('class', noMoreClass);
-        });
-};
+//var movePage = function(moveToNext){
+//
+//    var container = $('#textbook-content'),
+//        pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
+//        pageToShow, // This is the page that will be shown next
+//        pageToReplace, // this is the page whose content will need to be updated
+//        currentNewClass, // this is the new class that will be applied to the current page
+//        currentPageNum, // Page number of the page that will be shown
+//        replacePageNum, // Number of the new page to be dynamically loaded
+//        noMoreClass; // Class that will be added to container if
+//    if(moveToNext === true){
+//        pageToShow = $('.page.next', container);
+//        pageToReplace = $('.page.previous', container);
+//        currentNewClass = 'previous';
+//        replaceNewClass = 'next';
+//        currentPageNum = parseInt(pageToShow.data('page'));
+//        replacePageNum = currentPageNum + 1;
+//        noMoreClass = 'last';
+//    } else {
+//        pageToShow = $('.page.previous', container);
+//        pageToReplace = $('.page.next', container);
+//        currentNewClass = 'next';
+//        replaceNewClass = 'previous';
+//        currentPageNum = parseInt(pageToShow.data('page'));
+//        replacePageNum = currentPageNum - 1;
+//        noMoreClass = 'first';
+//    }
+//
+//    // Replace page number
+//    //console.log("current page", currentPageNum)
+//    current_pagenumber = currentPageNum
+//    localStorage.setItem("pageToBeRefreshed", currentPageNum);
+//    $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
+//
+//
+//    //close any card with page navigation
+//    if(type!=''){
+//        $('.card.' + type).removeClass('active');
+//    }
+//
+//    // Do swaps
+//    pageToHide.attr('class','page').addClass(currentNewClass); // Turn the current page into either next or previous
+//    pageToShow.attr('class','page');
+//    pageToReplace.attr('class','page').addClass(replaceNewClass);
+//
+//    // Replace page to replace content
+//    loadPage(
+//        replacePageNum,
+//        pageToReplace,
+//        function(){
+//            container.attr('class','');
+//        },
+//        function(){
+//            container.attr('class', noMoreClass);
+//        });
+//};
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
     //console.log('next page (loadPage Function)', pageNum)
@@ -257,7 +257,7 @@ var bindActivityButtons = function(){
         var id = activityButton.attr('data-id');
         console.log('activity id::', id)
 
-        //activity_id = id; //passing it to teacherindex.js
+        //individual_act_id = id; //passing it to individual_gallery.js
 
         // Disable current card and enable new card
         $('.card.active').removeClass('active');
@@ -327,9 +327,8 @@ var bindActivityButtons = function(){
              //if the card is already extended, put it back to normal
              card_extension_close();
 
-             //TODO Fix with correct id values
-             $('#upload-img input[name="act-id"]').attr('value', 1);
-             $("input[name='group-id']").attr('value', 1);
+             $('#upload-img input[name="act-id"]').attr('value', id);
+             $("input[name='group-id']").attr('value', 1); //TODO automate in the backend
 
              //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
              $('img#default').attr('src', API_URL.picsBase + "/default.png");
@@ -341,8 +340,11 @@ var bindActivityButtons = function(){
 
          if($('.card.individual').hasClass('active')){
 
-             //if the card is already extended, put it back to normal
+            //if the card is already extended, put it back to normal
             card_extension_close();
+
+            //when a user opens this card, load with appropriate images and comments wrt the current user
+            loadIndividualFeed(id);
 
         }
 //       ------------------------------ GALLERY (group discussion) -----------------------

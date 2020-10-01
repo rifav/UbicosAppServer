@@ -3,10 +3,6 @@ from django.conf import settings
 import jsonfield
 
 # Create your models here.
-class ActivityIndex(models.Model):
-    page_number = models.IntegerField()
-    activity_type = models.CharField(max_length=40)
-
 
 class imageModel(models.Model):
 
@@ -36,18 +32,21 @@ class imageComment(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
-class khanAcademyAnswer(models.Model):
-    ka_id = models.IntegerField()
-    ka_image = models.ImageField(upload_to='ka_images')
-    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    posted_at = models.DateTimeField(auto_now_add=True)
-    response_type = models.CharField(max_length=20)
-    response = models.CharField(max_length=2000)
-
-    def natural_key(self):
-        return (self.posted_by.username)
+# delete the following method
+# class khanAcademyAnswer(models.Model):
+#     ka_id = models.IntegerField()
+#     ka_image = models.ImageField(upload_to='ka_images')
+#     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+#     posted_at = models.DateTimeField(auto_now_add=True)
+#     response_type = models.CharField(max_length=20)
+#     response = models.CharField(max_length=2000)
+#
+#     def natural_key(self):
+#         return (self.posted_by.username)
 
 # activity feed message
+
+#rename the following method for clarification
 class Message(models.Model):
     content = models.CharField(max_length=400)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -56,12 +55,12 @@ class Message(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+
 class badgeModel(models.Model):
     userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.CharField(max_length=400)
     badgeType = models.CharField(max_length=400)
     platform = models.CharField(max_length=10)
-
 
     def natural_key(self):
         return (self.userid.username)
@@ -92,7 +91,6 @@ class userQuesAnswerTable(models.Model):
 
 #temp solution for pilot-1 -- start
 class groupInfo(models.Model):
-    activityType = models.CharField(max_length=20)
     activityID = models.IntegerField(null=True)
     group = models.IntegerField(null=True)
     users = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

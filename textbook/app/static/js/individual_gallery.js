@@ -1,39 +1,59 @@
 var host_url = window.location.host
 
 $(function(){
-    loadIndividualFeed();
+
 });
 
+//call this function when individual comment is loaded for a particular number of activity
+var loadIndividualFeed = function(act_id) {
+//    //this method will load images from the current users' group members uploaded photo
+//    //the messages associated with each photo is only visible to the current student
+
+//      steps to be implemented
+//      1. get the current users group-mate info -- done in the server side
+//      2. make a query to retrieve the images and send back to the client side -- done
+//      3. display the images -- done
+//      4. setup commenting and display [only visible to the current user] --TODO
+        $.ajax({
+            type:'GET',
+            url:'http://'+ host_url +'/getIndividualImages/'+act_id,
+            async: false, //wait for ajax call to finish
+            success: function(data){
+                data = JSON.parse(data.imageData);
+                //console.log(data)
+                //console.log(data[0].fields['gallery_id']);
+
+                //loop through the data to access each image
+                $.each(data, function(key, value){
+                    image_src = value.fields['image'];
+                    image_posted_by = value.fields['posted_by'];
+                    var id=key+1;
+                    $('#slide-'+id).find('img').attr('src','/media/'+image_src);
+                    //TODO: display who posted the image
+
+                    //hovering the image
+                    $('#slide-'+id+' img').hover(function(){
+                        $(this).css({ "-webkit-transform": "scale(1.2)",
+                               "transform":"scale(1.2) " ,
+                               "transition":"transform 0.25s ease"
+                               });
+                        }, function(){ //remove hovering effect
+                            $(this).css({ "-webkit-transform": "scale(1)",
+                                   "transform":"scale(1)" ,
+                                   "transition":"transform 0.25s ease"});
+                        });
+
+                      //  TODO  display the comment for each image part:
 
 
-function loadIndividualFeed(){
+                });
 
-//    //this part of the code shows messages instantly when a message is posted.
-//    //initiate puhser with your application key
-//    var pusher = new Pusher('ea517de8755ddb1edd03',{
-//      cluster: 'us2',
-//      encrypted: true
-//    });
-//
-//    //subscribe to the channel you want to listen to
-//    var my_channel = pusher.subscribe('a_channel');
-//
-//    //wait for an event to be triggered in that channel
-//    my_channel.bind("an_event", function (data) {
-//
-//        var logged_in = ''
-//
-//        //get the logged in user
-//        $.ajax({
-//            type:'GET',
-//            url:'http://'+ host_url +'/getUsername/',
-//            async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
-//            success: function(e){
-//                logged_in  = e.name
-//                //console.log('logged in username (inside) :: ', logged_in)
-//            }
-//        })
-//
+            }
+        })
+
+} //end of loadIndividualFeed method
+
+
 //        //  add in the thread itself
 //        var li = $("<li/>").appendTo("#activity-feed");
 //
@@ -67,21 +87,21 @@ function loadIndividualFeed(){
 //
 //    });
 
-
-    //add event listener to the chat button click
-    $("#ind-msg-send-btn").off().on('click', function(e){
-        e.preventDefault();
-        //postIndMessage();
-        alert($("input[name='ind-msg-text']").val());
-    });
-    $('#msg-text').off().on('keypress', function (e) {
-        if (e.which == 13) {
-          postMessage();
-          return false;
-        }
-      });
-
-}
+//
+//    //add event listener to the chat button click
+//    $("#ind-msg-send-btn").off().on('click', function(e){
+//        e.preventDefault();
+//        //postIndMessage();
+//        alert($("input[name='ind-msg-text']").val());
+//    });
+//    $('#msg-text').off().on('keypress', function (e) {
+//        if (e.which == 13) {
+//          postMessage();
+//          return false;
+//        }
+//      });
+//
+//}
 
 function postIndMessage(){
 
@@ -175,11 +195,3 @@ function loadFeed(type){
         });
 }
 
-//TODO: move to general js file: add action related to message hover.
-function messageHover(){
-    $("ul.feed").on('mouseenter', 'li p', function(){
-       //add action here
-    }).on('mouseleave', function(){
-       //add action here
-    });
-}

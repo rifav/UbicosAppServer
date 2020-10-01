@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, Message, brainstormNote,userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, khanAcademyAnswer, random_group_users, badgeModel
+    userQuesAnswerTable, groupInfo, userLogTable, random_group_users, badgeModel
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -86,12 +86,6 @@ def broadcastBrainstormNote(request):
 
 
 #in the browser: http://127.0.0.1:8000/app/
-def getUsername(request):
-    if request.user.is_authenticated:
-        print('username :: ', request.user.get_username())
-        username = request.user.get_username();
-        return JsonResponse({'name': username, 'errorMsg': True})
-
 @login_required
 def index(request):
     if request.user.is_authenticated:
@@ -100,12 +94,6 @@ def index(request):
         # if request.user.get_username() == 'AW':
         #     return render(request, 'app/teacherindex.html')
         # else: return render(request, 'app/index.html')
-
-
-
-# def activityList(request):
-#     activities = ActivityIndex.objects.all();
-#     return render(request, 'app/index.html',  {'activities': activities})
 
 def login_form(request):
     return render(request, 'app/login.html',{})
@@ -153,7 +141,7 @@ def uploadImage(request):
         gallery_id = request.POST.get('act-id')
         print('gallery_id :: ', gallery_id)
 
-        #get the group ID
+        #get the student group ID
         group_id = request.POST.get('group-id')
         print('group_id :: ', group_id)
 
@@ -208,33 +196,80 @@ def uploadImage(request):
 
         return JsonResponse({'success': image_data, 'errorMsg': True})
 
-def uploadKAImage(request):
-    #get image from html and save it in the database
-    if request.method == "POST":
-        # print (request.Files) #gives the name of the <input type='file' name...>
+# call from individual_gallery.js
+def getIndividualImages(request, act_id):
+    #get the group members of the current users
+    member_list = getGroupMembers(request, act_id);
+    print("getIndividualImages member list:: ", member_list);
+    #retrieve images from Image Model for each user in member_list
+    images = imageModel.objects.filter(posted_by_id__in=member_list)
+    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
+    #print('line 205', image_data)
 
-        #get the KA ID
-        ka_id = request.POST.get('ka-act-id');
+    return JsonResponse({'imageData': image_data})
 
-        #get the logged in username
-        username = ''
-        if request.user.is_authenticated:
-            print('username :: ', request.user.get_username())
-            username = request.user.get_username();
-        else:
-            print('user not signed in') #add in log
 
-        #insert values in the database
-        ka_image_upload = khanAcademyAnswer(ka_id=ka_id, ka_image=request.FILES['ka_img_name'], posted_by=request.user);
-        # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
-        ka_image_upload.save();
+## handler methods start
+def getUsername(request):
+    if request.user.is_authenticated:
+        print('def GetUsername method -- username :: ', request.user.get_username())
+        username = request.user.get_username();
+        return JsonResponse({'name': username, 'errorMsg': None})
 
-        latest_upload = khanAcademyAnswer.objects.filter(ka_id=ka_id).last()
-        #https://stackoverflow.com/questions/16640021/django-object-is-not-iterable-using-serializers-serialize
-        ka_img = serializers.serialize('json', [latest_upload], use_natural_foreign_keys=True)
-        #print(latest_upload.pk)
+# input: activity ID
+# output: the group ID of the current user for the given activity ID
+def getGroupID(request, act_id):
+    groupID = groupInfo.objects.all().filter(activityID = act_id)
+    groupID = groupID.filter(users_id = request.user)
 
-        return JsonResponse({'ka_imgID': latest_upload.pk, 'ka_img':ka_img})
+    return groupID[0].group;
+
+#input: activity ID
+#output: return the ID of the group members of the current user for the given activity
+def getGroupMembers(request, act_id):
+    # what is the group number of the current user in a particular activity
+    current_user_groupID = getGroupID(request, act_id);
+
+    # which users are are there in this group
+    group_members = groupInfo.objects.all().filter(activityID=act_id, group=current_user_groupID);
+
+    group_member_list = [];
+    for member in group_members:
+        group_member_list.append(member.users_id);
+
+    return group_member_list;
+
+## handler methods end
+
+
+# delete the following method
+# def uploadKAImage(request):
+#     #get image from html and save it in the database
+#     if request.method == "POST":
+#         # print (request.Files) #gives the name of the <input type='file' name...>
+#
+#         #get the KA ID
+#         ka_id = request.POST.get('ka-act-id');
+#
+#         #get the logged in username
+#         username = ''
+#         if request.user.is_authenticated:
+#             print('username :: ', request.user.get_username())
+#             username = request.user.get_username();
+#         else:
+#             print('user not signed in') #add in log
+#
+#         #insert values in the database
+#         ka_image_upload = khanAcademyAnswer(ka_id=ka_id, ka_image=request.FILES['ka_img_name'], posted_by=request.user);
+#         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
+#         ka_image_upload.save();
+#
+#         latest_upload = khanAcademyAnswer.objects.filter(ka_id=ka_id).last()
+#         #https://stackoverflow.com/questions/16640021/django-object-is-not-iterable-using-serializers-serialize
+#         ka_img = serializers.serialize('json', [latest_upload], use_natural_foreign_keys=True)
+#         #print(latest_upload.pk)
+#
+#         return JsonResponse({'ka_imgID': latest_upload.pk, 'ka_img':ka_img})
 
 def getImage(request, view_id, gallery_id,group_id):
 
@@ -395,192 +430,192 @@ def submitAnswer(request):
 
     return HttpResponse('')
 
-def submitKAAnswer(request):
-    #check if any query present for that KA
-
-    #TODO: try update_or_create method
-    if khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).exists():
-
-        khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).\
-            update(response_type=request.POST.get('response_type'),response=request.POST.get('answer'))
-
-    #     khanAcademyAnswer.objects.filter(ka_id=request.POST.get('id')).filter(response_type=request.POST.get('response_type')).update(response=request.POST.get('answer'))
-    # else:
-    #     ka_answer = khanAcademyAnswer(ka_id=request.POST.get('id'), response_type=request.POST.get('response_type'), response=request.POST.get('answer'), posted_by = request.user)
-    #     ka_answer.save()
-
-    return HttpResponse('from server')
-
-
-
-def checkKAAnswer(request, ka_id):
-
-    try:
-        #if multiple image with same ka activity id, pull the latest one
-        ka_obj = khanAcademyAnswer.objects.filter(ka_id=ka_id).filter(posted_by=request.user).order_by('-pk')[:1];
-        ka_obj = serializers.serialize('json', ka_obj, use_natural_foreign_keys=True)
-        print(ka_obj)
-    except imageModel.DoesNotExist:
-        ka_obj = None
-
-    return JsonResponse({'success': ka_obj})
-
-
-def random_discussion_group_generator(request):
-
-    #delete previoud grouping - if any
-    random_group_users.objects.all().delete();
-
-    #TODO: username and user face to face group number array
-    self = None;
-    all_group_list  = randomGroupGenerator.creategroup(self)
-    for i in range(1,4):
-        #iterate through the list of lists
-        for list in  all_group_list:
-            print(list)
-
-            #get user for username=AW
-            teacher_user = User.objects.get(username='AW')
-            #iterate through the list and make entry
-
-            for g in list:
-                user =  User.objects.get(username=g)
-                print(user)
-                group_member = random_group_users(users=user, gallery_id = i, group=all_group_list.index(list)+1) #plus 1 so the group number starts from 1 instead of 0
-                group_member.save();
-
-                #add amanda in every group
-            group_member = random_group_users(users=teacher_user, gallery_id = i, group=all_group_list.index(list)+1)
-            group_member.save();
-
-
-    # for i in range(1, 7): #6 galleries, so upto 7
-    #     users_list = [str(user) for user in User.objects.all()];
-    #     users_list = [n for n in users_list if n not in ['AW', 'user1', 'user2']]
-    #     print(users_list)
-    #     member_limit = 5;
-    #
-    #     users_list_copy = users_list
-    #     group_list = []
-    #     while len(users_list_copy) > 0:  # use all users
-    #         if (len(users_list_copy) < member_limit):
-    #             used_users = users_list_copy
-    #             username_list_2 = [n for n in users_list_copy if n not in used_users]
-    #             group_list.append(used_users)
-    #             #print('groups:: ', used_users)
-    #             break
-    #         used_users = random.sample(users_list_copy, member_limit)
-    #         group_list.append(used_users)
-    #         #print('groups:: ', used_users)
-    #         users_list_copy = [n for n in users_list_copy if n not in used_users]
-    #         #print(users_list_copy)
-    #
-    #     #print(group_list)
-    #
-    #     #get user for username=AW
-    #     teacher_user = User.objects.get(username='AW')
-    #     #iterate through the list and make entry
-    #     for group_index in range(len(group_list)):
-    #         group = group_list[group_index]
-    #         for g in group:
-    #             user =  User.objects.get(username=g)
-    #             print(user)
-    #             group_member = random_group_users(users=user, gallery_id = i, group=group_index+1) #plus 1 so the group number starts from 1 instead of 0
-    #             group_member.save();
-    #
-    #         #add amanda in every group
-    #         group_member = random_group_users(users=teacher_user, gallery_id = i, group=group_index+1)
-    #         group_member.save();
-
-    #end of for loop
-    return HttpResponse('')
-
-    # # check if a user has joined a group or not; if not add him in a group if group has still empty place
-    # # https://stackoverflow.com/questions/3090302/how-do-i-get-the-object-if-it-exists-or-none-if-it-does-not-exist
-    # try:
-    #     isUserPresent = random_group_users.objects.get(users_id=request.user)
-    #     print('inside try', isUserPresent)
-    #     return HttpResponse('unable to join the group, already joined a group')
-    # except random_group_users.DoesNotExist:
-    #     print('inside except')
-    #     isUserPresent = None
-    #     # count total number of members in the group
-    #     member_count = random_group_users.objects.filter(group='A').count()
-    #     print('total member count', member_count)
-    #     if member_count < 6: #allows 6 members
-    #         group_member = random_group_users(users = request.user, group='A')
-    #         group_member.save();
-    #         return HttpResponse('successfully joined the group')
-    #     else:
-    #         return HttpResponse('unable to join the group, group exceeded 6 members')
-
-# called from gallery.js
-def  getMediumGroupDiscussion(request):
-
-    gallery_id = request.POST.get('gallery_id');
-
-    #first filter based on gallery since each gallery has different random group
-    random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-
-    #get in which middle group for current user
-    middlegroup_id = random_users_based_on_gallery.get(users_id=request.user).group #get the query first and access the group from that query
-
-    image_data_all = aux_method_get_img_random_list_group(middlegroup_id, gallery_id)
-
-    return JsonResponse({'success': image_data_all})
-
-def getRandomListData(request, gallery_id,group_id):
-
-    image_data_all = aux_method_get_img_random_list_group(group_id, gallery_id)
-
-    return JsonResponse({'success': image_data_all})
-
-def aux_method_get_img_random_list_group(middlegroup_id, gallery_id):
-
-    # first filter based on gallery since each gallery has different random group
-    random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-
-    # find other users in this group
-    middlegroup_users = random_users_based_on_gallery.filter(group=middlegroup_id)
-    for o in middlegroup_users: print(o.users_id)
-
-    # get their original group from groupinfo table
-    image_data_all = []
-    originalgroup_list = []
-    for o in middlegroup_users:
-        group_id = groupInfo.objects.filter(users_id=User.objects.get(pk=o.users_id)).order_by('group').values('group').distinct()[0]['group']
-
-        originalgroup_list.append(group_id);
-
-    # if same id twice -- image is displayed twice -- so get the distinct IDs of the image e.g., [7,7,1,4]
-    originalgroup_list = list(set(originalgroup_list))
-    print(originalgroup_list)
-
-    for oid in originalgroup_list:
-        #for each original group id get the image posted by that group - there should one image per group atleast
-        images = imageModel.objects.filter(gallery_id=gallery_id)
-        images = images.filter(group_id=oid)
-
-        image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
-        image_data_all.append(image_data)
-
-
-    print(image_data_all)
-
-    return image_data_all
-
-# check random_group_users table for distinct group numbers, converts the query into list
-# returns the list of groups
-# called from digTextbook.js
-def randomDiscussionList(request):
-    #get total groups
-    middlegroup_id = random_group_users.objects.values('group').distinct()
-
-    #convert query into list
-    middlegroup_id_list = [int(q["group"]) for q in middlegroup_id]
-    print('randomDiscussionList method: ', middlegroup_id_list)
-
-    return JsonResponse({'list': middlegroup_id_list})
+# def submitKAAnswer(request):
+#     #check if any query present for that KA
+#
+#     #TODO: try update_or_create method
+#     if khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).exists():
+#
+#         khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).\
+#             update(response_type=request.POST.get('response_type'),response=request.POST.get('answer'))
+#
+#     #     khanAcademyAnswer.objects.filter(ka_id=request.POST.get('id')).filter(response_type=request.POST.get('response_type')).update(response=request.POST.get('answer'))
+#     # else:
+#     #     ka_answer = khanAcademyAnswer(ka_id=request.POST.get('id'), response_type=request.POST.get('response_type'), response=request.POST.get('answer'), posted_by = request.user)
+#     #     ka_answer.save()
+#
+#     return HttpResponse('from server')
+#
+#
+#
+# def checkKAAnswer(request, ka_id):
+#
+#     try:
+#         #if multiple image with same ka activity id, pull the latest one
+#         ka_obj = khanAcademyAnswer.objects.filter(ka_id=ka_id).filter(posted_by=request.user).order_by('-pk')[:1];
+#         ka_obj = serializers.serialize('json', ka_obj, use_natural_foreign_keys=True)
+#         print(ka_obj)
+#     except imageModel.DoesNotExist:
+#         ka_obj = None
+#
+#     return JsonResponse({'success': ka_obj})
+#
+#
+# def random_discussion_group_generator(request):
+#
+#     #delete previoud grouping - if any
+#     random_group_users.objects.all().delete();
+#
+#     #TODO: username and user face to face group number array
+#     self = None;
+#     all_group_list  = randomGroupGenerator.creategroup(self)
+#     for i in range(1,4):
+#         #iterate through the list of lists
+#         for list in  all_group_list:
+#             print(list)
+#
+#             #get user for username=AW
+#             teacher_user = User.objects.get(username='AW')
+#             #iterate through the list and make entry
+#
+#             for g in list:
+#                 user =  User.objects.get(username=g)
+#                 print(user)
+#                 group_member = random_group_users(users=user, gallery_id = i, group=all_group_list.index(list)+1) #plus 1 so the group number starts from 1 instead of 0
+#                 group_member.save();
+#
+#                 #add amanda in every group
+#             group_member = random_group_users(users=teacher_user, gallery_id = i, group=all_group_list.index(list)+1)
+#             group_member.save();
+#
+#
+#     # for i in range(1, 7): #6 galleries, so upto 7
+#     #     users_list = [str(user) for user in User.objects.all()];
+#     #     users_list = [n for n in users_list if n not in ['AW', 'user1', 'user2']]
+#     #     print(users_list)
+#     #     member_limit = 5;
+#     #
+#     #     users_list_copy = users_list
+#     #     group_list = []
+#     #     while len(users_list_copy) > 0:  # use all users
+#     #         if (len(users_list_copy) < member_limit):
+#     #             used_users = users_list_copy
+#     #             username_list_2 = [n for n in users_list_copy if n not in used_users]
+#     #             group_list.append(used_users)
+#     #             #print('groups:: ', used_users)
+#     #             break
+#     #         used_users = random.sample(users_list_copy, member_limit)
+#     #         group_list.append(used_users)
+#     #         #print('groups:: ', used_users)
+#     #         users_list_copy = [n for n in users_list_copy if n not in used_users]
+#     #         #print(users_list_copy)
+#     #
+#     #     #print(group_list)
+#     #
+#     #     #get user for username=AW
+#     #     teacher_user = User.objects.get(username='AW')
+#     #     #iterate through the list and make entry
+#     #     for group_index in range(len(group_list)):
+#     #         group = group_list[group_index]
+#     #         for g in group:
+#     #             user =  User.objects.get(username=g)
+#     #             print(user)
+#     #             group_member = random_group_users(users=user, gallery_id = i, group=group_index+1) #plus 1 so the group number starts from 1 instead of 0
+#     #             group_member.save();
+#     #
+#     #         #add amanda in every group
+#     #         group_member = random_group_users(users=teacher_user, gallery_id = i, group=group_index+1)
+#     #         group_member.save();
+#
+#     #end of for loop
+#     return HttpResponse('')
+#
+#     # # check if a user has joined a group or not; if not add him in a group if group has still empty place
+#     # # https://stackoverflow.com/questions/3090302/how-do-i-get-the-object-if-it-exists-or-none-if-it-does-not-exist
+#     # try:
+#     #     isUserPresent = random_group_users.objects.get(users_id=request.user)
+#     #     print('inside try', isUserPresent)
+#     #     return HttpResponse('unable to join the group, already joined a group')
+#     # except random_group_users.DoesNotExist:
+#     #     print('inside except')
+#     #     isUserPresent = None
+#     #     # count total number of members in the group
+#     #     member_count = random_group_users.objects.filter(group='A').count()
+#     #     print('total member count', member_count)
+#     #     if member_count < 6: #allows 6 members
+#     #         group_member = random_group_users(users = request.user, group='A')
+#     #         group_member.save();
+#     #         return HttpResponse('successfully joined the group')
+#     #     else:
+#     #         return HttpResponse('unable to join the group, group exceeded 6 members')
+#
+# # called from gallery.js
+# def  getMediumGroupDiscussion(request):
+#
+#     gallery_id = request.POST.get('gallery_id');
+#
+#     #first filter based on gallery since each gallery has different random group
+#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
+#
+#     #get in which middle group for current user
+#     middlegroup_id = random_users_based_on_gallery.get(users_id=request.user).group #get the query first and access the group from that query
+#
+#     image_data_all = aux_method_get_img_random_list_group(middlegroup_id, gallery_id)
+#
+#     return JsonResponse({'success': image_data_all})
+#
+# def getRandomListData(request, gallery_id,group_id):
+#
+#     image_data_all = aux_method_get_img_random_list_group(group_id, gallery_id)
+#
+#     return JsonResponse({'success': image_data_all})
+#
+# def aux_method_get_img_random_list_group(middlegroup_id, gallery_id):
+#
+#     # first filter based on gallery since each gallery has different random group
+#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
+#
+#     # find other users in this group
+#     middlegroup_users = random_users_based_on_gallery.filter(group=middlegroup_id)
+#     for o in middlegroup_users: print(o.users_id)
+#
+#     # get their original group from groupinfo table
+#     image_data_all = []
+#     originalgroup_list = []
+#     for o in middlegroup_users:
+#         group_id = groupInfo.objects.filter(users_id=User.objects.get(pk=o.users_id)).order_by('group').values('group').distinct()[0]['group']
+#
+#         originalgroup_list.append(group_id);
+#
+#     # if same id twice -- image is displayed twice -- so get the distinct IDs of the image e.g., [7,7,1,4]
+#     originalgroup_list = list(set(originalgroup_list))
+#     print(originalgroup_list)
+#
+#     for oid in originalgroup_list:
+#         #for each original group id get the image posted by that group - there should one image per group atleast
+#         images = imageModel.objects.filter(gallery_id=gallery_id)
+#         images = images.filter(group_id=oid)
+#
+#         image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
+#         image_data_all.append(image_data)
+#
+#
+#     print(image_data_all)
+#
+#     return image_data_all
+#
+# # check random_group_users table for distinct group numbers, converts the query into list
+# # returns the list of groups
+# # called from digTextbook.js
+# def randomDiscussionList(request):
+#     #get total groups
+#     middlegroup_id = random_group_users.objects.values('group').distinct()
+#
+#     #convert query into list
+#     middlegroup_id_list = [int(q["group"]) for q in middlegroup_id]
+#     print('randomDiscussionList method: ', middlegroup_id_list)
+#
+#     return JsonResponse({'list': middlegroup_id_list})
 
 
 # projection gallery dashboard
@@ -968,49 +1003,6 @@ def createUser(request):
 
     return HttpResponse('')
 
-#temp solution for pilot-1 -- start
-def groupAdd(request):
-
-    users_list = [str(user) for user in User.objects.all()]
-    print(len(users_list))
-
-    usernames_array = ["giraffe", "raccoon", "ant", "tiger", "sheep", "deer", "panda", "liger", "fox", "hippo", "alligator",
-                       "dog", "dolphin", "eagle", "zebra", "rabbit", "bear","monkey", "leopard", "frog", "squirrel", "elephant", "bee",
-                       "duck", "kangaroo", "penguin", "fish","bat", "lion", "AW", "user1", "user2"];
-
-
-    # for username in users_list:
-    #     print(usernames_array.index(username))
-
-    username_groupID = ['1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4', '5', '5', '5', '6', '6', '6','7', '7',
-                        '7', '8', '8', '8', '9', '9', '9','10', '10', '10', '11', '11', '11']
-
-    for i in range(len(usernames_array)):
-        print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
-
-
-    # 4 gallery activities so range is from 1 to 5 (first study)
-    # 6 gallery activities so range is from 1 to 7 (second study)
-
-    for username in users_list:
-        for i in range(1, 7):
-            member = groupInfo(activityType='gallery', activityID=i, group=username_groupID[usernames_array.index(username)],
-                               users=User.objects.get(username=username))
-            member.save();
-
-    return HttpResponse('')
-
-def getGroupID(request, act_id):
-    print('line 384 From server activity id', act_id)
-    groupID = groupInfo.objects.all().filter(activityID = act_id)
-    print('from server group id', groupID[0].group)
-    groupID = groupID.filter(users_id = request.user)
-    print(type(groupID))
-    print('line 358',groupID[0].group)
-
-    return HttpResponse(groupID[0].group)
-
-# temp solution for pilot-1 -- end
 
 def camera(request):
     return render(request, 'app/camera.html', {})
@@ -1047,7 +1039,7 @@ def userLogFromExtenstion(request):
 
 # hacks - start
 
-
+#if this method is called with users already existing in the database, will return a django error message
 def createBulkUser(request):
 
     # 29 user for the study + 3 user
@@ -1142,6 +1134,32 @@ def createBulkUser(request):
     user = User.objects.create_user('user2', '', 'user2');
     user.save();
 
+
+    return render(request, 'app/login.html', {})
+
+def groupAdd(request):
+
+    users_list = [str(user) for user in User.objects.all()]
+    print(len(users_list))
+
+    usernames_array = ["giraffe", "raccoon", "ant", "tiger", "sheep", "deer", "panda", "liger", "fox", "hippo", "alligator",
+                       "dog", "dolphin", "eagle", "zebra", "rabbit", "bear","monkey", "leopard", "frog", "squirrel", "elephant", "bee",
+                       "duck", "kangaroo", "penguin", "fish","bat", "lion", "AW", "user1", "user2"];
+
+    username_groupID = ['1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4', '5', '5', '5', '6', '6', '6','7', '7',
+                        '7', '8', '8', '8', '9', '9', '9','10', '10', '10', '11', '11', '11']
+
+    # for i in range(len(usernames_array)):
+    #     print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
+    #
+
+    #rangeVal = total number of unique gallery activities
+    rangeVal = 4;
+    for username in users_list:
+        for i in range(1, rangeVal):
+            member = groupInfo(activityID=i, group=username_groupID[usernames_array.index(username)],
+                               users=User.objects.get(username=username))
+            member.save();
 
     return HttpResponse('')
 
