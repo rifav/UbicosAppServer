@@ -2,7 +2,7 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response
 from rest_framework.views import APIView
-from .models import imageModel, imageComment, Message, brainstormNote,userLogTable, tableChartData, \
+from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
     userQuesAnswerTable, groupInfo, userLogTable, random_group_users, badgeModel
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
@@ -202,14 +202,21 @@ def getIndividualImages(request, act_id):
     member_list = getGroupMembers(request, act_id);
     print("getIndividualImages member list:: ", member_list);
     #retrieve images from Image Model for each user in member_list
-    images = imageModel.objects.filter(posted_by_id__in=member_list)
-    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
+    images = imageModel.objects.filter(posted_by_id__in=member_list);
+    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True);
     #print('line 205', image_data)
 
-    return JsonResponse({'imageData': image_data})
+    return JsonResponse({'imageData': image_data});
 
+def individualCommentMsgs(request):
+    #insert into the model
+    comment = individualMsgComment(activityID=request.POST.get('activityID'), imageId_id=request.POST.get('imagePK'), content=request.POST.get('message'),
+                                   posted_by=request.user);
+    comment.save();
 
-## handler methods start
+    return HttpResponse('');
+
+############ handler methods start ############
 def getUsername(request):
     if request.user.is_authenticated:
         print('def GetUsername method -- username :: ', request.user.get_username())
@@ -239,37 +246,9 @@ def getGroupMembers(request, act_id):
 
     return group_member_list;
 
-## handler methods end
 
+############ handler methods end ############
 
-# delete the following method
-# def uploadKAImage(request):
-#     #get image from html and save it in the database
-#     if request.method == "POST":
-#         # print (request.Files) #gives the name of the <input type='file' name...>
-#
-#         #get the KA ID
-#         ka_id = request.POST.get('ka-act-id');
-#
-#         #get the logged in username
-#         username = ''
-#         if request.user.is_authenticated:
-#             print('username :: ', request.user.get_username())
-#             username = request.user.get_username();
-#         else:
-#             print('user not signed in') #add in log
-#
-#         #insert values in the database
-#         ka_image_upload = khanAcademyAnswer(ka_id=ka_id, ka_image=request.FILES['ka_img_name'], posted_by=request.user);
-#         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
-#         ka_image_upload.save();
-#
-#         latest_upload = khanAcademyAnswer.objects.filter(ka_id=ka_id).last()
-#         #https://stackoverflow.com/questions/16640021/django-object-is-not-iterable-using-serializers-serialize
-#         ka_img = serializers.serialize('json', [latest_upload], use_natural_foreign_keys=True)
-#         #print(latest_upload.pk)
-#
-#         return JsonResponse({'ka_imgID': latest_upload.pk, 'ka_img':ka_img})
 
 def getImage(request, view_id, gallery_id,group_id):
 
@@ -315,7 +294,6 @@ def getImagePerUser(request, act_id, username):
     return JsonResponse({'success': image_data})
 
 def imageDelete(request, img_id):
-
     img = imageModel.objects.get(pk=img_id)
     # This will delete the image and all of its Entry objects.
     print(img)
@@ -329,8 +307,6 @@ def updateFeed(request, type):
     # msg = Message.objects.all()
     # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
     # return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
-
-
     if int(type) == 0:
         #message of all times
         msg = Message.objects.all()
@@ -402,17 +378,6 @@ def brainstormDelete(request,note_id):
 
     return HttpResponse('no delete?')
 
-
-def userlog(request):
-
-    log = userLogTable(username=request.user, action=request.POST.get('action'), type=request.POST.get('type'),
-                       input=request.POST.get('input'), pagenumber=request.POST.get('pagenumber'))
-    log.save()
-
-    return HttpResponse('')
-
-
-
 def tableEntriesSave(request):
 
     entries = tableChartData(posted_by = request.user, table_id = request.POST.get('table_id'), plot_type = request.POST.get('plot_type'),
@@ -421,14 +386,42 @@ def tableEntriesSave(request):
 
     return HttpResponse('')
 
+# delete the following method
+# def uploadKAImage(request):
+#     #get image from html and save it in the database
+#     if request.method == "POST":
+#         # print (request.Files) #gives the name of the <input type='file' name...>
+#
+#         #get the KA ID
+#         ka_id = request.POST.get('ka-act-id');
+#
+#         #get the logged in username
+#         username = ''
+#         if request.user.is_authenticated:
+#             print('username :: ', request.user.get_username())
+#             username = request.user.get_username();
+#         else:
+#             print('user not signed in') #add in log
+#
+#         #insert values in the database
+#         ka_image_upload = khanAcademyAnswer(ka_id=ka_id, ka_image=request.FILES['ka_img_name'], posted_by=request.user);
+#         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
+#         ka_image_upload.save();
+#
+#         latest_upload = khanAcademyAnswer.objects.filter(ka_id=ka_id).last()
+#         #https://stackoverflow.com/questions/16640021/django-object-is-not-iterable-using-serializers-serialize
+#         ka_img = serializers.serialize('json', [latest_upload], use_natural_foreign_keys=True)
+#         #print(latest_upload.pk)
+#
+#         return JsonResponse({'ka_imgID': latest_upload.pk, 'ka_img':ka_img})
 
-def submitAnswer(request):
-
-    print(request.POST.get('answer'));
-    userQuesAnswer = userQuesAnswerTable(questionIDbyPage = request.POST.get('page'), answer = request.POST.get('answer'), posted_by = request.user)
-    userQuesAnswer.save()
-
-    return HttpResponse('')
+# def submitAnswer(request):
+#
+#     print(request.POST.get('answer'));
+#     userQuesAnswer = userQuesAnswerTable(questionIDbyPage = request.POST.get('page'), answer = request.POST.get('answer'), posted_by = request.user)
+#     userQuesAnswer.save()
+#
+#     return HttpResponse('')
 
 # def submitKAAnswer(request):
 #     #check if any query present for that KA
@@ -618,221 +611,221 @@ def submitAnswer(request):
 #     return JsonResponse({'list': middlegroup_id_list})
 
 
-# projection gallery dashboard
-def dashboardGalleryInfo(request,act_id):
-    gallery_id = act_id;
-
-    # get total groups for this gallery
-    info_query = random_group_users.objects.filter(gallery_id=gallery_id).values('group').distinct()
-
-    # convert query into list
-    group_list = [int(q["group"]) for q in info_query]
-
-    list=[]
-    for group_id in group_list:
-        dict={};
-
-        #store group id for this particular gallery
-        dict['group_id'] = group_id
-
-        info_query = random_group_users.objects.filter(gallery_id=gallery_id).filter(group=group_id)
-
-        # store user list for this group for this gallery
-        # get the user id from the users table and get their username
-
-        temp = [User.objects.get(pk=e.users_id).get_username() for e in info_query]
-        temp.remove('AW') #remove simply removes the item, does not return anything. so print the list again
-        dict['user_list'] = temp
-        #print(dict['user_list'])
-
-        # get the total number of comments by the users for each group for this gallery
-        image_data = aux_method_get_imgcomment_random_list_group_teacher(group_id, gallery_id)
-        dict['total_comment'] = len(image_data)
-
-        list.append(dict);
-
-    #print([q["fields"] for q in info_query])
-    return JsonResponse({'list': list})
-
-
-def getRandomGroupMemberList(request, gallery_id):
-
-    # get the group for the user for specific gallery
-    random_group_id = random_group_users.objects.filter(gallery_id=gallery_id).filter(users_id=request.user).values('group')
-    for o in random_group_id: random_group_id = o['group']
-
-    #get the user list - this returns a query object
-    random_list = random_group_users.objects.filter(gallery_id=gallery_id).filter(group=random_group_id)
-
-    #convert the query list into a list
-    random_group_list = [User.objects.get(pk=o.users_id).get_username() for o in random_list]
-
-    return random_group_list;
-
-def updateDiscussionImageFeed(request, gallery_id):
-
-    print("updateDiscussionImageFeed");
-
-    print("updateDiscussionImageFeed glry id", gallery_id)
-    # first filter based on gallery since each gallery has different random group
-    random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-
-    # get in which middle group for current user
-    middlegroup_id = random_users_based_on_gallery.get(users_id=request.user).group  # get the query first and access the group from that query
-    print("updateDiscussionImageFeed random group", middlegroup_id)
-
-    image_data = aux_method_get_imgcomment_random_list_group_teacher(middlegroup_id, gallery_id)
-    image_data = serializers.serialize('json', image_data, use_natural_foreign_keys=True)
-
-    return JsonResponse({'success': image_data, 'username': request.user.get_username(), 'errorMsg': True})
-
-def updateDiscussionImageFeedTeacherVersion(request, gallery_id, group_id):
-    print('updateDiscussionImageFeedTeacherVersion', gallery_id)
-    print('updateDiscussionImageFeedTeacherVersion',group_id)
-    image_data = aux_method_get_imgcomment_random_list_group_teacher(group_id, gallery_id)
-    image_data = serializers.serialize('json', image_data, use_natural_foreign_keys=True)
-    return JsonResponse({'success': image_data, 'username': request.user.get_username(), 'errorMsg': True})
-
-def aux_method_get_imgcomment_random_list_group_teacher(middlegroup_id, gallery_id):
-    # find other users in this group
-    # first filter based on gallery since each gallery has different random group
-    random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-
-    middlegroup_users = random_users_based_on_gallery.filter(group=middlegroup_id)
-    for o in middlegroup_users: print("updateDiscussionImageFeed random grp members", o.users_id)
-
-    # get their original group from groupinfo table
-    image_pk = []
-    for o in middlegroup_users:
-        originalgroup_id = \
-        groupInfo.objects.filter(users_id=User.objects.get(pk=o.users_id)).order_by('group').values('group').distinct()[
-            0]['group']
-
-        print("updateDiscussionImageFeed original group id", originalgroup_id)
-        # for each original group id get the image posted by that group - there should one image per group atleast
-        images = imageModel.objects.filter(gallery_id=gallery_id).filter(group_id=originalgroup_id).values('pk')
-        print("updateDiscussionImageFeed", images)
-
-        for im in images:
-            image_pk.append(im['pk']);
-        # image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
-
-    # image ids of the images that a group can see.
-    # print('with duplicates :: ',image_pk)
-
-    # if same id twice -- image is displayed twice -- so get the distinct IDs of the image
-    image_pk = list(set(image_pk))
-    # print('without duplicates :: ',image_pk)
-
-    #get user object for middle group users
-    userobject_list = []
-    for o in middlegroup_users:
-        userID = User.objects.get(pk=o.users_id)
-        userobject_list.append(userID)
-
-    # https://stackoverflow.com/questions/34830595/how-to-perform-a-queryset-in-django-with-a-loop-for-in
-    image_data = imageComment.objects.filter(isGroupDiscussion='yes').filter(imageId_id__in=image_pk).filter(posted_by_id__in=userobject_list)
-    print(image_data)
-
-    return image_data
-
-def getKAPerKAID(request,ka_id):
+# # projection gallery dashboard
+# def dashboardGalleryInfo(request,act_id):
+#     gallery_id = act_id;
+#
+#     # get total groups for this gallery
+#     info_query = random_group_users.objects.filter(gallery_id=gallery_id).values('group').distinct()
+#
+#     # convert query into list
+#     group_list = [int(q["group"]) for q in info_query]
+#
+#     list=[]
+#     for group_id in group_list:
+#         dict={};
+#
+#         #store group id for this particular gallery
+#         dict['group_id'] = group_id
+#
+#         info_query = random_group_users.objects.filter(gallery_id=gallery_id).filter(group=group_id)
+#
+#         # store user list for this group for this gallery
+#         # get the user id from the users table and get their username
+#
+#         temp = [User.objects.get(pk=e.users_id).get_username() for e in info_query]
+#         temp.remove('AW') #remove simply removes the item, does not return anything. so print the list again
+#         dict['user_list'] = temp
+#         #print(dict['user_list'])
+#
+#         # get the total number of comments by the users for each group for this gallery
+#         image_data = aux_method_get_imgcomment_random_list_group_teacher(group_id, gallery_id)
+#         dict['total_comment'] = len(image_data)
+#
+#         list.append(dict);
+#
+#     #print([q["fields"] for q in info_query])
+#     return JsonResponse({'list': list})
 
 
-    plusone = int(ka_id) + 1
-    #gives the raw query object
-    ka_items = khanAcademyAnswer.objects.filter(ka_id__in=[ka_id, str(plusone)]).order_by('posted_by__username') #posted by is the foreign key, so it was sorting based on the
-                                                                                            #id, posted_by__username sorts alphabetically.
+# def getRandomGroupMemberList(request, gallery_id):
+#
+#     # get the group for the user for specific gallery
+#     random_group_id = random_group_users.objects.filter(gallery_id=gallery_id).filter(users_id=request.user).values('group')
+#     for o in random_group_id: random_group_id = o['group']
+#
+#     #get the user list - this returns a query object
+#     random_list = random_group_users.objects.filter(gallery_id=gallery_id).filter(group=random_group_id)
+#
+#     #convert the query list into a list
+#     random_group_list = [User.objects.get(pk=o.users_id).get_username() for o in random_list]
+#
+#     return random_group_list;
 
-    #user id who posted
-    userid_list = [User.objects.get(pk=user['posted_by_id']).get_username() for user in khanAcademyAnswer.objects.values('posted_by_id').distinct()]
-    #print(userid_list)
-    #find users who did not post
-    users_did_not_post = [x for x in getAllUserList() if x not in userid_list]
-    #print(len(users_did_not_post))
-    #print(users_did_not_post)
+# def updateDiscussionImageFeed(request, gallery_id):
+#
+#     print("updateDiscussionImageFeed");
+#
+#     print("updateDiscussionImageFeed glry id", gallery_id)
+#     # first filter based on gallery since each gallery has different random group
+#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
+#
+#     # get in which middle group for current user
+#     middlegroup_id = random_users_based_on_gallery.get(users_id=request.user).group  # get the query first and access the group from that query
+#     print("updateDiscussionImageFeed random group", middlegroup_id)
+#
+#     image_data = aux_method_get_imgcomment_random_list_group_teacher(middlegroup_id, gallery_id)
+#     image_data = serializers.serialize('json', image_data, use_natural_foreign_keys=True)
+#
+#     return JsonResponse({'success': image_data, 'username': request.user.get_username(), 'errorMsg': True})
 
+# def updateDiscussionImageFeedTeacherVersion(request, gallery_id, group_id):
+#     print('updateDiscussionImageFeedTeacherVersion', gallery_id)
+#     print('updateDiscussionImageFeedTeacherVersion',group_id)
+#     image_data = aux_method_get_imgcomment_random_list_group_teacher(group_id, gallery_id)
+#     image_data = serializers.serialize('json', image_data, use_natural_foreign_keys=True)
+#     return JsonResponse({'success': image_data, 'username': request.user.get_username(), 'errorMsg': True})
+#
+# def aux_method_get_imgcomment_random_list_group_teacher(middlegroup_id, gallery_id):
+#     # find other users in this group
+#     # first filter based on gallery since each gallery has different random group
+#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
+#
+#     middlegroup_users = random_users_based_on_gallery.filter(group=middlegroup_id)
+#     for o in middlegroup_users: print("updateDiscussionImageFeed random grp members", o.users_id)
+#
+#     # get their original group from groupinfo table
+#     image_pk = []
+#     for o in middlegroup_users:
+#         originalgroup_id = \
+#         groupInfo.objects.filter(users_id=User.objects.get(pk=o.users_id)).order_by('group').values('group').distinct()[
+#             0]['group']
+#
+#         print("updateDiscussionImageFeed original group id", originalgroup_id)
+#         # for each original group id get the image posted by that group - there should one image per group atleast
+#         images = imageModel.objects.filter(gallery_id=gallery_id).filter(group_id=originalgroup_id).values('pk')
+#         print("updateDiscussionImageFeed", images)
+#
+#         for im in images:
+#             image_pk.append(im['pk']);
+#         # image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
+#
+#     # image ids of the images that a group can see.
+#     # print('with duplicates :: ',image_pk)
+#
+#     # if same id twice -- image is displayed twice -- so get the distinct IDs of the image
+#     image_pk = list(set(image_pk))
+#     # print('without duplicates :: ',image_pk)
+#
+#     #get user object for middle group users
+#     userobject_list = []
+#     for o in middlegroup_users:
+#         userID = User.objects.get(pk=o.users_id)
+#         userobject_list.append(userID)
+#
+#     # https://stackoverflow.com/questions/34830595/how-to-perform-a-queryset-in-django-with-a-loop-for-in
+#     image_data = imageComment.objects.filter(isGroupDiscussion='yes').filter(imageId_id__in=image_pk).filter(posted_by_id__in=userobject_list)
+#     print(image_data)
+#
+#     return image_data
 
-    #count number of student post
-    counter = Counter()
-    for o in ka_items:
-        counter[o.posted_by.get_username()] += 1;
+# def getKAPerKAID(request,ka_id):
+#
+#
+#     plusone = int(ka_id) + 1
+#     #gives the raw query object
+#     ka_items = khanAcademyAnswer.objects.filter(ka_id__in=[ka_id, str(plusone)]).order_by('posted_by__username') #posted by is the foreign key, so it was sorting based on the
+#                                                                                             #id, posted_by__username sorts alphabetically.
+#
+#     #user id who posted
+#     userid_list = [User.objects.get(pk=user['posted_by_id']).get_username() for user in khanAcademyAnswer.objects.values('posted_by_id').distinct()]
+#     #print(userid_list)
+#     #find users who did not post
+#     users_did_not_post = [x for x in getAllUserList() if x not in userid_list]
+#     #print(len(users_did_not_post))
+#     #print(users_did_not_post)
+#
+#
+#     #count number of student post
+#     counter = Counter()
+#     for o in ka_items:
+#         counter[o.posted_by.get_username()] += 1;
+#
+#     ka_list = []
+#     #add users who did not post anything #not so happy with this approach #remove starts here
+#     for o in users_did_not_post:
+#         data = {}
+#         data['ka_image'] = '';
+#         data['posted_by'] = o;
+#         data['count'] = 0;
+#         data['response_type'] = '';
+#         data['response'] = '';
+#         #json_data = json.dumps(data);
+#         ka_list.append(data);
+#     # remove finishes here
+#
+#     #iterate over the query
+#     for o in ka_items:
+#         data = {}
+#         data['ka_image'] = str(o.ka_image);
+#         data['posted_by'] = o.posted_by.get_username();
+#         data['count'] = counter[o.posted_by.get_username()];
+#         data['response_type'] = o.response_type;
+#         data['response'] = o.response;
+#         #json_data = json.dumps(data);
+#         ka_list.append(data);
+#
+#     #sort list of dictionary items by their username
+#     #ka_list = sorted(ka_list, key=lambda k: k['posted_by'])
+#
+#     #sort list by their counts
+#     ka_list = sorted(ka_list, key=lambda k: k['count'])
+#
+#     # context = {
+#     #     'list': ka_list,
+#     #
+#     # }
+#     #return render(request, 'app/dashboard.html', context); #sent to html itself
+#
+#     return JsonResponse({'success': ka_list});
 
-    ka_list = []
-    #add users who did not post anything #not so happy with this approach #remove starts here
-    for o in users_did_not_post:
-        data = {}
-        data['ka_image'] = '';
-        data['posted_by'] = o;
-        data['count'] = 0;
-        data['response_type'] = '';
-        data['response'] = '';
-        #json_data = json.dumps(data);
-        ka_list.append(data);
-    # remove finishes here
-
-    #iterate over the query
-    for o in ka_items:
-        data = {}
-        data['ka_image'] = str(o.ka_image);
-        data['posted_by'] = o.posted_by.get_username();
-        data['count'] = counter[o.posted_by.get_username()];
-        data['response_type'] = o.response_type;
-        data['response'] = o.response;
-        #json_data = json.dumps(data);
-        ka_list.append(data);
-
-    #sort list of dictionary items by their username
-    #ka_list = sorted(ka_list, key=lambda k: k['posted_by'])
-
-    #sort list by their counts
-    ka_list = sorted(ka_list, key=lambda k: k['count'])
-
-    # context = {
-    #     'list': ka_list,
-    #
-    # }
-    #return render(request, 'app/dashboard.html', context); #sent to html itself
-
-    return JsonResponse({'success': ka_list});
-
-def getGalleryPerID(request,gid):
-
-    #gives the raw query object
-    images = imageModel.objects.filter(gallery_id=gid)
-
-    # user id who posted
-    userid_list = []
-    # image id list for this particular gallery
-    image_list = []
-    for im in images:
-        comment_count_list = []
-        comment_count_list = [0] * 31
-        item = {}
-        item['image_id'] = im.pk
-        item['posted_by'] = im.posted_by.get_username()
-        userid_list.append(item['posted_by'])
-        image_comments = imageComment.objects.filter(imageId = im.pk)
-        item['comments'] = [im.content for im in image_comments]
-        item['count'] = len(item['comments'])
-        image_list.append(item)
-
-    #print(image_list)
-    # find users who did not post
-    users_did_not_post = [x for x in getAllUserList() if x not in userid_list]
-
-    for user in users_did_not_post:
-        item = {}
-        item['image_id'] = 0;
-        item['posted_by'] = user;
-        item['comments'] = []
-        item['count'] = 0
-        image_list.append(item)
-
-    # sort list by their counts
-    image_list = sorted(image_list, key=lambda k: k['count'])
-
-    return JsonResponse({'success': image_list});
+# def getGalleryPerID(request,gid):
+#
+#     #gives the raw query object
+#     images = imageModel.objects.filter(gallery_id=gid)
+#
+#     # user id who posted
+#     userid_list = []
+#     # image id list for this particular gallery
+#     image_list = []
+#     for im in images:
+#         comment_count_list = []
+#         comment_count_list = [0] * 31
+#         item = {}
+#         item['image_id'] = im.pk
+#         item['posted_by'] = im.posted_by.get_username()
+#         userid_list.append(item['posted_by'])
+#         image_comments = imageComment.objects.filter(imageId = im.pk)
+#         item['comments'] = [im.content for im in image_comments]
+#         item['count'] = len(item['comments'])
+#         image_list.append(item)
+#
+#     #print(image_list)
+#     # find users who did not post
+#     users_did_not_post = [x for x in getAllUserList() if x not in userid_list]
+#
+#     for user in users_did_not_post:
+#         item = {}
+#         item['image_id'] = 0;
+#         item['posted_by'] = user;
+#         item['comments'] = []
+#         item['count'] = 0
+#         image_list.append(item)
+#
+#     # sort list by their counts
+#     image_list = sorted(image_list, key=lambda k: k['count'])
+#
+#     return JsonResponse({'success': image_list});
 
 def getDashboard(request):
     return render(request, 'app/dashboard.html');
@@ -859,121 +852,121 @@ def getBadges(request):
 
     return JsonResponse({'badgeList': badgeList})
 
-def pageParser(request):
-    #CASE 4: static method - FAIL, not possible to call `cls.get` or `self.get`
-    #ref: https://stackoverflow.com/questions/50806626/django-calling-one-class-method-from-another-in-class-based-view
-    self = None
-    print(parser.activityParser(self))
-    return HttpResponse('')
+# def pageParser(request):
+#     #CASE 4: static method - FAIL, not possible to call `cls.get` or `self.get`
+#     #ref: https://stackoverflow.com/questions/50806626/django-calling-one-class-method-from-another-in-class-based-view
+#     self = None
+#     print(parser.activityParser(self))
+#     return HttpResponse('')
+#
+# def getUserList(request):
+#     users = User.objects.all()
+#     print(users)
+#     context = {'user_list': users}
+#     return render(request, 'app/studentList.html', context)
+#
+#
+# def getAllStudentInfo(request,std_id):
+#     return HttpResponse(std_id)
+#
+#
+# def dashboardKAInfo(request,ka_id):
+#
+#     print('entering dashboardKAInfo ka_id:', ka_id);
+#
+#     ka_id = int(ka_id)
+#     if ka_id%2 == 0:
+#         even_id = ka_id;
+#         odd_id = ka_id-1;
+#     else:
+#         odd_id = ka_id;
+#         even_id = ka_id+1;
+#
+#     # post - 1
+#     odd_post_object = khanAcademyAnswer.objects.filter(ka_id = odd_id).exclude(response_type='')
+#     ka_post_length_odd_id = len(odd_post_object)
+#     print('hojoborolo',len(odd_post_object))
+#
+#     #how many are question and how many are answer
+#     post_odd_count = odd_post_object.values('response_type').annotate(dcount=Count('response_type'))
+#     print(post_odd_count)  #output in the format --> {{response type:answer, dcount:2}, {response type:question, dcount:1})
+#
+#     answer =  0
+#     question = 0
+#
+#     for q in post_odd_count:
+#         print(q)
+#         if 'answer' in q.values():
+#             answer = q["dcount"]
+#         #else: answer = 0;
+#
+#         if 'question' in q.values():
+#             question = q["dcount"]
+#         #else: question = 0;
+#
+#     odd_answer_count = answer
+#     odd_question_count = question
+#
+#
+#     #post - 2
+#     post_even_object = khanAcademyAnswer.objects.filter(ka_id=even_id).exclude(response_type='')
+#     ka_post_length_even_id = len(post_even_object)
+#
+#     # how many are question and how many are answer
+#     post_even_count = post_even_object.values('response_type').annotate(dcount=Count('response_type'))
+#
+#     answer = 0
+#     question = 0
+#
+#     for q in post_even_count:
+#         print(q)
+#         if 'answer' in q.values():
+#             answer = q["dcount"]
+#         #else: answer = 0;
+#
+#         if 'question' in q.values():
+#             question = q["dcount"]
+#         #else: question = 0;
+#
+#     even_answer_count = answer
+#     even_question_count = question
+#
+#
+#
+#     return JsonResponse({'ka_post_length_odd_id': ka_post_length_odd_id, 'odd_answer_count':odd_answer_count, 'odd_question_count':odd_question_count,
+#                          'ka_post_length_even_id':ka_post_length_even_id, 'even_answer_count':even_answer_count, 'even_question_count':even_question_count})
 
-def getUserList(request):
-    users = User.objects.all()
-    print(users)
-    context = {'user_list': users}
-    return render(request, 'app/studentList.html', context)
-
-
-def getAllStudentInfo(request,std_id):
-    return HttpResponse(std_id)
-
-
-def dashboardKAInfo(request,ka_id):
-
-    print('entering dashboardKAInfo ka_id:', ka_id);
-
-    ka_id = int(ka_id)
-    if ka_id%2 == 0:
-        even_id = ka_id;
-        odd_id = ka_id-1;
-    else:
-        odd_id = ka_id;
-        even_id = ka_id+1;
-
-    # post - 1
-    odd_post_object = khanAcademyAnswer.objects.filter(ka_id = odd_id).exclude(response_type='')
-    ka_post_length_odd_id = len(odd_post_object)
-    print('hojoborolo',len(odd_post_object))
-
-    #how many are question and how many are answer
-    post_odd_count = odd_post_object.values('response_type').annotate(dcount=Count('response_type'))
-    print(post_odd_count)  #output in the format --> {{response type:answer, dcount:2}, {response type:question, dcount:1})
-
-    answer =  0
-    question = 0
-
-    for q in post_odd_count:
-        print(q)
-        if 'answer' in q.values():
-            answer = q["dcount"]
-        #else: answer = 0;
-
-        if 'question' in q.values():
-            question = q["dcount"]
-        #else: question = 0;
-
-    odd_answer_count = answer
-    odd_question_count = question
-
-
-    #post - 2
-    post_even_object = khanAcademyAnswer.objects.filter(ka_id=even_id).exclude(response_type='')
-    ka_post_length_even_id = len(post_even_object)
-
-    # how many are question and how many are answer
-    post_even_count = post_even_object.values('response_type').annotate(dcount=Count('response_type'))
-
-    answer = 0
-    question = 0
-
-    for q in post_even_count:
-        print(q)
-        if 'answer' in q.values():
-            answer = q["dcount"]
-        #else: answer = 0;
-
-        if 'question' in q.values():
-            question = q["dcount"]
-        #else: question = 0;
-
-    even_answer_count = answer
-    even_question_count = question
-
-
-
-    return JsonResponse({'ka_post_length_odd_id': ka_post_length_odd_id, 'odd_answer_count':odd_answer_count, 'odd_question_count':odd_question_count,
-                         'ka_post_length_even_id':ka_post_length_even_id, 'even_answer_count':even_answer_count, 'even_question_count':even_question_count})
-
-def getGalleryTableTD(request, act_id):
-
-    #get all the users
-    users_list = [str(user) for user in User.objects.all()]
-    print(users_list)
-    #returns None if no object is returned from the query. handles exception/error.s
-    try:
-        images = imageModel.objects.filter(gallery_id=act_id)
-    except imageModel.DoesNotExist:
-        images = None
-
-    image_list = []
-    for im in images:
-        comment_count_list = []
-        comment_count_list = [0] * 31
-        item = {}
-        item['image_id'] = im.pk
-        item['posted_by'] = im.posted_by.get_username()
-        image_comments = imageComment.objects.filter(imageId = im.pk)
-        item['comments'] = [im.content for im in image_comments]
-        temp = [im.posted_by.get_username() for im in image_comments]
-        temp = Counter(temp)
-        for key, value in temp.items():
-            index = [users_list.index(key)] #returns a list of one item
-            comment_count_list[index[0]] = value;
-
-
-        item['comment_count'] = comment_count_list
-        image_list.append(item)
-
-    return JsonResponse({'success': json.loads(json.dumps(image_list)), 'errorMsg': True})
+# def getGalleryTableTD(request, act_id):
+#
+#     #get all the users
+#     users_list = [str(user) for user in User.objects.all()]
+#     print(users_list)
+#     #returns None if no object is returned from the query. handles exception/error.s
+#     try:
+#         images = imageModel.objects.filter(gallery_id=act_id)
+#     except imageModel.DoesNotExist:
+#         images = None
+#
+#     image_list = []
+#     for im in images:
+#         comment_count_list = []
+#         comment_count_list = [0] * 31
+#         item = {}
+#         item['image_id'] = im.pk
+#         item['posted_by'] = im.posted_by.get_username()
+#         image_comments = imageComment.objects.filter(imageId = im.pk)
+#         item['comments'] = [im.content for im in image_comments]
+#         temp = [im.posted_by.get_username() for im in image_comments]
+#         temp = Counter(temp)
+#         for key, value in temp.items():
+#             index = [users_list.index(key)] #returns a list of one item
+#             comment_count_list[index[0]] = value;
+#
+#
+#         item['comment_count'] = comment_count_list
+#         image_list.append(item)
+#
+#     return JsonResponse({'success': json.loads(json.dumps(image_list)), 'errorMsg': True})
 
 # create superuser
 # https://docs.djangoproject.com/en/2.1/topics/auth/default/
@@ -1165,212 +1158,219 @@ def groupAdd(request):
 
 # hacks - end
 
-def dataToCSV(request):
-    #get all the image objects and serialize to get the foreign key values
-    sql = imageModel.objects.all();
-    sql = serializers.serialize('json', sql, use_natural_foreign_keys=True)
+def userlog(request):
 
-    # how many image posted by each user?
-    sql = imageModel.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
-    # TODO: unable to serialize this query with the following
-    #sql = serializers.serialize('json', sql, use_natural_foreign_keys=True)
-
-    #get imagecomment count grouped by image id but does not give the content
-    sql = imageComment.objects.values('imageId_id').annotate(dcount=Count('imageId_id'))
-    #print(sql) #print the result #print(len(sql[0]) #prints 2 - length of the first element
-    print(len(sql)) #get the length of total image group by count
-
-    #get distinct image id from imagecomment model
-    #https://stackoverflow.com/questions/10848809/django-model-get-distinct-value-list
-    sql = imageComment.objects.order_by('imageId_id').values('imageId_id').distinct()
-
-    #get the distinct image id in a list
-    image_id_list = [query['imageId_id'] for query in sql]
-    print(image_id_list)
-
-    #only get the content field for each image id
-    #http://books.agiliq.com/projects/django-orm-cookbook/en/latest/select_some_fields.html
-    imageContent = []
-    for image_id in image_id_list:
-        #print(imageComment.objects.filter(imageId_id = image_id).values('content'))
-        comments = imageComment.objects.filter(imageId_id = image_id).values('content','posted_by_id')
-        # convert the query set into a list -- list(comments)
-        #process comments to remove content from each row
-        # #https://stackoverflow.com/questions/7650448/django-serialize-queryset-values-into-json
-        #comment_list = json.dumps([dict(item) for item in comments])
-        comment_list = [dict(item) for item in comments]
-        #print(comment_list)
-
-        #print(list(comments))
-        item = {}
-        item['imageID'] = image_id
-        item['comments'] = comment_list
-        imageContent.append(item)
-
-
-    print(json.dumps(imageContent))
-    return HttpResponse('')
-
-def perUserDataExtract(request):
-    #get all the user list
-    users_list = [str(user) for user in User.objects.all()]
-    users_list.insert(0,0) #to start indexing from 1 instead of 0 to match user pk
-    #print(users_list[1:])
-
-    user_activity = []
-    for user in users_list[1:29]:
-        #get image comment
-        #index and primary id is the same for user
-        imagecomment = imageComment.objects.filter(posted_by_id = users_list.index(user)).order_by('imageId_id').values('content','imageId_id')
-        comment_list = [dict(item) for item in imagecomment]
-
-        item = {}
-        item['userID'] = users_list.index(user)
-        item['imagecomment'] = comment_list
-
-        #get activity feed message for each user
-        general_chat_message = Message.objects.filter(posted_by_id = users_list.index(user)).values('content')
-        general_chat_message = [gcm['content'] for gcm in general_chat_message]
-        item['generalmessage'] = general_chat_message
-        user_activity.append(item)
-
-
-    #print(json.dumps(user_activity))
-
-    #https://stackoverflow.com/questions/42354001/python-json-object-must-be-str-bytes-or-bytearray-not-dict
-    context = {'user_activity': json.loads(json.dumps(user_activity))}
-    return render(request, 'app/studentList.html', context)
-
-    #return HttpResponse('')
-
-def getGeneralChatMsg(request):
-    userid_list = [user['posted_by_id'] for user in Message.objects.values('posted_by_id').distinct()]
-    generalChatComment_list = []
-    for userid in userid_list:
-        dict = {}
-        dict[userid] = [item['content'] for item in Message.objects.filter(posted_by_id=userid).values('content')]
-        generalChatComment_list.append(dict)
-
-    return HttpResponse(generalChatComment_list)
-
-def getimageCommentCount(request):
-    imageComment_count = imageComment.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
-    print(imageComment_count)
-
-    # list of unique users who posted in khan academy (not all users may post in khan academy)
-    userid_list = [user['posted_by_id'] for user in imageComment.objects.values('posted_by_id').distinct()]
-
-    imageComment_list = []
-    for userid in userid_list:
-        dict = {}
-        dict[userid] = [item['content'] for item in imageComment.objects.filter(posted_by_id=userid).values('content')]
-        imageComment_list.append(dict)
-
-    return HttpResponse(imageComment_list)
-
-def getimageCommentDetails(request):
-    # sort out images by each gallery id
-    gallery_id = [gid['gallery_id'] for gid in imageModel.objects.values('gallery_id').distinct()];
-    gallery_id.sort(); #in place sort, next time the list will be sorted.
-    print(gallery_id);
-
-    list = [] #list of dictionary items
-    for gid in gallery_id:
-        dict={}
-        dict[gid] = [iid['id'] for iid in imageModel.objects.filter(gallery_id=gid).values('id')]
-        list.append(dict);
-
-    # print list of dictionary items in key/value pairs
-    # for item in list:
-    #     for k,v in item.items():
-    #         print('{}: {}'.format(k,v));
-
-    for item in list:
-        for k,v in item.items():
-            #v is the list of images in gallery k.
-            print('gallery #', k, 'has',len(v),'images');
-            print('image id list for gallery #', k, ':',v);
-            for i in v:
-                print('image id:',i, '---',imageComment.objects.filter(imageId_id=i).values('isGroupDiscussion').annotate(Count('isGroupDiscussion')))
-
-
-
-    return HttpResponse();
-def getkhanAcademyCount(request):
-    khanacademy_count = khanAcademyAnswer.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
-    #print(khanacademy_count)
-
-    # list of unique users who posted in khan academy (not all users may post in khan academy)
-    userid_list = [user['posted_by_id'] for user in khanAcademyAnswer.objects.values('posted_by_id').distinct()]
-
-    kaResponse_list = []
-    for userid in userid_list:
-        dict = {}
-        dict[userid] = [{'type':item['response_type'], 'response':item['response']} for item in khanAcademyAnswer.objects.filter(posted_by_id=userid).values('response_type', 'response')]
-        kaResponse_list.append(dict)
-
-    return HttpResponse(kaResponse_list)
-
-def getKhanAcademyDetails(request):
-    #get total post on each khan academy
-    khanacademy_count = khanAcademyAnswer.objects.values('ka_id').annotate(dcount=Count('ka_id'))
-
-    kid_list = [k['ka_id'] for k in khanAcademyAnswer.objects.values('ka_id').distinct()]
-
-    list = [];
-    for kid in kid_list:
-        dict = {}
-        dict[kid] = [{'userid':User.objects.get(pk=item['posted_by_id']).username, 'count':item['dcount']} for item in khanAcademyAnswer.objects.filter(ka_id=kid).values('posted_by_id').annotate(dcount=Count('posted_by_id'))]
-        list.append(dict)
-
-
-    return HttpResponse()
-
-
-def getBadgeCount(request):
-    #total count of badges each user recieved
-    badge_count = badgeModel.objects.values('userid_id').annotate(dcount=Count('userid_id'));
-    #print(badge_count);
-
-    # identify different badges for each user
-    #list of unique users who received badge (not all users may not get badge)
-    userid_list = [user['userid_id'] for user in badgeModel.objects.values('userid_id').distinct()]
-    #print(userid_list)
-
-    # get  all of the badges for each user -- it will return dict in the format <userid:badgelist>
-    badge_list = []
-    for userid in userid_list:
-        badge_dict = {}
-        user = User.objects.get(pk=userid).username
-        badge_dict[user] = [item['badgeType'] for item in badgeModel.objects.filter(userid_id=userid).values('badgeType')]
-        badge_list.append(badge_dict)
-
-    #print(badge_list)
-    return HttpResponse(badge_list)
-
-def getBadgeDetails(request):
-    badge_list = badgeModel.objects.values('message','badgeType','userid_id');
-    list=[];
-    for item in badge_list:
-        list.append(item)
-    print(list)
-    return HttpResponse(list)
-
-def addUserToGroupsForm(request):
-    return render(request, 'app/group.html', {})
-
-def deleteAllItems(request):
-    brainstormNote.objects.all().delete()
-    imageModel.objects.all().delete()
-    Message.objects.all().delete()
-    random_group_users.objects.all().delete();
-    #userLogTable.objects.all().delete();
-    khanAcademyAnswer.objects.all().delete();
-    # groupInfo.objects.all().delete()
+    log = userLogTable(username=request.user, action=request.POST.get('action'), type=request.POST.get('type'),
+                       input=request.POST.get('input'), pagenumber=request.POST.get('pagenumber'))
+    log.save()
 
     return HttpResponse('')
 
-def getAllUserList():
-    users_list = [str(user) for user in User.objects.all()]
+# def dataToCSV(request):
+#     #get all the image objects and serialize to get the foreign key values
+#     sql = imageModel.objects.all();
+#     sql = serializers.serialize('json', sql, use_natural_foreign_keys=True)
+#
+#     # how many image posted by each user?
+#     sql = imageModel.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
+#     # TODO: unable to serialize this query with the following
+#     #sql = serializers.serialize('json', sql, use_natural_foreign_keys=True)
+#
+#     #get imagecomment count grouped by image id but does not give the content
+#     sql = imageComment.objects.values('imageId_id').annotate(dcount=Count('imageId_id'))
+#     #print(sql) #print the result #print(len(sql[0]) #prints 2 - length of the first element
+#     print(len(sql)) #get the length of total image group by count
+#
+#     #get distinct image id from imagecomment model
+#     #https://stackoverflow.com/questions/10848809/django-model-get-distinct-value-list
+#     sql = imageComment.objects.order_by('imageId_id').values('imageId_id').distinct()
+#
+#     #get the distinct image id in a list
+#     image_id_list = [query['imageId_id'] for query in sql]
+#     print(image_id_list)
+#
+#     #only get the content field for each image id
+#     #http://books.agiliq.com/projects/django-orm-cookbook/en/latest/select_some_fields.html
+#     imageContent = []
+#     for image_id in image_id_list:
+#         #print(imageComment.objects.filter(imageId_id = image_id).values('content'))
+#         comments = imageComment.objects.filter(imageId_id = image_id).values('content','posted_by_id')
+#         # convert the query set into a list -- list(comments)
+#         #process comments to remove content from each row
+#         # #https://stackoverflow.com/questions/7650448/django-serialize-queryset-values-into-json
+#         #comment_list = json.dumps([dict(item) for item in comments])
+#         comment_list = [dict(item) for item in comments]
+#         #print(comment_list)
+#
+#         #print(list(comments))
+#         item = {}
+#         item['imageID'] = image_id
+#         item['comments'] = comment_list
+#         imageContent.append(item)
+#
+#
+#     print(json.dumps(imageContent))
+#     return HttpResponse('')
+#
+# def perUserDataExtract(request):
+#     #get all the user list
+#     users_list = [str(user) for user in User.objects.all()]
+#     users_list.insert(0,0) #to start indexing from 1 instead of 0 to match user pk
+#     #print(users_list[1:])
+#
+#     user_activity = []
+#     for user in users_list[1:29]:
+#         #get image comment
+#         #index and primary id is the same for user
+#         imagecomment = imageComment.objects.filter(posted_by_id = users_list.index(user)).order_by('imageId_id').values('content','imageId_id')
+#         comment_list = [dict(item) for item in imagecomment]
+#
+#         item = {}
+#         item['userID'] = users_list.index(user)
+#         item['imagecomment'] = comment_list
+#
+#         #get activity feed message for each user
+#         general_chat_message = Message.objects.filter(posted_by_id = users_list.index(user)).values('content')
+#         general_chat_message = [gcm['content'] for gcm in general_chat_message]
+#         item['generalmessage'] = general_chat_message
+#         user_activity.append(item)
+#
+#
+#     #print(json.dumps(user_activity))
+#
+#     #https://stackoverflow.com/questions/42354001/python-json-object-must-be-str-bytes-or-bytearray-not-dict
+#     context = {'user_activity': json.loads(json.dumps(user_activity))}
+#     return render(request, 'app/studentList.html', context)
+#
+#     #return HttpResponse('')
+#
+# def getGeneralChatMsg(request):
+#     userid_list = [user['posted_by_id'] for user in Message.objects.values('posted_by_id').distinct()]
+#     generalChatComment_list = []
+#     for userid in userid_list:
+#         dict = {}
+#         dict[userid] = [item['content'] for item in Message.objects.filter(posted_by_id=userid).values('content')]
+#         generalChatComment_list.append(dict)
+#
+#     return HttpResponse(generalChatComment_list)
+#
+# def getimageCommentCount(request):
+#     imageComment_count = imageComment.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
+#     print(imageComment_count)
+#
+#     # list of unique users who posted in khan academy (not all users may post in khan academy)
+#     userid_list = [user['posted_by_id'] for user in imageComment.objects.values('posted_by_id').distinct()]
+#
+#     imageComment_list = []
+#     for userid in userid_list:
+#         dict = {}
+#         dict[userid] = [item['content'] for item in imageComment.objects.filter(posted_by_id=userid).values('content')]
+#         imageComment_list.append(dict)
+#
+#     return HttpResponse(imageComment_list)
+#
+# def getimageCommentDetails(request):
+#     # sort out images by each gallery id
+#     gallery_id = [gid['gallery_id'] for gid in imageModel.objects.values('gallery_id').distinct()];
+#     gallery_id.sort(); #in place sort, next time the list will be sorted.
+#     print(gallery_id);
+#
+#     list = [] #list of dictionary items
+#     for gid in gallery_id:
+#         dict={}
+#         dict[gid] = [iid['id'] for iid in imageModel.objects.filter(gallery_id=gid).values('id')]
+#         list.append(dict);
+#
+#     # print list of dictionary items in key/value pairs
+#     # for item in list:
+#     #     for k,v in item.items():
+#     #         print('{}: {}'.format(k,v));
+#
+#     for item in list:
+#         for k,v in item.items():
+#             #v is the list of images in gallery k.
+#             print('gallery #', k, 'has',len(v),'images');
+#             print('image id list for gallery #', k, ':',v);
+#             for i in v:
+#                 print('image id:',i, '---',imageComment.objects.filter(imageId_id=i).values('isGroupDiscussion').annotate(Count('isGroupDiscussion')))
+#
+#
+#
+#     return HttpResponse();
+# def getkhanAcademyCount(request):
+#     khanacademy_count = khanAcademyAnswer.objects.values('posted_by_id').annotate(dcount=Count('posted_by_id'))
+#     #print(khanacademy_count)
+#
+#     # list of unique users who posted in khan academy (not all users may post in khan academy)
+#     userid_list = [user['posted_by_id'] for user in khanAcademyAnswer.objects.values('posted_by_id').distinct()]
+#
+#     kaResponse_list = []
+#     for userid in userid_list:
+#         dict = {}
+#         dict[userid] = [{'type':item['response_type'], 'response':item['response']} for item in khanAcademyAnswer.objects.filter(posted_by_id=userid).values('response_type', 'response')]
+#         kaResponse_list.append(dict)
+#
+#     return HttpResponse(kaResponse_list)
+#
+# def getKhanAcademyDetails(request):
+#     #get total post on each khan academy
+#     khanacademy_count = khanAcademyAnswer.objects.values('ka_id').annotate(dcount=Count('ka_id'))
+#
+#     kid_list = [k['ka_id'] for k in khanAcademyAnswer.objects.values('ka_id').distinct()]
+#
+#     list = [];
+#     for kid in kid_list:
+#         dict = {}
+#         dict[kid] = [{'userid':User.objects.get(pk=item['posted_by_id']).username, 'count':item['dcount']} for item in khanAcademyAnswer.objects.filter(ka_id=kid).values('posted_by_id').annotate(dcount=Count('posted_by_id'))]
+#         list.append(dict)
+#
+#
+#     return HttpResponse()
+#
+#
+# def getBadgeCount(request):
+#     #total count of badges each user recieved
+#     badge_count = badgeModel.objects.values('userid_id').annotate(dcount=Count('userid_id'));
+#     #print(badge_count);
+#
+#     # identify different badges for each user
+#     #list of unique users who received badge (not all users may not get badge)
+#     userid_list = [user['userid_id'] for user in badgeModel.objects.values('userid_id').distinct()]
+#     #print(userid_list)
+#
+#     # get  all of the badges for each user -- it will return dict in the format <userid:badgelist>
+#     badge_list = []
+#     for userid in userid_list:
+#         badge_dict = {}
+#         user = User.objects.get(pk=userid).username
+#         badge_dict[user] = [item['badgeType'] for item in badgeModel.objects.filter(userid_id=userid).values('badgeType')]
+#         badge_list.append(badge_dict)
+#
+#     #print(badge_list)
+#     return HttpResponse(badge_list)
+#
+# def getBadgeDetails(request):
+#     badge_list = badgeModel.objects.values('message','badgeType','userid_id');
+#     list=[];
+#     for item in badge_list:
+#         list.append(item)
+#     print(list)
+#     return HttpResponse(list)
 
-    return users_list;
+# def addUserToGroupsForm(request):
+#     return render(request, 'app/group.html', {})
+#
+# def deleteAllItems(request):
+#     brainstormNote.objects.all().delete()
+#     imageModel.objects.all().delete()
+#     Message.objects.all().delete()
+#     random_group_users.objects.all().delete();
+#     #userLogTable.objects.all().delete();
+#     # groupInfo.objects.all().delete()
+#
+#     return HttpResponse('')
+#
+# def getAllUserList():
+#     users_list = [str(user) for user in User.objects.all()]
+#
+#     return users_list;
