@@ -216,11 +216,15 @@ def saveIndividualCommentMsgs(request):
 
     return HttpResponse('');
 
+# input: image id
+# output: get comments for the current user for a given image id
+
 def getIndividualCommentMsgs(request,imageId):
     imageCommments = individualMsgComment.objects.filter(imageId=imageId, posted_by=request.user);
     imageCommments = serializers.serialize('json', imageCommments, use_natural_foreign_keys=True);
     return JsonResponse({'imageCommments': imageCommments});
 
+###############################################
 ############ handler methods start ############
 def getUsername(request):
     if request.user.is_authenticated:
@@ -253,7 +257,7 @@ def getGroupMembers(request, act_id):
 
 
 ############ handler methods end ############
-
+#############################################
 
 def getImage(request, view_id, gallery_id,group_id):
 

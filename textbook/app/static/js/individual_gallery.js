@@ -18,12 +18,13 @@ var loadIndividualFeed = function(act_id) {
 //    //this method will load images from the current users' group members uploaded photo
 //    //the messages associated with each photo is only visible to the current student
         ind_act_id = act_id;
-//      steps to be implemented
-//      1. get the current users group-mate info -- done in the server side
-//      2. make a query to retrieve the images and send back to the client side -- done
-//      3. display the images -- done
-//      4. setup commenting and display [only visible to the current user] -- TODO
+//      steps to be implemented:
+//      1. get all the images using the the current users group-mate info -- done in the server side
+//      2. make a query to retrieve the images and send back to the client side -- done in the server side with the following ajax
+//      3. display the images -- done with the following ajax
+//      4. setup commenting and display [only visible to the current user] -- done
 
+        //this ajax completes the 1-4 steps
         $.ajax({
             type:'GET',
             url:'http://'+ host_url +'/getIndividualImages/'+act_id,
@@ -62,10 +63,32 @@ var loadIndividualFeed = function(act_id) {
 
         });//end of the ajax call
 
-        //display the comments of the first image
-        // get the pk of the first image
-        var imagePk = $("#slide-1 img").attr("data-imgID");
-        retrieveComments(imagePk);
+        //display the comments of the first image, clear the feed first for previous additions
+        $('#ind-feed').empty();
+
+        //initial display fix -- start
+        //initially no button is grey, so the variable is true
+        var noGrey=true;
+        $('.slider a').each(function(id,element){
+              //if there is any a tag element that is grey upon loading, means previously selected, so load the comments for that image
+              if($(element).css('background-color') == 'rgb(165, 168, 166)') {
+                var div = $(element).attr('href');
+                imagePk = $(div+" img").attr("data-imgID");
+                console.log('line 75 :: ',imagePk);
+                retrieveComments(imagePk);
+                noGrey=false;
+                return false;
+              }
+        });
+
+        //since no button is grey, means the first time loading, color the first button grey and load the comments for that image
+        if(noGrey==true) {
+            $('a[href="#slide-1"]').css('background-color',"#a5a8a6");
+            var imagePk = $('#slide-1 img').attr("data-imgID");
+            retrieveComments(imagePk);
+        }
+        //initial display fix -- end
+
 
 } //end of loadIndividualFeed method
 
@@ -93,7 +116,7 @@ var imageNavigation = function(){
          //if data exists, display it in the ind-feed
          var div = $(this).attr('href');
          var imagePk = $(div+" img").attr("data-imgID");
-         console.log("currently clicked image primary key :: " + imagePk);
+         //console.log("currently clicked image primary key :: " + imagePk);
 
         retrieveComments(imagePk);
 
