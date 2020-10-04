@@ -208,13 +208,18 @@ def getIndividualImages(request, act_id):
 
     return JsonResponse({'imageData': image_data});
 
-def individualCommentMsgs(request):
+def saveIndividualCommentMsgs(request):
     #insert into the model
     comment = individualMsgComment(activityID=request.POST.get('activityID'), imageId_id=request.POST.get('imagePK'), content=request.POST.get('message'),
                                    posted_by=request.user);
     comment.save();
 
     return HttpResponse('');
+
+def getIndividualCommentMsgs(request,imageId):
+    imageCommments = individualMsgComment.objects.filter(imageId=imageId, posted_by=request.user);
+    imageCommments = serializers.serialize('json', imageCommments, use_natural_foreign_keys=True);
+    return JsonResponse({'imageCommments': imageCommments});
 
 ############ handler methods start ############
 def getUsername(request):

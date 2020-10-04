@@ -17,7 +17,8 @@ urlpatterns = [
     url('uploadImage', views.uploadImage, name='uploadImage'),
     #urls for upload image tool
     url('getIndividualImages/(?P<act_id>\d+)', views.getIndividualImages),
-    url('individualCommentMsgs', views.individualCommentMsgs),
+    url('saveIndividualCommentMsgs', views.saveIndividualCommentMsgs),
+    url('getIndividualCommentMsgs/(?P<imageId>\d+)', views.getIndividualCommentMsgs),
     #url('getUserList',views.getUserList),
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),

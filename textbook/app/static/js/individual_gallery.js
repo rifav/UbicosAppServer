@@ -1,10 +1,11 @@
 var host_url = window.location.host;
 var ind_act_id; //digTextbook.js --> loadIndividualFeed --> postIndMessages --> database
+var loaded_comments;
 
 $(function(){
 
-    //button color change with real time click
-    buttonColorChange();
+    //button color change with real time image navigation
+    imageNavigation();
 
     //adding user input button event action
     individiualMsgBtnAction();
@@ -21,7 +22,7 @@ var loadIndividualFeed = function(act_id) {
 //      1. get the current users group-mate info -- done in the server side
 //      2. make a query to retrieve the images and send back to the client side -- done
 //      3. display the images -- done
-//      4. setup commenting and display [only visible to the current user] --TODO
+//      4. setup commenting and display [only visible to the current user] -- TODO
 
         $.ajax({
             type:'GET',
@@ -29,10 +30,10 @@ var loadIndividualFeed = function(act_id) {
             async: false, //wait for ajax call to finish
             success: function(data){
                 data = JSON.parse(data.imageData);
-                console.log(data)
+                //console.log(data)
                 //console.log(data[0].fields['gallery_id']);
 
-                //loop through the data to access each image
+                //loop through the data to access each image and display the images
                 $.each(data, function(key, value){
                     image_src = value.fields['image'];
                     image_posted_by = value.fields['posted_by'];
@@ -56,28 +57,45 @@ var loadIndividualFeed = function(act_id) {
                                    "transition":"transform 0.25s ease"});
                         });
 
-                      //  TODO  display the comment for each image part:
-                });
-            }
-        })
+                });//end of the each loop
+            }//end of the success for the post ajax
+
+        });//end of the ajax call
+
+        //display the comments of the first image
+        // get the pk of the first image
+        var imagePk = $("#slide-1 img").attr("data-imgID");
+        retrieveComments(imagePk);
 
 } //end of loadIndividualFeed method
 
 
-var buttonColorChange = function(){
+var imageNavigation = function(){
+
     $('.slider a').off().on('click', function(e){
 
+         //with each button click, change the color of the selected button
          var href = $(this).attr('href');
-         console.log(href);
 
          //change the background of the currently selected number
          $(this).css('background-color',"#a5a8a6");
 
-         //change the background of the other numbers to original
+         //change the background of the other numbers to original white color
          $('.slider a').not('[href="'+href+'"]').each(function(id,element){
               //console.log($(element));
               $(element).css('background-color',"white");
          });
+
+         //with each click of the button empty the ind-feed first
+         $('#ind-feed').empty();
+
+         //comments are already retrieved when the page is loaded, so display based on the primary key of the image
+         //if data exists, display it in the ind-feed
+         var div = $(this).attr('href');
+         var imagePk = $(div+" img").attr("data-imgID");
+         console.log("currently clicked image primary key :: " + imagePk);
+
+        retrieveComments(imagePk);
 
     });
 } //end of buttonColorChange method
@@ -124,13 +142,13 @@ var postIndMessage = function (){
               if($(element).css('background-color') == 'rgb(165, 168, 166)') {
                 var div = $(element).attr('href');
                 imagePk = $(div+" img").attr("data-imgID");
-                console.log('post message in the server', imagePk);
+                console.log('post message in the server ', imagePk);
               }
     });
 
 //    //triggers the event in views.py
     $.post({
-        url:'/individualCommentMsgs',
+        url:'/saveIndividualCommentMsgs',
         async: false,
         data: {
          'activityID': ind_act_id,
@@ -139,26 +157,15 @@ var postIndMessage = function (){
         },
         success: function (data) {
             //empty the message pane
-            $("input[name='username']").val('');
+            $("input[name='ind-msg-text']").val('');
 
             //display the message in the feed when posted
-            var li = $("<li/>").appendTo("#ind-feed");
-            li.addClass('message self');
-            var div = $("<div/>").appendTo(li);
-            div.addClass('user-image');
-            var span = $('<span/>', {text: logged_in}).appendTo(div); //logged_in from utility.js
-            var p = $('<p/>', {text: message}).appendTo(li);
-            var div_msg = $("<div/>").appendTo(li);
-            div_msg.addClass('msg-timestamp');
-            var span_timestap = $('<span/>', {
-                      text: "add_timestamp"}).appendTo(div_msg);
-
-            $('#ind-feed').scrollTop($('#ind-feed')[0].scrollHeight);
+            buildFeedwithMsgs(message);
 
         },
         error: function(){
             //inputEl.prop('disabled', false);
-            $("input[name='username']").val('');
+            $("input[name='ind-msg-text']").val('');
             alert("select an image first using the numbered circular buttons.");
 
             return false;
@@ -167,57 +174,43 @@ var postIndMessage = function (){
 
 } // end of postIndMessage method
 
+var buildFeedwithMsgs = function(message){
+    var li = $("<li/>").appendTo("#ind-feed");
+    li.addClass('message self');
+    var div = $("<div/>").appendTo(li);
+    div.addClass('user-image');
+    var span = $('<span/>', {text: logged_in}).appendTo(div); //logged_in from utility.js
+    var p = $('<p/>', {text: message}).appendTo(li);
+    var div_msg = $("<div/>").appendTo(li);
+    div_msg.addClass('msg-timestamp');
+    var span_timestap = $('<span/>', {
+              text: "add_timestamp"}).appendTo(div_msg);
 
-//function loadFeed(type){
-//    //alert("calling loadFeed method");
-//    //clear existing html so the new ones dont get appended
-//    $('#activity-feed').empty();
-//
-//    $.ajax({
-//
-//            type:'GET',
-//            url:'http://'+ host_url +'/updateFeed/'+type,
-//
-//            success: function(response){
-//
-//                var logged_in_user = response.username //passed from views.py - updateFeed
-//
-//                msg_data = response.success
-//                var obj = jQuery.parseJSON(msg_data);
-//
-//                //console.log(obj)
-//
-//                $.each(obj, function(key, value){
-//
-//                    //  add in the thread itself
-//                    var li = $("<li/>").appendTo("#activity-feed");
-//                    if(value.fields['posted_by'][0] == logged_in_user){
-//                        li.addClass('message self');
-//                    }else{
-//                        li.addClass('message');
-//                    }
-//
-//                    var div = $("<div/>").appendTo(li);
-//                    div.addClass('user-image');
-//
-//                    var span = $('<span/>', {
-//                        text: value.fields['posted_by'][0]}).appendTo(div);
-//
-//                    var p = $('<p/>', {
-//                            text: value.fields['content']}).appendTo(li);
-//
-//
-//                    var div_msg = $("<div/>").appendTo(li);
-//                    div_msg.addClass('msg-timestamp');
-//
-//                    var span_timestap = $('<span/>', {
-//                            text: "add timestamp"}).appendTo(div_msg);
-//
-//                });
-//
-//                // Scroll page to bottom
-//                $('#dynamic-content').animate({ scrollTop: $('#activity-feed').height() }, 400);
-//            }
-//        });
-//}
+    $('#ind-feed').scrollTop($('#ind-feed')[0].scrollHeight);
+}// end of buildFeedwithMsgs method
+
+var retrieveComments = function(imagePk){
+
+    $.ajax({
+        type:'GET',
+        url:'http://'+ host_url +'/getIndividualCommentMsgs/'+imagePk,
+        async: false, //wait for ajax call to finish
+        success: function(data){
+              //display this data
+              loaded_comments = JSON.parse(data.imageCommments); // converts from string type to array format
+              //console.log("when the page is loading :: ", loaded_comments);
+              //console.log(jQuery.type(data));
+              if(loaded_comments==0){//if no comment this data will be empty
+                console.log("no comment data");
+              }else{
+                //show the first image comments with the loading of the images
+                //console.log(loaded_comments[0].fields['content']);
+                //TODO loop through loaded_comments to display all the messages; [0] only displays the first comment
+                buildFeedwithMsgs(loaded_comments[0].fields['content']);
+              }
+
+        },
+    });
+
+} //end of retrieveComments (imagePk) method
 
