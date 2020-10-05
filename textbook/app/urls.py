@@ -20,6 +20,8 @@ urlpatterns = [
     url('saveIndividualCommentMsgs', views.saveIndividualCommentMsgs),
     url('getIndividualCommentMsgs/(?P<imageId>\d+)', views.getIndividualCommentMsgs),
     #urls for gallery image tool
+    url('imageComment', views.broadcastImageComment),
+    url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
 
 
 
@@ -30,8 +32,6 @@ urlpatterns = [
     #urls for different tool utility
     url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
-    url(r'^ajax/imageComment/$', views.broadcastImageComment),
-    url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
     url('gallery/del/(?P<img_id>\d+)', views.imageDelete),
     # url('getGalleryPerID/(?P<gid>\d+)', views.getGalleryPerID),
     # url('getRandomGroupMemberList/(?P<gallery_id>\d+)', views.getRandomGroupMemberList),

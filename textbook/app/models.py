@@ -27,7 +27,7 @@ class imageComment(models.Model):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     posted_at = models.DateTimeField(auto_now_add=True)
     imageId = models.ForeignKey(imageModel, on_delete=models.CASCADE)
-    isGroupDiscussion = models.CharField(max_length=400)
+    activityID = models.IntegerField(null=True)
 
     def natural_key(self):
         return (self.posted_by.username)

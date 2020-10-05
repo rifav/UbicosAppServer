@@ -52,15 +52,15 @@ def broadcast(request):
 @csrf_exempt
 def broadcastImageComment(request):
 
-    print('image broad cast', request.POST['discussion-type'])
-    pusher1.trigger(u'b_channel', u'bn_event', {u'name': request.POST['username'], u'message': request.POST['message'], u'imageid': request.POST['imagePk'] })
+
+    pusher1.trigger(u'b_channel', u'bn_event', {u'name': request.POST['username'], u'message': request.POST['message'],
+                                                u'imageid': request.POST['imagePk'], u'activityID': request.POST['activityID']})
 
     #get the image id
     img = imageModel.objects.get(id=request.POST['imagePk'])
-    print('image primary id type',type(img))
     #error: id is not instance of the model
     #solution: https://www.slideshare.net/BaabtraMentoringPartner/how-to-fix-must-be-an-instance-when-a-foreign-key-is-referred-django-python-mysql
-    comment = imageComment(content=request.POST['message'], posted_by = request.user, imageId = img, isGroupDiscussion=request.POST['discussion-type'])
+    comment = imageComment(content=request.POST['message'], posted_by = request.user, imageId = img, activityID=request.POST['activityID'])
     comment.save()
 
     return JsonResponse({'success': '', 'errorMsg': True})
@@ -224,6 +224,14 @@ def getIndividualCommentMsgs(request,imageId):
     imageCommments = serializers.serialize('json', imageCommments, use_natural_foreign_keys=True);
     return JsonResponse({'imageCommments': imageCommments});
 
+#used in gallery.js
+def updateImageFeed(request, img_id):
+
+    print('updateImageFeed (image_id) :: ' + img_id)
+    img_msg = imageComment.objects.filter(imageId_id=img_id)
+    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True)
+
+    return JsonResponse({'success': img_msg, 'username': request.user.get_username(),'errorMsg': True})
 
 ###############################################
 ############ handler methods start ############
@@ -312,13 +320,7 @@ def updateFeed(request, type):
     # print('msg :: ', msg_data)
     # return HttpResponse('')
 
-def updateImageFeed(request, img_id):
 
-    print('updateImageFeed (image_id) :: ' + img_id)
-    img_msg = imageComment.objects.filter(isGroupDiscussion='no').filter(imageId_id=img_id)
-    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True)
-
-    return JsonResponse({'success': img_msg, 'username': request.user.get_username(),'errorMsg': True})
 
 def brainstormSave(request):
 
