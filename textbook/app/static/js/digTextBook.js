@@ -1,8 +1,6 @@
 var current_pagenumber = 1 //initial page number; gets updated with page change
 var type = '' //card type
-var groupArray = ['A', 'B','C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
 var activity_id
-var lastOpenedTool
  var host_url = window.location.host
 
 window.onerror = function(message, file, line) {
@@ -353,65 +351,25 @@ var bindActivityButtons = function(){
 
             card_extension();
 
-            lastOpenedTool = 'gallery';
-
-             //todo: need to fix this activity id value passing
-             $('#upload-img input[name="act-id"]').attr('value', id);
-
-            //todo: can we make it global? move to utility.js?
-            var user_group_id
-            $.ajax({
-                type:'GET',
-                url:'http://'+ host_url +'/getGroupID/'+$('input[name="act-id"]').val(),
-                async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
-                success: function(e){
-                    user_group_id = e;
-                    console.log("my group id (from digtextBook.js)::", e)
-                }
-            });
-
-            //get data heading from the <a> tags
-            //console.log(activityButton.attr('data-heading'));
-
             //update the heading in the card
-            $('.card.' + type + ' h1').text(activityButton.attr('data-heading') + ' Group ' + groupArray[user_group_id-1]);
+            $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
+
+            loadGalleryFeed(id);
 
 
-            //gallery 1 card stays open if explicitly not closed and you go to gallery 2.
-            //with each click hide the single image view
-            $('#gallery-panel').show();
-            //$('#single-image-view').hide();
+//            //todo: can we make it global? move to utility.js?
+//            var user_group_id
+//            $.ajax({
+//                type:'GET',
+//                url:'http://'+ host_url +'/getGroupID/'+$('input[name="act-id"]').val(),
+//                async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
+//                success: function(e){
+//                    user_group_id = e;
+//                    console.log("my group id (from digtextBook.js)::", e)
+//                }
+//            });
 
 
-//            var view = activityButton.attr('data-view');
-//            console.log('view: ', view)
-//
-//            //call function from gallery.js
-//            $("input[name='group-id']").attr('value', user_group_id);
-//            viewDiv("class", user_group_id);
-//
-//            //indicate that its not a middleGroupDiscussion -- variable used to extract comments as needed
-//            //defined in gallery.js (top)
-//            middleGroupDiscussion = 'no';
-//
-//            //teacher-view handle
-//            //TODO: Can transfar ajax request to gallery.js inside populate function
-//            if(logged_in == 'AW'){
-//                $(".teacher-view").css("display", "block");
-//                 $.ajax({
-//                    type:'GET',
-//                    url:'http://'+ host_url +'/randomDiscussionList', //fetches number of groups
-//                    async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
-//                    success: function(e){
-//
-//                        console.log(e.list);
-//                        populateTeacherViewDiv(e.list); //defined in gallery.js
-//                    }
-//                });
-//            }
-
-            //if the card is already extended, put it back to normal -- we don't want to close the expansion for this card.
-            //card_extension_close();
         }
 
 //        ------------------------------ANSWER-----------------------
@@ -466,17 +424,7 @@ var bindActivityButtons = function(){
 
 var card_extension = function(){
 
-    var width = $(".card").width() / $('.card').parent().width() * 100
-    width = width/2;
-    console.log('width ::', width);
-
     $('.card').css({'width':'100%'});
-
-//    if (width == 50){
-//        $('.card').css({'width':'100%'});
-//    }else{
-//        $('.card').css({'width':'50%'});
-//    }
 
 }
 

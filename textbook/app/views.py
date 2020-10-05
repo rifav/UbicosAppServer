@@ -26,7 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 # instantiate the pusher class - this is used for activity feed message
 pusher = Pusher(app_id=u'525110', key=u'ea517de8755ddb1edd03', secret=u'be2bf8ae15037bde9d94', cluster=u'us2')
 
-# instantiate the pusher class - this is used for inidividual image message
+# instantiate the pusher class - this is used for individual image message
 pusher1 = Pusher(app_id=u'525110', key=u'f6bea936b66e4ad47f97', secret=u'ed3e9509fce91430fcac', cluster=u'us2')
 
 # instantiate the pusher class - this is used for brainstorm note
@@ -200,11 +200,11 @@ def uploadImage(request):
 def getIndividualImages(request, act_id):
     #get the group members of the current users
     member_list = getGroupMembers(request, act_id);
-    print("getIndividualImages member list:: ", member_list);
+    print("getIndividualImages member id list :: ", member_list);
     #retrieve images from Image Model for each user in member_list
     images = imageModel.objects.filter(posted_by_id__in=member_list);
     image_data = serializers.serialize('json', images, use_natural_foreign_keys=True);
-    #print('line 205', image_data)
+    #print('debug, get individual images method :: ', image_data)
 
     return JsonResponse({'imageData': image_data});
 
@@ -223,6 +223,7 @@ def getIndividualCommentMsgs(request,imageId):
     imageCommments = individualMsgComment.objects.filter(imageId=imageId, posted_by=request.user);
     imageCommments = serializers.serialize('json', imageCommments, use_natural_foreign_keys=True);
     return JsonResponse({'imageCommments': imageCommments});
+
 
 ###############################################
 ############ handler methods start ############
@@ -255,33 +256,10 @@ def getGroupMembers(request, act_id):
 
     return group_member_list;
 
-
 ############ handler methods end ############
 #############################################
 
-def getImage(request, view_id, gallery_id,group_id):
 
-    # for pilot/study
-    if(int(view_id) == 1): #view_id = 1 means comment view
-        #images = imageModel.objects.exclude(group_id=group_id)
-        #images = images.filter(gallery_id=gallery_id)
-        images = imageModel.objects.filter(gallery_id=gallery_id)
-    else:
-        images = imageModel.objects.filter(gallery_id=gallery_id)
-        images = images.filter(group_id=group_id)
-
-    # for workshop
-    # images = imageModel.objects.filter(group_id=group_id)
-    # images = images.filter(gallery_id=gallery_id)
-
-    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
-    #print(image_data)
-    #get and send random group information here
-
-    random_group_list = getRandomGroupMemberList(request, gallery_id)
-    random_group_list.remove('AW')  # remove simply removes the item, does not return anything. so print the list again
-
-    return JsonResponse({'success': image_data, 'random_group_list':random_group_list})
 
 def getImageID(request,img_filename):
     print('receiving parameter :: file name :: ' + img_filename);

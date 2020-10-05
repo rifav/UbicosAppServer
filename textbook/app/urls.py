@@ -15,17 +15,19 @@ urlpatterns = [
     url('getGroupID/(?P<act_id>\d+)', views.getGroupID),
     #urls for upload image tool
     url('uploadImage', views.uploadImage, name='uploadImage'),
-    #urls for upload image tool
+    #urls for individual image tool
     url('getIndividualImages/(?P<act_id>\d+)', views.getIndividualImages),
     url('saveIndividualCommentMsgs', views.saveIndividualCommentMsgs),
     url('getIndividualCommentMsgs/(?P<imageId>\d+)', views.getIndividualCommentMsgs),
+    #urls for gallery image tool
+
+
+
     #url('getUserList',views.getUserList),
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),
     #url('addUserToGroups',views.addUserToGroupsForm),
-
     #urls for different tool utility
-    url('getImage/(?P<view_id>\d+)/(?P<gallery_id>\d+)/(?P<group_id>\d+)/', views.getImage, name='getImg'),
     url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url(r'^ajax/imageComment/$', views.broadcastImageComment),
