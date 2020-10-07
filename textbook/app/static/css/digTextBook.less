@@ -704,24 +704,25 @@ a {
 }
 
 
-#feed-toggle {
-    position: fixed;
-    top: 15px;
-    right: 60px;
-    display: inline-block;
-    width: 50px;
-    height: 50px;
-    z-index: 2;
-    background-image: url(../pics/time.png);
-    background-size: cover;
-    border-radius: 50%;
-    transition: all 0.4s;
 
-    &.pressedf {
-        box-shadow: inset 0 3px 25px rgba(0,0,0,0.3);
-        background-color: #C9DDE4;
-    }
-}
+// #feed-toggle {
+//     position: fixed;
+//     top: 15px;
+//     right: 60px;
+//     display: inline-block;
+//     width: 50px;
+//     height: 50px;
+//     z-index: 2;
+//     background-image: url(../pics/time.png);
+//     background-size: cover;
+//     border-radius: 50%;
+//     transition: all 0.4s;
+//
+//     &.pressedf {
+//         box-shadow: inset 0 3px 25px rgba(0,0,0,0.3);
+//         background-color: #C9DDE4;
+//     }
+// }
 
 #teacher-toggle {
     position: fixed;
@@ -1081,6 +1082,50 @@ a {
     we could apply some JS to do so.
     */
     position: relative;
+}
+
+#gallery-group-user {
+    position: fixed;
+    top: 10px;
+    right: 60px;
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    z-index: 2;
+    background-image: url(../pics/group-members.png);
+    background-size: cover;
+    border:3px solid black;
+    border-radius: 50%;
+    transition: all 0.4s;
+}
+
+.gallery-group-members {
+        position: fixed;
+        top: 55px;
+        right: 50px;
+        z-index: 2;
+        background-color: #E1E8EF;
+        border-radius: 30%;
+        opacity: 0;
+        overflow: hidden;
+        color: black;
+        transition: opacity 300ms ease;
+
+        ul{
+             list-style: none;
+
+             li{
+                padding: 5px;
+                margin-right: 40px;
+                //color: black;
+
+             }
+        }
+}
+
+#gallery-group-user:hover ~ .gallery-group-members{
+  max-height: inherit;
+  opacity: 1;
 }
 
 

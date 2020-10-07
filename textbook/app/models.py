@@ -4,6 +4,16 @@ import jsonfield
 
 # Create your models here.
 
+# saves students personality
+class studentCharacteristicModel (models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    has_msc = models.BooleanField(default=False)
+    has_hsc = models.BooleanField(default=False)
+    has_fam = models.BooleanField(default=False)
+    has_con = models.BooleanField(default=False)
+
+
+# saves the image
 class imageModel(models.Model):
 
     gallery_id = models.IntegerField()
@@ -21,7 +31,7 @@ class imageModel(models.Model):
         #return (self.posted_by.username)
         return (self.id)
 
-
+# saves comment from the digital gallery discussion
 class imageComment(models.Model):
     content = models.CharField(max_length=400)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -32,6 +42,7 @@ class imageComment(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+# saves comment from the individual commenting section
 class individualMsgComment(models.Model):
     activityID = models.IntegerField(null=True)
     imageId = models.ForeignKey(imageModel, on_delete=models.CASCADE)
@@ -42,21 +53,9 @@ class individualMsgComment(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
-# delete the following method
-# class khanAcademyAnswer(models.Model):
-#     ka_id = models.IntegerField()
-#     ka_image = models.ImageField(upload_to='ka_images')
-#     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     posted_at = models.DateTimeField(auto_now_add=True)
-#     response_type = models.CharField(max_length=20)
-#     response = models.CharField(max_length=2000)
-#
-#     def natural_key(self):
-#         return (self.posted_by.username)
 
 # activity feed message
-
-#rename the following method for clarification
+# rename the following method for clarification
 class Message(models.Model):
     content = models.CharField(max_length=400)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -109,13 +108,6 @@ class groupInfo(models.Model):
         return '%s %s' % (self.activityID, self.group)
 #temp solution for pilot-1 -- end
 
-class random_group_users(models.Model):
-    users = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    gallery_id = models.IntegerField()
-    group = models.CharField(max_length=20)
-
-    def natural_key(self):
-        return (self.posted_by.username)
 
 class userLogTable(models.Model):
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

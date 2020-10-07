@@ -22,10 +22,10 @@ urlpatterns = [
     #urls for gallery image tool
     url('imageComment', views.broadcastImageComment),
     url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
+    #urls for student characteristic
+    url('saveCharacteristic', views.saveCharacteristic),
 
 
-
-    #url('getUserList',views.getUserList),
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),
     #url('addUserToGroups',views.addUserToGroupsForm),

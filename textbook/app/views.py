@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, random_group_users, badgeModel
+    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -131,6 +131,16 @@ def login(request):
     else:
         return render(request, 'app/login.html', {})
 
+def saveCharacteristic(request):
+    #TODO update from the front-end
+    #loop through all the user and set some values
+    for o in User.objects.all():
+        student_char = studentCharacteristicModel(user=o, has_msc=True,
+                                                  has_hsc=True, has_fam=True, has_con=True);
+        student_char.save();
+
+
+    return HttpResponse('');
 
 def uploadImage(request):
     #get image from html and save it in the database
@@ -848,11 +858,7 @@ def getBadges(request):
 #     print(parser.activityParser(self))
 #     return HttpResponse('')
 #
-# def getUserList(request):
-#     users = User.objects.all()
-#     print(users)
-#     context = {'user_list': users}
-#     return render(request, 'app/studentList.html', context)
+
 #
 #
 # def getAllStudentInfo(request,std_id):
