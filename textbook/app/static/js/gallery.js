@@ -53,6 +53,9 @@ var loadGalleryFeed = function(act_id){
              }
      });
 
+     //hide badge prompt div
+
+
 
 } //end of loadGalleryFeed method
 
@@ -72,6 +75,16 @@ var galleryMsgBtnAction = function(){
             return false;
         }
       });
+
+    $('#badge-option a').off().on('click', function(e){
+
+        console.log($(e.target).parents('a').attr('id'));
+        $("#badge-option").css("display", "none");
+        $(".div-badge-prompt").css("display", "");
+
+        //alert("clicked");
+
+    });
 
 } //end of galleryMsgBtnAction method
 
@@ -173,6 +186,7 @@ var image_hover_func = function(){
     $('.section div').hover(function(){
     $(this).css({ "-webkit-transform": "scale(1.2)",
            "transform":"scale(1.2) " ,
+           "transform-origin": "center",
            "transition":"transform 0.25s ease"
            });
     }, function(){ //remove hovering effect

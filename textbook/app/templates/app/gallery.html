@@ -24,9 +24,11 @@
                 <p id="gallery-description">
                         Discuss about the images as a group.
                 </p>
-                <div>
+                <div >
                     <a id="gallery-group-user"></a>
+                    <span class="gallery-span">5</span>
                     <div class="gallery-group-members">
+                        <span>5</span>
                         <ul>
                             <li>name 1</li>
                             <li>name 2</li>
@@ -44,15 +46,57 @@
 <!--                    <a href="" class="next-image"></a>-->
                     <div>
                         <img  src="{% static 'pics/default.png' %}" alt="">
-                        <span> Image upload by </span>
+<!--                        <span> Image upload by </span>-->
                     </div>
                     <!--<a href="#" class="gallery_image_user_name">here i am</a>-->
                     <input type="hidden" name="image-index" value=""/>
                     <input type="hidden" name="image-db-pk" value=""/>
                     <!--<div class = "posted_by_image"></div>-->
                 </div>
-                <div>
+                <!--div displaying the badge selection-->
+                <div id="badge-option" class="badge-option-class">
+                    <div>
+                       <a href="#" id="badge1">
+                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                           <span>badge  1</span>
+                       </a>
+                    </div>
+                    <div>
+                       <a href="#" id="badge2">
+                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                           <span>badge  2</span>
+                       </a>
+                   </div>
+                    <div>
+                       <a href="#" id="badge3">
+                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                           <span>badge  3</span>
+                       </a> <br/>
 
+                   </div>
+                     <div>
+                       <a href="#" id="badge4">
+                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                            <span>badge  4</span>
+                       </a>
+
+                   </div>
+
+                </div>
+                <!--div displaying the badge prompt and sentence starter-->
+                <div class="div-badge-prompt" style="display: none">
+                    <div style="float:left">
+                        <a href="#">
+                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                           <span>badge  3</span>
+                       </a>
+                    </div>
+                    <p>
+                        This is a sample prompt message. this is for testing. want to check the length of the prompt message.
+                        In the time of covid we are all together. we will get through this. thanks for being patient. I can fit
+                        another sentence. can fit another sentence.
+                    </p>
+<!--                    <p class="badge-ss"></p>-->
                 </div>
             </div>
 
