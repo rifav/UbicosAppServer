@@ -16,7 +16,7 @@ window.onerror = function(message, file, line) {
     * activityindex.js
 */
 
-var NUM_PAGES = 18;
+var NUM_PAGES = 25;
 
 
 $(function(){
@@ -56,7 +56,7 @@ $(function(){
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
     loadPage(1, $('.page:not(.previous):not(.next)'));
-    //loadPage(2, $('.page.next'));
+    loadPage(2, $('.page.next'));
 
     // If we start loading the cards dynamically, this needs to be called after the brainstorm card is built
     setupBrainstorm();
@@ -135,62 +135,62 @@ $(function(){
 });
 
 
-//var movePage = function(moveToNext){
-//
-//    var container = $('#textbook-content'),
-//        pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
-//        pageToShow, // This is the page that will be shown next
-//        pageToReplace, // this is the page whose content will need to be updated
-//        currentNewClass, // this is the new class that will be applied to the current page
-//        currentPageNum, // Page number of the page that will be shown
-//        replacePageNum, // Number of the new page to be dynamically loaded
-//        noMoreClass; // Class that will be added to container if
-//    if(moveToNext === true){
-//        pageToShow = $('.page.next', container);
-//        pageToReplace = $('.page.previous', container);
-//        currentNewClass = 'previous';
-//        replaceNewClass = 'next';
-//        currentPageNum = parseInt(pageToShow.data('page'));
-//        replacePageNum = currentPageNum + 1;
-//        noMoreClass = 'last';
-//    } else {
-//        pageToShow = $('.page.previous', container);
-//        pageToReplace = $('.page.next', container);
-//        currentNewClass = 'next';
-//        replaceNewClass = 'previous';
-//        currentPageNum = parseInt(pageToShow.data('page'));
-//        replacePageNum = currentPageNum - 1;
-//        noMoreClass = 'first';
-//    }
-//
-//    // Replace page number
-//    //console.log("current page", currentPageNum)
-//    current_pagenumber = currentPageNum
-//    localStorage.setItem("pageToBeRefreshed", currentPageNum);
-//    $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
-//
-//
-//    //close any card with page navigation
-//    if(type!=''){
-//        $('.card.' + type).removeClass('active');
-//    }
-//
-//    // Do swaps
-//    pageToHide.attr('class','page').addClass(currentNewClass); // Turn the current page into either next or previous
-//    pageToShow.attr('class','page');
-//    pageToReplace.attr('class','page').addClass(replaceNewClass);
-//
-//    // Replace page to replace content
-//    loadPage(
-//        replacePageNum,
-//        pageToReplace,
-//        function(){
-//            container.attr('class','');
-//        },
-//        function(){
-//            container.attr('class', noMoreClass);
-//        });
-//};
+var movePage = function(moveToNext){
+
+    var container = $('#textbook-content'),
+        pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
+        pageToShow, // This is the page that will be shown next
+        pageToReplace, // this is the page whose content will need to be updated
+        currentNewClass, // this is the new class that will be applied to the current page
+        currentPageNum, // Page number of the page that will be shown
+        replacePageNum, // Number of the new page to be dynamically loaded
+        noMoreClass; // Class that will be added to container if
+    if(moveToNext === true){
+        pageToShow = $('.page.next', container);
+        pageToReplace = $('.page.previous', container);
+        currentNewClass = 'previous';
+        replaceNewClass = 'next';
+        currentPageNum = parseInt(pageToShow.data('page'));
+        replacePageNum = currentPageNum + 1;
+        noMoreClass = 'last';
+    } else {
+        pageToShow = $('.page.previous', container);
+        pageToReplace = $('.page.next', container);
+        currentNewClass = 'next';
+        replaceNewClass = 'previous';
+        currentPageNum = parseInt(pageToShow.data('page'));
+        replacePageNum = currentPageNum - 1;
+        noMoreClass = 'first';
+    }
+
+    // Replace page number
+    //console.log("current page", currentPageNum)
+    current_pagenumber = currentPageNum
+    localStorage.setItem("pageToBeRefreshed", currentPageNum);
+    $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
+
+
+    //close any card with page navigation
+    if(type!=''){
+        $('.card.' + type).removeClass('active');
+    }
+
+    // Do swaps
+    pageToHide.attr('class','page').addClass(currentNewClass); // Turn the current page into either next or previous
+    pageToShow.attr('class','page');
+    pageToReplace.attr('class','page').addClass(replaceNewClass);
+
+    // Replace page to replace content
+    loadPage(
+        replacePageNum,
+        pageToReplace,
+        function(){
+            container.attr('class','');
+        },
+        function(){
+            container.attr('class', noMoreClass);
+        });
+};
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
     //console.log('next page (loadPage Function)', pageNum)
