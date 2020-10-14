@@ -15,6 +15,21 @@ $(function(){
 
         //event handler for all four higher level tabs e.g., general, week1, week2, week3
         $('.showLinkgeneral, .showLinkweek1, .showLinkweek2, .showLinkweek3 ').click(function (e) {
+                //toggle the up/down image, except the current selected "a" tab, set uparrow/downarrow for the rest of the tabs -- start
+                $(this).find('img').toggle();
+
+                var navBars = ['showLinkgeneral', 'showLinkweek1', 'showLinkweek2', 'showLinkweek3']
+                var selected = $(this).attr('class');
+
+                navBars.splice( $.inArray(selected,navBars), 1);
+                $.each(navBars, function(id, element){
+                    $("a."+element+" img.uparrow").css("display","none");
+                    $("a."+element+" img.downarrow").css("display","");
+                })
+
+                //toggle the up/down image -- end
+
+                //expand the selected tab
                 var className = $(this).attr('class').replace('showLink','').trim();
                 //alert(className);
                 //toggle the currently selected <ul> tag element

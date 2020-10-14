@@ -1,10 +1,14 @@
+   {% load static %}
     <span id="right-side-menu">&#9776;</span>
 
 
     <div id="mySidenav" class="sidenav" >
         <a href="javascript:void(0)" class="right-menu-closebtn">&times;</a>
 
-        <a class="showLinkgeneral">General</a>
+        <a class="showLinkgeneral">General
+              <img class="uparrow" src="{% static 'pics/uparrow.png' %}" style="display:none"/>
+              <img class="downarrow" src="{% static 'pics/downarrow.png' %}" />
+        </a>
         <ul class="side-nav-ul general">
             <li style="list-style-type: none;">
                 <a href="#" class="nav" data-pageId="0">Modelbook Demo Video</a>
@@ -16,7 +20,10 @@
 
 
 
-        <a class="showLinkweek1">Week 1</a>
+        <a class="showLinkweek1">Week 1
+            <img class="uparrow" src="{% static 'pics/uparrow.png' %}" style="display:none"/>
+            <img class="downarrow" src="{% static 'pics/downarrow.png' %}" />
+        </a>
         <ul class="side-nav-ul week1">
             <li style="list-style-type: none;">
                 <a href="#" class="nav" data-pageId="1">Help-Giving and Talk Moves Assignment</a>
@@ -36,7 +43,10 @@
 
 
 
-        <a class="showLinkweek2">Week 2</a>
+        <a class="showLinkweek2">Week 2
+            <img class="uparrow" src="{% static 'pics/uparrow.png' %}" style="display:none"/>
+            <img class="downarrow" src="{% static 'pics/downarrow.png' %}" />
+        </a>
         <ul class="side-nav-ul week2">
             <li style="list-style-type: none;">
                 <a href="#" class="nav" data-pageId="13">Return of the Ratio Assignment</a>
@@ -55,7 +65,10 @@
             </li>
         </ul>
 
-        <a class="showLinkweek3">Week 3</a>
+        <a class="showLinkweek3">Week 3
+            <img class="uparrow" src="{% static 'pics/uparrow.png' %}" style="display:none"/>
+            <img class="downarrow" src="{% static 'pics/downarrow.png' %}" />
+        </a>
         <ul class="side-nav-ul week3">
             <li style="list-style-type: none;">
                 <a href="#" class="nav" data-pageId="26">Buggy Lab Cont.</a>
