@@ -96,6 +96,7 @@
                 <div id ="suggestion_text"></div>
             </div>
 
+
 <!--            <div id="activity-index-view" class="main-view" style="display: none;">-->
 <!--                {% include 'app/activityindex.html' %}-->
 <!--            </div>-->
@@ -154,6 +155,11 @@
                 {% include 'app/multQues.html' %}
             </div>
 
+             <div class="card badgeCard active">
+                <a class="close-card"></a>
+                {% include 'app/badge.html' %}
+            </div>
+
         </div>
     </div>
 
@@ -171,7 +177,6 @@
     <script src="{% static 'js/gallery.js' %}"></script>
     <script src="{% static 'js/activityfeed.js' %}"></script>
     <script src="{% static 'js/brainstorm.js' %}"></script>
-<!--    <script src="{% static 'js/convert.js' %}"></script>-->
     <script src="{% static 'js/individual_gallery.js' %}"></script>
     <script src="{% static 'js/table.js' %}"></script>
     <script src="{% static 'js/userlog.js' %}"></script>

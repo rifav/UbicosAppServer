@@ -1,6 +1,7 @@
 // Define colors for activity types
 @video1: #e43131;
 @video2: #e45882;
+@badge: #4CB7B7;
 @brainstorm1: #F4AB4D;
 @brainstorm2: #F9C82C;
 @brainstorm3: #ff9933; /* brainstorm model so far */
@@ -265,6 +266,22 @@ a {
 }
 .activity-button.brainstorm:hover {
     box-shadow: 0 0 30px @brainstorm1;
+    transition: all 0.4s;
+}
+
+/* badgeCard class color + activity button color */
+
+.badgeCard {
+    color: @badge;
+}
+.activity-button.badgeCard {
+    background-image: url('/static/pics/blank.png');
+}
+.activity-button.badgeCard:after {
+    background: linear-gradient(@badge, @badge);
+}
+.activity-button.badgeCard:hover {
+    box-shadow: 0 0 30px @badge;
     transition: all 0.4s;
 }
 
@@ -2127,86 +2144,56 @@ a {
 }
 //first page left side menu bar related CSS -- end
 
-//personality question page css - start
 
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 90px;
-  height: 34px;
-}
+//badgeCard css -- start
 
-.switch input {display:none;}
+.child {
+    display: inline-block;
 
-.response-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ca2222;
-  -webkit-transition: .4s;
-  transition: .4s;
-  border-radius: 34px;
+    span {
+        display: block;
+     }
 
 }
 
-.response-slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-  border-radius: 50%;
+.child.platform{
+    position: relative;
+    top: -28px;
+}
+
+.badgeContainter {
+    border: 1px solid black;
+    padding: 25px 10px 25px 10px;
+    text-align: center;
+    display: block;
+
+    img {
+        width: 70px;
+        height: 70px;
+    }
 
 }
 
-input:checked + .response-slider {
-  background-color: #2ab934;
+.badgeContainter > div {
+    display: inline-block;
+    padding: 0px 25px 0px 25px;
 }
 
-input:focus + .response-slider {
-  box-shadow: 0 0 1px #2196F3;
+.badgeContent {
+    margin:auto;
+    margin-top: -50px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    padding: 10px 22px 10px 25px;
+    text-transform:uppercase;
+    line-height: 1em;
+    background-color: #ccc;
+    width: 20%;
+    min-width: 170px;
 }
 
-input:checked + .response-slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(55px);
-}
+.badgeTitle {color: black;}
+.badgeSub {color: green;}
 
-.response-slider:after
-{
- content:'NO';
- color: white;
- display: block;
- position: absolute;
- transform: translate(-50%,-50%);
- top: 50%;
- left: 50%;
- font-size: 10px;
- font-family: Verdana, sans-serif;
-}
-
-input:checked + .response-slider:after
-{
-  content:'YES';
-}
-
-
-/* Rounded sliders */
-.response-slider.round {
-  border-radius: 34px;
-}
-
-.response-slider.round:before {
-  border-radius: 50%;
-}
-
-
-//personality question page css - end
+//badgeCard css -- end

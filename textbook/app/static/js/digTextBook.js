@@ -318,6 +318,16 @@ var bindActivityButtons = function(){
               card_extension_close();
 
         }
+//        ---------------------badge card-----------------------
+        if($('.card.badgeCard').hasClass('active')){
+
+             //if the card is already extended, put it back to normal
+             card_extension_close();
+
+             console.log('card opened');
+
+
+        }
 
 //        ---------------------image upload card-----------------------
         if($('.card.upload').hasClass('active')){
