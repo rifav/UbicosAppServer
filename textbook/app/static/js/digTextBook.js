@@ -25,7 +25,7 @@ $(function(){
 
         var classNameWhichisClosed = $(this).offsetParent()[0].className.split(" ")[1]
         //user logging
-        enterLogIntoDatabase('card close', classNameWhichisClosed, 'none', current_pagenumber)
+        //enterLogIntoDatabase('card close', classNameWhichisClosed, 'none', current_pagenumber)
         $(this).closest('.card').removeClass('active');
 
     });
@@ -42,8 +42,8 @@ $(function(){
             $('.card').css({'width':'50%'});
         }
 
-        var classNameWhichisExtended = $(this).offsetParent()[0].className.split(" ")[1]
-        enterLogIntoDatabase('card extend', classNameWhichisExtended, 'none', current_pagenumber)
+        //var classNameWhichisExtended = $(this).offsetParent()[0].className.split(" ")[1]
+        //enterLogIntoDatabase('card extend', classNameWhichisExtended, 'none', current_pagenumber)
 
     });
 
@@ -83,21 +83,6 @@ $(function(){
             }
      });
 
-//     $('#teacher-toggle').click(function() {
-//            $(this).toggleClass('pressedf');
-//            if ($(this).hasClass("pressedf")){
-//                var conf = confirm("You are about to view student information, are you sure?!");
-//                if(conf){
-//                    window.location.href = "http://"+host_url+"/getDashboard";
-//                }else{
-//                    $(this).removeClass("pressedf");
-//                }
-//
-//            }else{
-//
-//            }
-//     });
-
 
 //    //delete the followin if no error occurs or make it a separate function
 //
@@ -129,6 +114,15 @@ $(function(){
 //
 //      }
 
+        console.log("here");
+        //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
+        $('.page').off().on('click','#editPersonalityBtn', function(event){
+             console.log("button clicked");
+//             $("#matchedPersonality").css("display", "none");
+//             $("#editPersonality").css("display", "");
+               $("#matchedPersonality").toggle();
+               $("#editPersonality").toggle();
+        });
 
 
 
