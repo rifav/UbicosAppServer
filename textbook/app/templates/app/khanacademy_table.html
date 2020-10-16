@@ -1,27 +1,33 @@
-<h1></h1>
-<!--{{list}}-->
+{% load static %}
+<!--<h1></h1>-->
+<!--&lt;!&ndash;{{list}}&ndash;&gt;-->
+<!--<div>-->
+<!--&lt;!&ndash;https://stackoverflow.com/questions/9388064/django-template-turn-array-into-html-table&ndash;&gt;-->
+<!--    {% if list %}-->
+<!--    <table border="1">-->
+<!--        <tr>-->
+<!--          &lt;!&ndash;<td>Image Link</td>&ndash;&gt;-->
+<!--          <td>Posted By</td>-->
+<!--          <td>Response Type</td>-->
+<!--          <td>Response</td>-->
+<!--        </tr>-->
+<!--      {% for item in list %}-->
+<!--        <tr>-->
+<!--          &lt;!&ndash;<td>{{item.ka_image}}</td>&ndash;&gt;-->
+<!--          <td>{{item.posted_by}}</td>-->
+<!--          <td>{{item.response_type}}</td>-->
+<!--          <td>{{item.response}}</td>-->
+<!--        </tr>-->
+<!--      {% endfor %}-->
+<!--    </table>-->
+
+<!--    {% else %}-->
+<!--        <p>No students registered in this class.</p>-->
+<!--    {% endif %}-->
+
+<!--</div>-->
+
 <div>
-<!--https://stackoverflow.com/questions/9388064/django-template-turn-array-into-html-table-->
-    {% if list %}
-    <table border="1">
-        <tr>
-          <!--<td>Image Link</td>-->
-          <td>Posted By</td>
-          <td>Response Type</td>
-          <td>Response</td>
-        </tr>
-      {% for item in list %}
-        <tr>
-          <!--<td>{{item.ka_image}}</td>-->
-          <td>{{item.posted_by}}</td>
-          <td>{{item.response_type}}</td>
-          <td>{{item.response}}</td>
-        </tr>
-      {% endfor %}
-    </table>
-
-    {% else %}
-        <p>No students registered in this class.</p>
-    {% endif %}
-
+    display badges and prompts here.
+    auto display them when any khan academy page loads.
 </div>

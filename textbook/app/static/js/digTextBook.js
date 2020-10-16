@@ -16,7 +16,7 @@ window.onerror = function(message, file, line) {
     * activityindex.js
 */
 
-var NUM_PAGES = 25;
+var NUM_PAGES = 33;
 
 
 $(function(){
@@ -114,10 +114,10 @@ $(function(){
 //
 //      }
 
-        console.log("here");
+        //console.log("here");
         //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
         $('.page').off().on('click','#editPersonalityBtn', function(event){
-             console.log("button clicked");
+             //console.log("button clicked");
 //             $("#matchedPersonality").css("display", "none");
 //             $("#editPersonality").css("display", "");
                $("#matchedPersonality").toggle();
@@ -314,6 +314,18 @@ var bindActivityButtons = function(){
         }
 //        ---------------------badge card-----------------------
         if($('.card.badgeCard').hasClass('active')){
+
+             //if the card is already extended, put it back to normal
+             card_extension_close();
+
+             console.log('card opened');
+
+
+        }
+
+//        ---------------------Khan academy card-----------------------
+//        ---------------------Khan academy card-----------------------
+        if($('.card.khanacademy').hasClass('active')){
 
              //if the card is already extended, put it back to normal
              card_extension_close();

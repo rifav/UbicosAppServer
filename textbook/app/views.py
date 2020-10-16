@@ -1,6 +1,6 @@
 
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, render_to_response
+from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
     userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel
