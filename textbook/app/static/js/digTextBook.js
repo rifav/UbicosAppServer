@@ -1,7 +1,7 @@
-var current_pagenumber = 1 //initial page number; gets updated with page change
+var global_current_pagenumber = 1 //initial page number; gets updated with page change //used for logging
 var type = '' //card type
-var activity_id
- var host_url = window.location.host
+var activity_id //activity id for the selected tool
+var host_url = window.location.host
 
 window.onerror = function(message, file, line) {
   console.log('An error occured at line ' + line + ' of ' + file + ': ' + message);
@@ -12,123 +12,81 @@ window.onerror = function(message, file, line) {
 
 /*
     This variable is key in the functioning of the page navigation functionality.
-    It is also used in:
-    * activityindex.js
+    It is also used in: activityindex.js
 */
 
 var NUM_PAGES = 33;
 
-
+//load all init function required for the digital textbook to load here
 $(function(){
-
-    $('.close-card').on('touch click', function(){
-
-        var classNameWhichisClosed = $(this).offsetParent()[0].className.split(" ")[1]
-        //user logging
-        //enterLogIntoDatabase('card close', classNameWhichisClosed, 'none', current_pagenumber)
-        $(this).closest('.card').removeClass('active');
-
-    });
-
-    $('.extend-card').on('touch click', function(){
-
-        var width = $(".card").width() / $('.card').parent().width() * 100
-        width = width/2;
-        console.log('width ::', width);
-
-        if (width == 50){
-            $('.card').css({'width':'100%'});
-        }else{
-            $('.card').css({'width':'50%'});
-        }
-
-        //var classNameWhichisExtended = $(this).offsetParent()[0].className.split(" ")[1]
-        //enterLogIntoDatabase('card extend', classNameWhichisExtended, 'none', current_pagenumber)
-
-    });
-
 
     //update activity feed with history of messages
     //call function from activity.js //0 means all; 1 means todays chat
     loadFeed(0);
-
 
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
     loadPage(1, $('.page:not(.previous):not(.next)'));
     loadPage(2, $('.page.next'));
 
-    // If we start loading the cards dynamically, this needs to be called after the brainstorm card is built
+    //If we start loading the cards dynamically, this needs to be called after the brainstorm card is built
     setupBrainstorm();
 
-    //toggle between activity feed and index
-    $('#main-view-toggle').click(function(){
-        var hidden = $('.main-view:hidden');
-        $('.main-view:visible').fadeOut('fast', function(){
-            hidden.fadeIn('fast');
-        });
-        $(this).toggleClass('pressed');
+    //check for the last accessed page in the local storage
+    if(localStorage.getItem("pageToBeRefreshed")){
 
-        //TODO: add user log
-        enterLogIntoDatabase('click', 'activity index', 'none', current_pagenumber)
-    });
+        var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
+        console.log("last accessed page (digTextBook.js)::", pageToBeRefreshed);
+        reloadPage(pageToBeRefreshed);
+    }
 
-    $('#feed-toggle').click(function() {
-            $(this).toggleClass('pressedf');
-            if ($(this).hasClass("pressedf")){
-            //call function from activity.js //0 means all; 1 means todays chat
-                loadFeed(1);
-            }else{
-                loadFeed(0);
-            }
-     });
-
-
-//    //delete the followin if no error occurs or make it a separate function
-
-//      if(localStorage.getItem("pageToBeRefreshed")){
-//
-//        var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
-//
-//        var gotoPage = pageToBeRefreshed;
-//        var container = $('#textbook-content');
-//
-//        // Update current page
-//        loadPage(
-//            gotoPage,
-//            $('.page:not(.previous):not(.next)'),
-//            function(){
-//                // Update container class if this is the last or the first page
-//                var containerClass = ''
-//                if(gotoPage == 1) containerClass = 'first';
-//                else if(gotoPage == NUM_PAGES) containerClass = 'last'; // NUM_PAGES is defined in digTtextBook.js
-//                container.attr('class',containerClass);
-//                // Change page number
-//                $("#page-control-number").text('Page ' + gotoPage + '/' + NUM_PAGES);
-//            });
-//        // Update previous and next
-//        loadPage(parseInt(gotoPage)+1, $('.page.next'));
-//        loadPage(gotoPage-1, $('.page.previous'));
-//
-//      }else{
-//
-//      }
-
-        //console.log("here");
-        //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
-        $('.page').off().on('click','#editPersonalityBtn', function(event){
-             //console.log("button clicked");
-//             $("#matchedPersonality").css("display", "none");
-//             $("#editPersonality").css("display", "");
-               $("#matchedPersonality").toggle();
-               $("#editPersonality").toggle();
-        });
-
-
+//        //console.log("here");
+//        //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
+//        $('.page').off().on('click','#editPersonalityBtn', function(event){
+//             //console.log("button clicked");
+////             $("#matchedPersonality").css("display", "none");
+////             $("#editPersonality").css("display", "");
+//               $("#matchedPersonality").toggle();
+//               $("#editPersonality").toggle();
+//        });
 
 });
 
+//this method loads a specific page, adjusts previous/next page accordingly
+//this method is called two times:
+//1) in digtextbook.js - load the last accessed page
+//2) in activityindex.js - when a page is selected from the side navigation bar
+var reloadPage = function(pageToLoad){
+    var gotoPage = pageToLoad;
+    var container = $('#textbook-content');
 
+    // Update the current page
+    loadPage(
+        gotoPage,
+        $('.page:not(.previous):not(.next)'),
+        function(){
+            // Update container class if this is the last or the first page
+            var containerClass = ''
+            if(gotoPage == 1) containerClass = 'first';
+            else if(gotoPage == NUM_PAGES) containerClass = 'last'; // NUM_PAGES is defined in digTtextBook.js
+            container.attr('class',containerClass);
+            // update page number
+            $("#page-control-number").text('Page ' + gotoPage + '/' + NUM_PAGES);
+        });
+     //Update previous and next
+    loadPage(parseInt(gotoPage)+1, $('.page.next'));
+    loadPage(gotoPage-1, $('.page.previous'));
+
+    //TODO: update the side navigation bar current status
+    //idenfity the a tag with the page id
+    console.log($($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]));
+    //then add active class in the current selected <a> tag -- not working
+    //$($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]).toggleClass('active');
+
+}
+
+
+//this method is used for page navigation i.e., previous/next buttons
 var movePage = function(moveToNext){
 
     var container = $('#textbook-content'),
@@ -157,9 +115,8 @@ var movePage = function(moveToNext){
         noMoreClass = 'first';
     }
 
-    // Replace page number
-    //console.log("current page", currentPageNum)
-    current_pagenumber = currentPageNum
+
+    global_current_pagenumber = currentPageNum; //
     localStorage.setItem("pageToBeRefreshed", currentPageNum);
     $("#page-control-number").text('Page ' + currentPageNum + '/' + NUM_PAGES);
 
@@ -231,8 +188,10 @@ var loadHTML = function(url, successFn, errorFn){
 };
 
 
+//button actions for the left hand side curriculum pages and right hand side card buttons
 var bindActivityButtons = function(){
 
+    //left hand side curriculum button actions -- start
     $('.page a').off().on('touch click', function(){
         // Get button type to open appropriate view
         //console.log('this', this)
@@ -246,12 +205,12 @@ var bindActivityButtons = function(){
 
         //for brainstorm different instances - start
         if(type.indexOf("msf")>=0){
-            console.log(type)
-            type = type.split(" ")[0]
+            type = type.split(" ")[0];
+            console.log(type);
         }
         if(type.indexOf("bs")>=0){
-            console.log(type)
-            type = type.split(" ")[0]
+            type = type.split(" ")[0];
+            console.log(type);
         }
         //for brainstorm different instances - start
 
@@ -269,19 +228,6 @@ var bindActivityButtons = function(){
         // based on the activity type, update titles in html
         $('.card.' + type + ' h1').text(type + ' #'+id); //update the title of each page
 
-//        ------------------------------teacher dashboard gallery-----------------------
-        $('.teacher-view-toggle').off().on('click', function(){
-
-            var activity_id = activityButton.attr('data-id');
-
-            //$('.card.active').removeClass('active');
-            $('.card.teacher').addClass('active');
-
-            initStage(); //defined in teacherindex.js
-            //loadtable(activity_id);   ////defined in teacherindex.js
-            card_extension();
-
-        })
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
 
@@ -318,7 +264,6 @@ var bindActivityButtons = function(){
                 clearTableStatus();
               }
 
-
               //if the card is already extended, put it back to normal
               card_extension_close();
 
@@ -331,21 +276,15 @@ var bindActivityButtons = function(){
 
              console.log('card opened');
 
-
         }
-
-//        ---------------------Khan academy card-----------------------
-//        ---------------------Khan academy card-----------------------
+//        --------------------Khan academy card-----------------------
         if($('.card.khanacademy').hasClass('active')){
 
              //if the card is already extended, put it back to normal
              card_extension_close();
 
              console.log('card opened');
-
-
         }
-
 //        ---------------------image upload card-----------------------
         if($('.card.upload').hasClass('active')){
 
@@ -383,22 +322,7 @@ var bindActivityButtons = function(){
 
             loadGalleryFeed(id);
 
-
-//            //todo: can we make it global? move to utility.js?
-//            var user_group_id
-//            $.ajax({
-//                type:'GET',
-//                url:'http://'+ host_url +'/getGroupID/'+$('input[name="act-id"]').val(),
-//                async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
-//                success: function(e){
-//                    user_group_id = e;
-//                    console.log("my group id (from digtextBook.js)::", e)
-//                }
-//            });
-
-
         }
-
 //        ------------------------------ANSWER-----------------------
         if($('.card.multQues').hasClass('active')){
 
@@ -440,15 +364,40 @@ var bindActivityButtons = function(){
         }
 
         //user logging
-        enterLogIntoDatabase('activity select', type , 'activity-id-'+id, current_pagenumber)
+        //enterLogIntoDatabase('activity select', type , 'activity-id-'+id, global_current_pagenumber);
+    });
+    //left hand side curriculum button actions -- end
 
+    //right hand side card button actions -- start
+    $('.close-card').on('touch click', function(){
+
+        var classNameWhichisClosed = $(this).offsetParent()[0].className.split(" ")[1]
+        //user logging
+        //enterLogIntoDatabase('card close', classNameWhichisClosed, 'none', global_current_pagenumber);
+        $(this).closest('.card').removeClass('active');
 
     });
 
+    $('.extend-card').on('touch click', function(){
+
+        var width = $(".card").width() / $('.card').parent().width() * 100
+        width = width/2;
+        console.log('width ::', width);
+
+        if (width == 50){
+            $('.card').css({'width':'100%'});
+        }else{
+            $('.card').css({'width':'50%'});
+        }
+        //var classNameWhichisExtended = $(this).offsetParent()[0].className.split(" ")[1]
+        //enterLogIntoDatabase('card extend', classNameWhichisExtended, 'none', global_current_pagenumber);
+
+    });
+    //right hand side card button actions -- end
 
 };
 
-
+//
 var card_extension = function(){
 
     $('.card').css({'width':'100%'});
@@ -463,6 +412,7 @@ var card_extension_close = function(){
     if (width == 100){
         $('.card').css({'width':'50%'});
     }
+
 
 }
 

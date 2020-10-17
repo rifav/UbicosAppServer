@@ -55,19 +55,15 @@ $(function(){
         $('#mySidenav a.nav').off().on('touch click', function(){
 
             //highlight one module one at a time within respective <ul> tag
-            //remove all the active class so far
-            $("#mySidenav a.nav").removeClass('active');
-            //then add active class in the current selected <a> tag
-            $(this).toggleClass('active');
+            $("#mySidenav a.nav").removeClass('active'); //remove all the active class so far
+            console.log($(this));
+            $(this).toggleClass('active'); //then add active class in the current selected <a> tag
+
+            //get the page id, load that page, save the page id as the last accessed page
             var pageID = $(this).attr("data-pageId");
-            //second parameter doesn't matter in this version
-            loadPage(pageID, $('.page:not(.previous):not(.next)'));
-            //console.log("activityindex.js :: ", pageID);
-            //update the page id based on the selected page from the side bar
-            $("#page-control-number").text('Page ' + pageID + '/' + NUM_PAGES);
-            // Update previous and next
-            loadPage(parseInt(pageID)+1, $('.page.next'));
-            loadPage(parseInt(pageID)-1, $('.page.previous'));
+            reloadPage(pageID); //the following function is defined in digTextBook.js
+            localStorage.setItem("pageToBeRefreshed", pageID);//next reload will load this page
+
             //close the side navigation bar once a module is selected
             $("#mySidenav").css("width", "0px");
 
