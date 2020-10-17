@@ -85,7 +85,7 @@ $(function(){
 
 
 //    //delete the followin if no error occurs or make it a separate function
-//
+
 //      if(localStorage.getItem("pageToBeRefreshed")){
 //
 //        var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
@@ -243,6 +243,17 @@ var bindActivityButtons = function(){
         //type of activity - gallery/brainstorm/video etc
         type = activityButton.attr('class').replace('activity-button','').trim();
         console.log('type::', type)
+
+        //for brainstorm different instances - start
+        if(type.indexOf("msf")>=0){
+            console.log(type)
+            type = type.split(" ")[0]
+        }
+        if(type.indexOf("bs")>=0){
+            console.log(type)
+            type = type.split(" ")[0]
+        }
+        //for brainstorm different instances - start
 
 
         //id of each each activity

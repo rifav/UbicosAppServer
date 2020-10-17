@@ -62,6 +62,12 @@ $(function(){
             var pageID = $(this).attr("data-pageId");
             //second parameter doesn't matter in this version
             loadPage(pageID, $('.page:not(.previous):not(.next)'));
+            //console.log("activityindex.js :: ", pageID);
+            //update the page id based on the selected page from the side bar
+            $("#page-control-number").text('Page ' + pageID + '/' + NUM_PAGES);
+            // Update previous and next
+            loadPage(parseInt(pageID)+1, $('.page.next'));
+            loadPage(parseInt(pageID)-1, $('.page.previous'));
             //close the side navigation bar once a module is selected
             $("#mySidenav").css("width", "0px");
 

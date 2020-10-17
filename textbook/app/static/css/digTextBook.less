@@ -2,12 +2,14 @@
 @video1: #e43131;
 @video2: #e45882;
 @badge: #4CB7B7;
-@brainstorm1: #F4AB4D;
-@brainstorm2: #F9C82C;
+@brainstorm_link: #F4AB4D;
+@brainstorm1: #f6eec0;
+@brainstorm2: #f4eab4;
 @brainstorm3: #ff9933; /* brainstorm model so far */
 @brainstorm4: #e67300; /* brainstorm model so far */
-@gallery1: #2DB872;
-@gallery2: #56EF2C;
+@gallery_link: #2DB872;
+@gallery1: #cdeba0;
+@gallery2: #c2e68b;
 @moreInfo1: rgb(105, 119, 128);
 @moreInfo2: rgb(109, 156, 194);
 @table1: #B182D9;
@@ -16,8 +18,9 @@
 @convert2: yellow;
 @multQues1: #33cccc; /* #0099FF; */
 @multQues2: #0099ff; /* #0066cc; */
-@khanacademy1:  #6699ff;
-@khanacademy2: #9900ff;
+@khanacademy_link:  #6699ff;
+@khanacademy1:  #d0baf0;
+@khanacademy2: #c6aced;
 
 // Other colors
 @linkColor: #007BFF;
@@ -43,6 +46,7 @@ h1 {
     font-family: 'Open Sans', sans-serif;
     font-weight: bolder;
     text-transform: capitalize;
+    color: black;
 }
 
 h2 {
@@ -256,16 +260,16 @@ a {
 /* brainstorm class color + activity button color */
 
 .brainstorm {
-    color: @brainstorm1;
+    color: @brainstorm_link;
 }
 .activity-button.brainstorm {
     background-image: url('/static/pics/brainstorm.png');
 }
 .activity-button.brainstorm:after {
-    background: linear-gradient(@brainstorm1, @brainstorm2);
+    background: linear-gradient(@brainstorm_link, @brainstorm2);
 }
 .activity-button.brainstorm:hover {
-    box-shadow: 0 0 30px @brainstorm1;
+    box-shadow: 0 0 30px @brainstorm_link;
     transition: all 0.4s;
 }
 
@@ -305,13 +309,13 @@ a {
 /* upload class color + activity button color */
 
 .upload {
-    color: @gallery1;
+    color: @gallery_link;
 }
 .activity-button.upload {
     background-image: url('/static/pics/upload.png');
 }
 .activity-button.upload:after {
-    background: linear-gradient(@gallery1, @gallery2);
+    background: linear-gradient(@gallery_link, @gallery2);
 }
 .activity-button.upload:hover {
     box-shadow: 0 0 30px @gallery1;
@@ -319,13 +323,13 @@ a {
 }
 
 .individual {
-    color: @gallery1;
+    color: gallery_link;
 }
 .activity-button.individual {
     background-image: url('/static/pics/individual.png');
 }
 .activity-button.individual:after {
-    background: linear-gradient(@gallery1, @gallery2);
+    background: linear-gradient(@gallery_link, @gallery2);
 }
 .activity-button.individual:hover {
     box-shadow: 0 0 30px @gallery1;
@@ -335,13 +339,13 @@ a {
 /* gallery class color + activity button color */
 
 .gallery {
-    color: @gallery1;
+    color: @gallery_link;
 }
 .activity-button.gallery {
     background-image: url('/static/pics/group.png');
 }
 .activity-button.gallery:after {
-    background: linear-gradient(@gallery1, @gallery2);
+    background: linear-gradient(@gallery_link, @gallery2);
 }
 .activity-button.gallery:hover {
     box-shadow: 0 0 30px @gallery1;
@@ -399,17 +403,17 @@ a {
 
 /* khan academy class color + activity button color */
 .khanacademy{
-    color: @khanacademy1;
+    color: @khanacademy_link;
 }
 
 .activity-button.khanacademy {
     background-image: url('/static/pics/idea.png');
 }
 .activity-button.khanacademy:after {
-    background: linear-gradient(@khanacademy1, @khanacademy2);
+    background: linear-gradient(@khanacademy_link, @khanacademy2);
 }
 .activity-button.khanacademy:hover {
-    box-shadow: 0 0 30px @khanacademy1;
+    box-shadow: 0 0 30px @khanacademy_link;
     transition: all 0.4s;
 }
 
@@ -497,7 +501,7 @@ a {
     right: 0px;
     height: 30px;
     width: 30px;
-    background: url('/static/pics/close-card.png') no-repeat;
+    background: url('/static/pics/clear.png') no-repeat;
     background-size: 100%;
     z-index: 2;
 }
@@ -789,9 +793,9 @@ a {
     z-index: 1;
     margin: 0 !important;
     display: inline-block;
-    width: calc(50% - 1rem);
+    width: calc(50% - 0rem);
     box-sizing: border-box;
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 .chat_prompt_p {
@@ -799,6 +803,7 @@ a {
     top: 4.5%;
     z-index: 1;
     font-size: smaller;
+    padding-top: 10px;
 }
 
 #activity-index {
@@ -854,18 +859,28 @@ a {
 
 /* upload */
 .card.upload {
-    background: linear-gradient(rgba(86, 197, 163, 1), rgba(93, 208, 106, 1));
+    background: linear-gradient(@gallery1, @gallery2);
+    p{
+        color: black;
+    }
 }
 
 /* individual discussion */
 /* upload */
 .card.individual {
-    background: linear-gradient(rgba(86, 197, 163, 1), rgba(93, 208, 106, 1));
+    background: linear-gradient(@gallery1, @gallery2);
+
+    p{
+        color: black;
+    }
 }
 
 /* GALLERY */
 .card.gallery {
-    background: linear-gradient(rgba(86, 197, 163, 1), rgba(93, 208, 106, 1));
+    background: linear-gradient(@gallery1, @gallery2);
+    p{
+        color: black;
+    }
 }
 
 #gallery-view, #upload-view {
@@ -1265,7 +1280,8 @@ a {
 
 /* BRAINSTORM */
 .card.brainstorm {
-    background: linear-gradient(rgba(244, 171, 76, 1), rgba(249, 198, 46, 1));
+    background: linear-gradient(@brainstorm1, @brainstorm2);
+    color: black;
 
     .object_delete {
         position: absolute;
@@ -1307,28 +1323,28 @@ a {
         overflow: auto;
     }
 
-        #idea-workspace .idea {
-            position: absolute;
-            width: 200px;
-            min-height: 120px;
-            height: 120px;
-            overflow: auto; /* https://www.w3schools.com/cssref/pr_pos_overflow.asp */
-            background: #8FC7EC;
-            color: black;
-            border-radius: 3px;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
-            padding: 5px;
-            padding-bottom: 25px;
-            opacity: 1;
-            transform: scale(1);
-            /*transition: opacity 0.5s, transform 0.5s;*/
-        }
+    #idea-workspace .idea {
+        position: absolute;
+        width: 200px;
+        min-height: 120px;
+        height: 120px;
+        overflow: auto; /* https://www.w3schools.com/cssref/pr_pos_overflow.asp */
+        background: #8FC7EC;
+        color: black;
+        border-radius: 3px;
+        box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        padding: 5px;
+        padding-bottom: 25px;
+        opacity: 1;
+        transform: scale(1);
+        /*transition: opacity 0.5s, transform 0.5s;*/
+    }
 
-        #idea-workspace .idea.new {
-            transform: scale(3);
-            opacity: 0;
-            transition: opacity 0.5s, transform 0.5s;
-        }
+    #idea-workspace .idea.new {
+        transform: scale(3);
+        opacity: 0;
+        transition: opacity 0.5s, transform 0.5s;
+    }
 
     /* Container style and base children style */
     #new-idea {
@@ -1643,9 +1659,12 @@ a {
 /* Khan Academy Card */
 .card.khanacademy {
 
-    background: linear-gradient(rgba(102, 153, 255, 1), rgba(153, 0, 255, 1));
+    background: linear-gradient(@khanacademy1, @khanacademy2);
     position: fixed;
     overflow: hidden;
+    p {
+        color: black;
+    }
 
 }
 
@@ -1867,7 +1886,7 @@ a {
     right: 45px;
     height: 10px;
     width: 10px;
-    background: url('/static/pics/close-card.png') no-repeat;
+    background: url('/static/pics/clear.png') no-repeat;
     background-size: 100%;
     z-index: 2;
 }
