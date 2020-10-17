@@ -266,7 +266,14 @@ var bindActivityButtons = function(){
 
               //if the card is already extended, put it back to normal
               card_extension_close();
+        }
+//        ---------------------Chat card-----------------------
+        if($('.card.chatCard').hasClass('active')){
 
+             //if the card is already extended, put it back to normal
+             card_extension_close();
+
+             console.log('card opened');
         }
 //        ---------------------badge card-----------------------
         if($('.card.badgeCard').hasClass('active')){
@@ -275,7 +282,6 @@ var bindActivityButtons = function(){
              card_extension_close();
 
              console.log('card opened');
-
         }
 //        --------------------Khan academy card-----------------------
         if($('.card.khanacademy').hasClass('active')){
@@ -297,8 +303,6 @@ var bindActivityButtons = function(){
              //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
              $('img#default').attr('src', API_URL.picsBase + "/default.png");
              // end of the solution
-
-
         }
 //        ---------------------individual discussion-----------------------
 

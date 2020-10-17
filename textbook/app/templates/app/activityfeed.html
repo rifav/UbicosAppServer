@@ -3,25 +3,12 @@
 <h1>General Chat</h1>
 <p class="chat_prompt_p">Ask any questions you may have. Feel free to help others. </p>
 
-<!--     <div class="prompt-card prompt-gm">-->
-<!--     <a class="prompt-close-card"></a>-->
-<!--     &lt;!&ndash;<span id="prompt-p"></span>&ndash;&gt;-->
-<!--     &lt;!&ndash;<img id="badge-default" src="{% static 'pics/default.png' %}" alt="">&ndash;&gt;-->
-<!--     <img id="prompt-badge-img-gm" src="{% static 'pics/default.png' %}" alt="" >-->
-<!--     <p id="prompt-p-gm" ></p>-->
-<!--   </div>-->
-
-
-<!--<div class="award-holder"   style="margin-left:0px;">-->
-<!--     <div class = "badge-description">Testing</div>-->
-<!--</div>-->
-
 <ul id="activity-feed" class="feed">
 </ul>
 
 
 
-<div id="write-message" class="message-input">
+<div id="write-message" class="card-message-input">
      <input type="text" name="msg-text" id="msg-text" placeholder="Type a message to your class here">
      <input type="hidden" name="username" value={{ user.get_username }}>
      <a href="" id="msg-send-btn"></a>

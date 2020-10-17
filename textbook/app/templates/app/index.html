@@ -91,10 +91,10 @@
             {%  endifequal %}
 
 
-            <div id="activity-feed-view" class="main-view">
-                {% include 'app/activityfeed.html' %}
-                <div id ="suggestion_text"></div>
-            </div>
+<!--            <div id="activity-feed-view" class="main-view">-->
+<!--                {% include 'app/activityfeed.html' %}-->
+<!--                <div id ="suggestion_text"></div>-->
+<!--            </div>-->
             
             <!-- 
                 Ideally we'd only have one div.card, whose content is loaded dynamically on click.
@@ -156,6 +156,11 @@
             <div class="card khanacademy">
                 <a class="close-card"></a>
                 {% include 'app/khanacademy_table.html' %}
+            </div>
+
+            <div class="card chatCard">
+                <a class="close-card"></a>
+                {% include 'app/activityfeed.html' %}
             </div>
 
         </div>
