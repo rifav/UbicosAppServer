@@ -305,6 +305,18 @@ var bindActivityButtons = function(){
              // end of the solution
         }
 //        ---------------------individual discussion-----------------------
+         if($('.card.self-gallery').hasClass('active')){
+
+             //if the card is already extended, put it back to normal
+             card_extension_close();
+
+             //when a user opens this card, load the image this user uploaded and
+             //display all the comments made by other students
+             loadSelfImageFeed(id);
+
+
+        }
+//        ---------------------individual discussion-----------------------
 
          if($('.card.individual').hasClass('active')){
 

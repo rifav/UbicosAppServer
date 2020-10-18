@@ -345,6 +345,23 @@ a {
     transition: all 0.4s;
 }
 
+/* individual (1) class color + activity button color */
+.self-gallery {
+    color: @gallery_link;
+}
+.activity-button.self-gallery {
+    background-image: url('/static/pics/ind.png');
+}
+.activity-button.self-gallery:after {
+    background: linear-gradient(@gallery_link, @gallery2);
+}
+.activity-button.self-gallery:hover {
+    box-shadow: 0 0 30px @gallery1;
+    transition: all 0.4s;
+}
+
+/* individual commenting class color + activity button color */
+
 .individual {
     color: gallery_link;
 }
@@ -628,6 +645,15 @@ a {
     overflow-y: auto;
 }
 
+#ind-comment-feed{
+    height: 45%;
+    padding: 15px 15px 15px 15px;
+    //border-style: dotted;
+    overflow-y: auto;
+    position: relative;
+    top: 40%;
+}
+
 .award-holder{
  background-color: #C9DDE4;
  height: 50px;
@@ -900,6 +926,14 @@ a {
     }
 }
 
+.card.self-gallery {
+    background: linear-gradient(@gallery1, @gallery2);
+
+    p{
+        color: black;
+    }
+}
+
 /* GALLERY */
 .card.gallery {
     background: linear-gradient(@gallery1, @gallery2);
@@ -978,6 +1012,15 @@ a {
 
 .upload-success-msg-closebtn:hover {
   color: black;
+}
+
+.self-gallery img{
+    height: 300px;
+    width: 400px;
+    position: fixed;
+    left: 50%;
+    top: 35%;
+    transform: translate(-50%, -50%);
 }
 
 //upload.html css end here

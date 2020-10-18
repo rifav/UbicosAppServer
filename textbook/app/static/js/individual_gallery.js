@@ -10,6 +10,8 @@ $(function(){
     //adding user input button event action
     individiualMsgBtnAction();
 
+
+
 });
 
 
@@ -156,7 +158,7 @@ var postIndMessage = function (){
 
     //get the user name who posted
     var user_name = $("input[name='username']").val()
-    enterLogIntoDatabase('click', 'activity-feed message input' , message, current_pagenumber);
+    enterLogIntoDatabase('click', 'activity-feed message input' , message, global_current_pagenumber);
 
     //check which image is open, extract that image data attribute (image PK) and pass that with the data to the server
     var imagePk;
@@ -197,18 +199,23 @@ var postIndMessage = function (){
 
 } // end of postIndMessage method
 
-var buildFeedwithMsgs = function(message){
-    var li = $("<li/>").appendTo("#ind-feed");
-    li.addClass('message self');
+var buildFeedwithMsgs = function(message, container, username){
+    var li = $("<li/>").appendTo(container);
+    if(logged_in == username){
+       li.addClass('message self');
+    }else{
+       li.addClass('message');
+    }
     var div = $("<div/>").appendTo(li);
     div.addClass('user-image');
-    var span = $('<span/>', {text: logged_in}).appendTo(div); //logged_in from utility.js
+    var span = $('<span/>', {text: username}).appendTo(div); //logged_in from utility.js
     var p = $('<p/>', {text: message}).appendTo(li);
     var div_msg = $("<div/>").appendTo(li);
     div_msg.addClass('msg-timestamp');
     var span_timestap = $('<span/>', {
               text: "add_timestamp"}).appendTo(div_msg);
 
+    //TODO change this into container
     $('#ind-feed').scrollTop($('#ind-feed')[0].scrollHeight);
 }// end of buildFeedwithMsgs method
 
@@ -229,11 +236,47 @@ var retrieveComments = function(imagePk){
                 //show the first image comments with the loading of the images
                 //console.log(loaded_comments[0].fields['content']);
                 //TODO loop through loaded_comments to display all the messages; [0] only displays the first comment
-                buildFeedwithMsgs(loaded_comments[0].fields['content']);
+                buildFeedwithMsgs(loaded_comments[0].fields['content'], "#ind-feed",logged_in);
               }
 
         },
     });
 
 } //end of retrieveComments (imagePk) method
+
+var loadSelfImageFeed = function(act_id) {
+
+        //this ajax completes the 1-4 steps
+        $.ajax({
+            type:'GET',
+            url:'http://'+ host_url +'/getSelfGalleryContent/'+act_id,
+            async: false, //wait for ajax call to finish
+            success: function(data){
+
+                var img_data = data.success['img_data'];
+                var img_msg = data.success['img_msg'];
+
+                var imgID = img_data[0]['id'];
+                var imgSrc =img_data[0]['image'];
+
+                //update the image src
+                $('div#self-gallery-div img').attr('src','/media/'+imgSrc);
+                //update the img primary key
+                $('div#self-gallery-div img').attr('data-imgID', imgID);
+                //console.log($('div#self-gallery-div img').attr('data-imgID'));
+
+                //clear out previously loaded comments
+                $('#ind-comment-feed').empty();
+                //loop through the img msg data to access each commment and display under the images
+                $.each(img_msg, function(key, value){
+                    //console.log(value);
+                    buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username']);
+                });//end of the each loop
+            }//end of the success for the post ajax
+
+        });//end of the ajax call
+
+
+}
+
 

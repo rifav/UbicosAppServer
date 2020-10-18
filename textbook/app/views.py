@@ -204,7 +204,7 @@ def uploadImage(request):
         # pusher1.trigger(u'b_channel', u'bn_event',
         #                 { u'new_image':image_data})
 
-        return JsonResponse({'success': image_data, 'errorMsg': True})
+        return JsonResponse({'success': image_data})
 
 # call from individual_gallery.js
 def getIndividualImages(request, act_id):
@@ -237,11 +237,34 @@ def getIndividualCommentMsgs(request,imageId):
 #used in gallery.js
 def updateImageFeed(request, img_id):
 
-    print('updateImageFeed (image_id) :: ' + img_id)
-    img_msg = imageComment.objects.filter(imageId_id=img_id)
-    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    print('updateImageFeed (image_id) :: ' + img_id);
+    img_msg = imageComment.objects.filter(imageId_id=img_id);
+    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
 
-    return JsonResponse({'success': img_msg, 'username': request.user.get_username(),'errorMsg': True})
+    return JsonResponse({'success': img_msg, 'username': request.user.get_username()});
+
+def getSelfGalleryContent(request, act_id):
+    # get the users uploaded image for this gallery
+    #img_data = imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user); #returns a queryset
+    img_data = list(imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user).values('id','image'));
+    # print('line 251:', type(img_data)); #type -- list
+    # print('line 252:', type(json.dumps(list(img_data)))); #type -- str
+    #todo: what if the filter returns multiple image i.e., user uploaded more than one image
+    #print('line 252 ::', img_data[0]['id']);
+
+    img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
+    #print('line 258 ::', img_msg);
+    #converting the time into a readable format
+    for i in img_msg:
+        i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
+        #print (i);
+
+    dict = {};
+    dict['img_data'] = img_data;
+    dict['img_msg'] = img_msg;
+
+    return JsonResponse({'success': dict});
+
 
 ###############################################
 ############ handler methods start ############
