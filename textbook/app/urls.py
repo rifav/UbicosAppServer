@@ -26,6 +26,10 @@ urlpatterns = [
     url('getSelfGalleryContent/(?P<act_id>\d+)', views.getSelfGalleryContent),
     #urls for student characteristic
     url('saveCharacteristic', views.saveCharacteristic),
+    #url for chat tool
+    url(r'^ajax/chat/$', views.broadcast),
+    url('updateFeed/(?P<id>\d+)', views.updateFeed),
+
 
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
@@ -42,8 +46,6 @@ urlpatterns = [
     url('brainstorm/get/(?P<brainstorm_id>\d+)',views.brainstormGet),
     url('brainstorm/update/(?P<note_id>\d+)/', views.brainstormUpdate),
     url('brainstorm/del/(?P<note_id>\d+)', views.brainstormDelete),
-    url(r'^ajax/chat/$', views.broadcast),
-    url('updateFeed/(?P<type>\d+)', views.updateFeed),
     url('tableData/save/',views.tableEntriesSave),
     # url('submitAnswer',views.submitAnswer),
     #url('uploadKAImage', views.uploadKAImage),

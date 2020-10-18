@@ -58,6 +58,7 @@ class individualMsgComment(models.Model):
 # rename the following method for clarification
 class Message(models.Model):
     content = models.CharField(max_length=400)
+    activity_id = models.IntegerField(null=True)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     posted_at = models.DateTimeField(auto_now_add=True)
 

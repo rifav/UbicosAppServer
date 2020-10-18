@@ -3,12 +3,15 @@
 <h1>General Chat</h1>
 <p class="chat_prompt_p">Ask any questions you may have. Feel free to help others. </p>
 
-<ul id="activity-feed" class="feed">
-</ul>
+<div>
+     <ul id="activity-feed" class="feed" style="margin-top: 100px;margin-bottom:100px">
+     </ul>
+</div>
 
 
 
-<div id="write-message" class="card-message-input">
+
+<div id="write-message" class="card-message-input" >
      <input type="text" name="msg-text" id="msg-text" placeholder="Type a message to your class here">
      <input type="hidden" name="username" value={{ user.get_username }}>
      <a href="" id="msg-send-btn"></a>

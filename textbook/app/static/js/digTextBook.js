@@ -20,10 +20,6 @@ var NUM_PAGES = 33;
 //load all init function required for the digital textbook to load here
 $(function(){
 
-    //update activity feed with history of messages
-    //call function from activity.js //0 means all; 1 means todays chat
-    loadFeed(0);
-
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
     loadPage(1, $('.page:not(.previous):not(.next)'));
@@ -217,6 +213,7 @@ var bindActivityButtons = function(){
 
         //id of each each activity
         var id = activityButton.attr('data-id');
+        activity_id = id;
         console.log('activity id::', id)
 
         //individual_act_id = id; //passing it to individual_gallery.js
@@ -226,7 +223,7 @@ var bindActivityButtons = function(){
         $('.card.' + type).addClass('active');
 
         // based on the activity type, update titles in html
-        $('.card.' + type + ' h1').text(type + ' #'+id); //update the title of each page
+        $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
 
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
@@ -235,7 +232,7 @@ var bindActivityButtons = function(){
         // if video tab is active get the video url and display in video.html
         //display the video url in a new tab instead of the card
         if(type == 'video'){
-            lastOpenedTool = 'video';
+            //lastOpenedTool = 'video';
             $('.card.active').removeClass('active');
             var video_url = activityButton.attr('data-video-url');
             window.open(video_url, '_blank'); //open paint splash game in a new window
@@ -243,10 +240,10 @@ var bindActivityButtons = function(){
 //        ------------------------------TABLE-----------------------
         //if the table tab is active
         if($('.card.table').hasClass('active')){
-             lastOpenedTool = 'table';
+             //lastOpenedTool = 'table';
 
              $('input[name="table-id"]').attr('value', id)
-             $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
+             //$('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
 
              //persistence checker and populate or clear the table according to that
              if(localStorage.getItem('table'+$('input[name="table-id"]').val())){
@@ -272,6 +269,8 @@ var bindActivityButtons = function(){
 
              //if the card is already extended, put it back to normal
              card_extension_close();
+
+             loadFeed(id); //load the chat feed based on the activity id
 
              console.log('card opened');
         }
@@ -334,7 +333,7 @@ var bindActivityButtons = function(){
             card_extension();
 
             //update the heading in the card
-            $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
+           // $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
 
             loadGalleryFeed(id);
 
@@ -361,7 +360,7 @@ var bindActivityButtons = function(){
 
             //update the heading
             //console.log('brainstorm heading:: ', activityButton.attr('data-heading'))
-            $('.card.' + type + ' h1').text(activityButton.attr('data-heading')); //update the title of each page
+            //$('.card.' + type + ' h1').text(activityButton.attr('data-heading')); //update the title of each page
 
 
             //update the description

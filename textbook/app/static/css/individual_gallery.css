@@ -102,18 +102,19 @@
     /* -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px); */
     overflow: hidden;
-    position: fixed;
-    bottom: -1%;
-    left: 0;
-    right: 14px;
-    height: 65px;
-    width: 95%;
+    position: absolute; /* was fixed before parent (i.e., .card element is fixed) */
     border-radius: 30px;
+    width: 95%;
+    bottom: 0%;
+    left: 0;
+    height: 65px;
     padding: 12px 10px 14px 9px;
+    right: 14px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
     .card-message-input input {
+
         margin: 10px 0px 10px 0px;
         height: 85%;
         border: none;
@@ -121,6 +122,7 @@
         width: calc(100% - 55px);
         padding-left: 10px;
         outline: none;
+
     }
 
     .card-message-input a {

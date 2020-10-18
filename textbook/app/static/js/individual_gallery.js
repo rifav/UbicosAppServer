@@ -199,6 +199,8 @@ var postIndMessage = function (){
 
 } // end of postIndMessage method
 
+//this method is used in three places: TODO
+//1)
 var buildFeedwithMsgs = function(message, container, username){
     var li = $("<li/>").appendTo(container);
     if(logged_in == username){
@@ -215,8 +217,10 @@ var buildFeedwithMsgs = function(message, container, username){
     var span_timestap = $('<span/>', {
               text: "add_timestamp"}).appendTo(div_msg);
 
-    //TODO change this into container
-    $('#ind-feed').scrollTop($('#ind-feed')[0].scrollHeight);
+    //TODO change this into a dynamic if else
+    $(container).animate({ scrollTop: $(container).height() }, 400);
+    //$(container).scrollTop($(container)[0].scrollHeight);
+
 }// end of buildFeedwithMsgs method
 
 var retrieveComments = function(imagePk){

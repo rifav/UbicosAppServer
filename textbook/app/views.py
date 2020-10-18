@@ -35,16 +35,15 @@ pusher2 = Pusher(app_id=u'525110', key=u'5da367936aa67ecdf673', secret=u'e43f21c
 @csrf_exempt
 def broadcast(request):
 
-
-    pusher.trigger(u'a_channel', u'an_event', {u'name': request.POST['username'], u'message': request.POST['message'] })
+    pusher.trigger(u'a_channel', u'an_event', {u'name': request.POST['username'],
+                                               u'message': request.POST['message'],
+                                               u'activity_id': request.POST['activity_id']})
 
     #insert into database
-    msg = Message(content=request.POST['message'], posted_by=request.user);
+    msg = Message(content=request.POST['message'], posted_by=request.user, activity_id = request.POST['activity_id']);
     msg.save();
 
-    # print(image_data)
-
-    return JsonResponse({'success': '', 'errorMsg': True})
+    return JsonResponse({'success': ''})
 
 # activity feed code -- end
 
@@ -329,30 +328,18 @@ def imageDelete(request, img_id):
 
     return HttpResponse('deleted?')
 
-def updateFeed(request, type):
+def updateFeed(request, id):
 
-    # # message of all times
-    # msg = Message.objects.all()
-    # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
-    # return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
-    if int(type) == 0:
-        #message of all times
-        msg = Message.objects.all()
-        msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
-        return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
-    elif int(type) == 1:
-        #separate message today vs other days
-        msg = Message.objects.filter(posted_at__gte = datetime.now() - timedelta(days=1)) #returns all the comment from today
-        msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
-        print('msg :: ', msg_data)
-        return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
+    # message of all times
+    msg = Message.objects.filter(activity_id = id);
+    msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
+    return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
 
-    # #separate message today vs other days
-    # msg = Message.objects.exclude(posted_at__contains = datetime.now().date()) #returns all the comment except from today
-    # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
-    # print('msg :: ', msg_data)
-    # return HttpResponse('')
-
+    # #separate message today vs other days -- keeping for any future use
+    # msg = Message.objects.filter(posted_at__gte = datetime.now() - timedelta(days=1)); #returns all the comment from today
+    # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True);
+    # print('msg :: ', msg_data);
+    # return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True});
 
 
 def brainstormSave(request):
