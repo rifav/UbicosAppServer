@@ -76,9 +76,40 @@ var galleryMsgBtnAction = function(){
         }
       });
 
+      //badge-option-div related button clicks -- start
+
       $('.badge-option-closebtn').off().on('click', function(e){
              $("#badge-option").css("display", "none");
       });
+
+      $('.badgeRequest img').on('click', function(e){
+            //if the badge-option div is visible do nothing, else toggle
+            if($('#badge-option').is(":visible")){
+                //alert("visible");
+            }else{
+                //alert("not visible");
+                $("#badge-option").css("display", "block");
+            }
+      });
+
+      $('.badge-option-display div').off().on('click', function(e){
+        //set all background color to original
+        $(this).siblings().css({backgroundColor: '#f4f4f4'});
+        //set the selected background color to
+        $(this).css({backgroundColor: '#d9d9d9'});
+        console.log($(this).attr('tabindex'));
+
+      });
+
+      $('.badge-option-footer button').off().on('click', function(e){
+            var badge_textarea_value = $('#badge-textarea-id').val();
+            //console.log(badge_textarea_value);
+            //set it to the message textbox
+            $('#image-msg-text').val(badge_textarea_value);
+
+      });
+
+      //badge-option-div related button clicks -- end
 
 //    $('#badge-option a').off().on('click', function(e){
 //

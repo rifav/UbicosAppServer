@@ -39,57 +39,47 @@
                     <input type="hidden" name="image-db-pk" value=""/>
                     <!--<div class = "posted_by_image"></div>-->
                 </div>
+                <div class="badgeRequest">
+                    <img  src="{% static 'pics/ques.png' %}" alt="">
+                </div>
                 <!--div displaying the badge selection-->
                 <div id="badge-option" class="badge-option-class">
                     <div class="badge-option-heading">
+                        <p> Choose how you want to participate: </p>
                         <a href="javascript:void(0)" class="badge-option-closebtn">&times;</a>
                     </div>
                     <div class="badge-option-display">
-                        <a href="#" id="badge1">
+                        <div href="#" id="badge1" tabindex="1">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Brainstorm</span>
-                        </a>
-                        <a href="#" id="badge2">
+                        </div>
+                        <div href="#" id="badge2" tabindex="2">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Elaboration</span>
-                       </a>
-                        <a href="#" id="badge3">
+                       </div>
+                        <div href="#" id="badge3" tabindex="3">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Feedback</span>
-                       </a>
-                        <a href="#" id="badge4">
+                       </div>
+                        <div href="#" id="badge4" tabindex="4">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                             <span>Reflection</span>
-                       </a>
+                       </div>
 
                     </div>
                     <div class="badge-prompt-text">
-                        <p>sample badge prompt text</p>
+                        <p>Coming up with the solution is difficult! Share your thoughts about the [topic_variable]
+                        so together you can come up with different ideas to solve the problem.</p>
                     </div>
                     <div class="badge-option-textarea">
-                        <textarea placeholder="I agree/disagree...">
-
-                        </textarea>
+                        <textarea id="badge-textarea-id">I agree/disagree... </textarea>
                     </div>
                     <div class="badge-option-footer">
-                        <button> ok </button>
+                        <button> Copy to the textbox </button>
                     </div>
 
                 </div>
-                <!--div displaying the badge prompt and sentence starter-->
-                <div class="div-badge-prompt" style="display: none">
-                    <div style="float:left">
-                        <a href="#">
-                           <img  src="{% static 'pics/blank.png' %}" alt="">
-                           <span>Brainstorm</span>
-                       </a>
-                    </div>
-                    <p>
-                        Coming up with the solution is difficult! Share your thoughts about the [topic_variable]
-                        so together you can come up with different ideas to solve the problem.
-                    </p>
-<!--                    <p class="badge-ss"></p>-->
-                </div>
+
             </div>
 
             <div id="row-right">
