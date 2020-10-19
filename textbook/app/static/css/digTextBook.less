@@ -1644,19 +1644,41 @@ a {
     position: relative;
 }
 
-#gallery-group-user {
+.gallery-userlist{
     position: fixed;
     top: 10px;
     right: 60px;
-    display: inline-block;
-    width: 45px;
+    border:1px solid #84a22a;
+    background-color: #c9e085;
+    border-radius: 65%;
+    width: 65px;
     height: 45px;
-    z-index: 2;
-    background-image: url(../pics/group-members.png);
-    background-size: cover;
-    border:1px solid black;
-    border-radius: 50%;
-    transition: all 0.4s;
+    display: inline-block;
+    z-index: 2; //since this div is on the right, z-index:2 puts this on the top
+    cursor: pointer;
+
+}
+
+.gallery-group-user {
+
+    //transition: all 0.4s;
+    padding: 6%;
+
+
+
+    img{
+        border-radius: 50%;
+        width: 35px;
+        border: 1px solid #666;
+        margin-left: 5px;
+    }
+    span{
+        color: black;
+        font-size: x-large;
+        position: absolute;
+        padding: 0%;
+        margin-left: 5%;
+    }
 }
 
 .gallery-group-members {
@@ -1664,8 +1686,8 @@ a {
         top: 55px;
         right: 50px;
         z-index: 2;
-        background-color: #E1E8EF;
-        border-radius: 30%;
+        background-color: #84a22a;
+        border-radius: 40%;
         opacity: 0;
         overflow: hidden;
         color: black;
@@ -1676,14 +1698,15 @@ a {
 
              li{
                 padding: 5px;
-                margin-right: 40px;
+                margin-left: -15px;
+                margin-right: 20px;
                 //color: black;
 
              }
         }
 }
 
-#gallery-group-user:hover ~ .gallery-group-members{
+.gallery-group-user:hover ~ .gallery-group-members{
   max-height: inherit;
   opacity: 1;
 }
