@@ -76,15 +76,19 @@ var galleryMsgBtnAction = function(){
         }
       });
 
-    $('#badge-option a').off().on('click', function(e){
+      $('.badge-option-closebtn').off().on('click', function(e){
+             $("#badge-option").css("display", "none");
+      });
 
-        console.log($(e.target).parents('a').attr('id'));
-        $("#badge-option").css("display", "none");
-        $(".div-badge-prompt").css("display", "");
-
-        //alert("clicked");
-
-    });
+//    $('#badge-option a').off().on('click', function(e){
+//
+//        console.log($(e.target).parents('a').attr('id'));
+//        $("#badge-option").css("display", "none");
+//        $(".div-badge-prompt").css("display", "");
+//
+//        //alert("clicked");
+//
+//    });
 
 } //end of galleryMsgBtnAction method
 

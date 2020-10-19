@@ -39,32 +39,39 @@
                 </div>
                 <!--div displaying the badge selection-->
                 <div id="badge-option" class="badge-option-class">
-                    <div>
-                       <a href="#" id="badge1">
+                    <div class="badge-option-heading">
+                        <a href="javascript:void(0)" class="badge-option-closebtn">&times;</a>
+                    </div>
+                    <div class="badge-option-display">
+                        <a href="#" id="badge1">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Brainstorm</span>
-                       </a>
-                    </div>
-                    <div>
-                       <a href="#" id="badge2">
+                        </a>
+                        <a href="#" id="badge2">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Elaboration</span>
                        </a>
-                   </div>
-                    <div>
-                       <a href="#" id="badge3">
+                        <a href="#" id="badge3">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Feedback</span>
-                       </a> <br/>
-
-                   </div>
-                     <div>
-                       <a href="#" id="badge4">
+                       </a>
+                        <a href="#" id="badge4">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                             <span>Reflection</span>
                        </a>
 
-                   </div>
+                    </div>
+                    <div class="badge-prompt-text">
+                        <p>sample badge prompt text</p>
+                    </div>
+                    <div class="badge-option-textarea">
+                        <textarea placeholder="I agree/disagree...">
+
+                        </textarea>
+                    </div>
+                    <div class="badge-option-footer">
+                        <button> ok </button>
+                    </div>
 
                 </div>
                 <!--div displaying the badge prompt and sentence starter-->
