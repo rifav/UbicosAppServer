@@ -5,7 +5,7 @@ var dict = {'suggestion': false, 'social' : false, 'relevance' : false, 'reflect
 
 $(function(){
 
-    displayAllBadges();
+   // displayAllBadges();
 
 
 })

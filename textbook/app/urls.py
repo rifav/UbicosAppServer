@@ -26,9 +26,11 @@ urlpatterns = [
     url('getSelfGalleryContent/(?P<act_id>\d+)', views.getSelfGalleryContent),
     #urls for student characteristic
     url('saveCharacteristic', views.saveCharacteristic),
+    url('getCharacteristic', views.getCharacteristic),
     #url for chat tool
     url(r'^ajax/chat/$', views.broadcast),
     url('updateFeed/(?P<id>\d+)', views.updateFeed),
+    url('getBadges',views.getBadges),
 
 
 

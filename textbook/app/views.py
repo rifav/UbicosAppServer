@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel
+    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel, badgeInfo
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -16,6 +16,8 @@ from .randomGroupGenerator import randomGroupGenerator
 import json, random
 from datetime import datetime, timedelta
 from collections import Counter
+
+from django.forms.models import model_to_dict
 
 
 
@@ -140,6 +142,22 @@ def saveCharacteristic(request):
 
 
     return HttpResponse('');
+
+# returns students characteristic from the student characterisitc model
+# called from utility.js and will save it into local storage
+def getCharacteristic(request):
+
+    info = studentCharacteristicModel.objects.get(user=request.user);
+    info = info.__dict__; #returns a dict
+    dict = {}
+    dict['msc'] = info['has_msc'];
+    dict['hsc'] = info['has_hsc'];
+    dict['fam'] = info['has_fam'];
+    dict['con'] = info['has_con'];
+
+    return dict;
+    #return JsonResponse({'info': dict});
+
 
 def uploadImage(request):
     #get image from html and save it in the database
@@ -846,20 +864,45 @@ def insertBadges(request):
 
     return HttpResponse('')
 
+#TODO: read excel and add it to the database method
+
 def getBadges(request):
-    badges = badgeModel.objects.filter(userid=request.user).values('badgeType').distinct()
+    # msc = badgeInfo(charac='con',value='True',index=1,badgeName='Reflection',
+    #                 platform='MB',prompt='con high prompt',sentence_opener='con high so');
+    # msc.save();
+    # msc = badgeInfo(charac='con', value='False', index=1, badgeName='Reflection',
+    #                 platform='MB', prompt='con low prompt', sentence_opener='con low so');
+    # msc.save();
 
-    badgeList = []
-    for badge in badges:
-        print(badge['badgeType'])
-        badgeList.append(badge['badgeType'])
+    #get platform from the front end
+    if request.method == 'POST':
+        platform = request.POST.get('platform');
 
-    #print(badgeList)
+    #get the students characteristic from the database
+    charac = getCharacteristic(request);
+    #print('accessing charac', charac['msc']);
 
-    badge_count = badgeModel.objects.values('badgeType').annotate(dcount=Count('badgeType'))
-    print(badge_count)
+    dict = {};
+    #make 3 separate queries
+    #TODO: how to make it into one query
+    #TODO: handle index for randomization
+    #TODO: separatae no participation badge vs constructive badge
+    msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
+                                              value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
+    dict['msc'] = msc_badge;
+    hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
+                                  value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
+    dict['hsc'] = hsc_badge;
+    fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
+                                              value=charac['fam'], index=1).values('badgeName', 'prompt',
+                                                                                   'sentence_opener'));
+    dict['fam'] = fam_badge;
 
-    return JsonResponse({'badgeList': badgeList})
+    #print('872 :: ', type(msc_badge[0]));
+
+    return JsonResponse({'badgeList': dict})
+    #return HttpResponse('');
+
 
 # def pageParser(request):
 #     #CASE 4: static method - FAIL, not possible to call `cls.get` or `self.get`

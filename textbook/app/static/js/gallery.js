@@ -1,4 +1,5 @@
 var gallery_act_id;
+var global_badgeList;
 
 $(function(){
 
@@ -8,18 +9,20 @@ $(function(){
 
  });
 
-
+//this method is used to load digital discussion gallery feed
+//called from digTextBook.js
 var loadGalleryFeed = function(act_id){
     //based on the activity id, load the image, group member names, and set of comment made by the members
     gallery_act_id = act_id;
-    //steps to be implement
-    //1. make an ajax call to get the image, group member names, and the comments
+    //steps implemented
+    //1. make an ajax call to get the image
     //2. display them
      $.ajax({
         type:'GET',
         url:'http://'+ host_url +'/getIndividualImages/'+act_id, //same url as this already gives us the images from all the group members
         async: false, //wait for ajax call to finish
         success: function(data){
+            //TODO: display image outside the group
             //display an image randomly -- choose the first image as random
             imageInfo = JSON.parse(data.imageData)[0];
             console.log(imageInfo);
@@ -30,36 +33,59 @@ var loadGalleryFeed = function(act_id){
         }
      });
 
+    //get the image primary key
     var imagePk = $('input[name="image-db-pk"]').val();
-//   //get the comments and update discussion feed with each image
+
+    //3. make an ajax call to get the comments and update discussion feed with each image
      $.ajax({
          type: 'GET',
          url: '/updateImageFeed/'+imagePk, //get image comment using primary id
          success: function(response){
                 //console.log(response)
-                //var logged_in_user = response.username //passed from views.py - updateFeed
+
                 msg_data = response.success
                 var obj = jQuery.parseJSON(msg_data);
                 //console.log(obj)
+                //clear the image feed so it doesn't add to the previous feed
+                $('#image-feed').empty();
                 $.each(obj, function(key, value){
-
-                    buildGalleryFeedwithMsgs(value.fields['posted_by'][0], value.fields['content']);
-
+                    //this method is defined in individual_gallery.js
+                    buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0]);
                 });
 
+                //scrollbar
                 var element = document.getElementById("image-feed");
                 element.scrollTop = element.scrollHeight;
 
              }
      });
 
-     //hide badge prompt div
 
+     //1. make an ajax call and use that to get badge info for gallery
+     //TODO: pass the platform; make this a separate function as this will be called from multiple places
+     $.ajax({
+        url: '/getBadges',
+        type: 'POST',
+        async: false,
+        data: {'platform':'MB'}, //TODO: check
+        success: function (data) {
+            //here data is a dict, where each key element is a list
+            //console.log(data.badgeList);
+            //assigning it to a global variable, so we can access it outside this call and update promp/sentence opener as needed
+            global_badgeList = data.badgeList;
+            //call the method and update the badge-option-view
+            badge_option_div_update(data.badgeList);
+        }
+    });
+
+    //TODO update the group member info
 
 
 } //end of loadGalleryFeed method
 
+
 var galleryMsgBtnAction = function(){
+
     //adding event listener to the chat button click
     $("#image-msg-send-btn").off().on('click', function(e){
         e.preventDefault();
@@ -67,6 +93,7 @@ var galleryMsgBtnAction = function(){
         postImageMessage();
 
     });
+
     //adding event lister for 'enter' button
     $('#image-msg-text').off().on('keypress', function (e) {
         if (e.which == 13) {
@@ -97,10 +124,30 @@ var galleryMsgBtnAction = function(){
         $(this).siblings().css({backgroundColor: '#f4f4f4'});
         //set the selected background color to
         $(this).css({backgroundColor: '#d9d9d9'});
-        console.log($(this).attr('tabindex'));
+        var char = $(this).attr('data-char');
+        console.log(char);
+        var prompt;
+        var sentence_opener;
+        if(char === 'none'){
+            prompt = "You can proceed without selecting any of the three options";
+            sentence_opener = "";
+        }else{
+            prompt = global_badgeList[char][0]['prompt'];
+            sentence_opener = global_badgeList[char][0]['sentence_opener'];
+        }
+
+        //set the prompt
+        //console.log(global_badgeList[char][0]['prompt']);
+        $('.badge-prompt-text p').text(''); //clear the p tag first
+        $('.badge-prompt-text p').text(prompt);
+        //set the sentence opener
+        $('#badge-textarea-id').text(''); //clear the p tag first
+        $('#badge-textarea-id').text(sentence_opener);
+
 
       });
 
+        //copy button
       $('.badge-option-footer button').off().on('click', function(e){
             var badge_textarea_value = $('#badge-textarea-id').val();
             //console.log(badge_textarea_value);
@@ -110,16 +157,6 @@ var galleryMsgBtnAction = function(){
       });
 
       //badge-option-div related button clicks -- end
-
-//    $('#badge-option a').off().on('click', function(e){
-//
-//        console.log($(e.target).parents('a').attr('id'));
-//        $("#badge-option").css("display", "none");
-//        $(".div-badge-prompt").css("display", "");
-//
-//        //alert("clicked");
-//
-//    });
 
 } //end of galleryMsgBtnAction method
 
@@ -143,7 +180,6 @@ var postImageMessage = function () {
 
         var imagePk = $("input[name='image-db-pk']").val();
         console.log('image pk :: ',imagePk)
-
 
         //posts student comment in database - can be extracted using image primary key.
         $.post({
@@ -186,35 +222,16 @@ var realTimeMsgTransfer = function(){
         //if student commenting on one image is the same as the other user is viewing show the comment else don't show
         if(data.imageid == $("input[name='image-db-pk']").val()){
             //call to the method to post the message in the feed
-            buildGalleryFeedwithMsgs(data.name, data.message);
+            buildFeedwithMsgs(data.message, "#image-feed", data.name);
+
         }
 
     });
 
 }// end of realTimeMsgTransfer method
 
-var buildGalleryFeedwithMsgs = function(name, message){
-        //  add in the individual image discussion thread itself
-        var li = $("<li/>").appendTo("#image-feed");
 
-        if(logged_in == name){
-               li.addClass('message self');
-        }else{
-               li.addClass('message');
-        }
-
-        var div = $("<div/>").appendTo(li);
-        div.addClass('user-image');
-        var span = $('<span/>', {text: name}).appendTo(div);
-        var p = $('<p/>', {text: message}).appendTo(li);
-        var div_msg = $("<div/>").appendTo(li);
-        div_msg.addClass('msg-timestamp');
-        var span_timestap = $('<span/>', {text: "add timestamp"}).appendTo(div_msg);
-
-        $('#image-feed').scrollTop($('#image-feed')[0].scrollHeight);
-
-}
-
+//TODO: this hover changes the original position; fix it
 var image_hover_func = function(){
 
      //hovering effect-start
@@ -233,4 +250,20 @@ var image_hover_func = function(){
 
 }// end of image_hover_func method
 
+//this method updates the badge option div based on the info retrieved from the database
+//use in gallery.js
+//to be used in khan academy and also in TA
+var badge_option_div_update = function(badgeList){
+    //TODO: change the dict to list of lists
+    //console.log("from the method", badgeList)
+    i = 1;
+    $.each(badgeList, function(key, element){
+        console.log(element[0]['badgeName']);
+        //update the badge-option-display div elements but not the prompt
+        $("div#badge"+i+" span").text(element[0]['badgeName']);
+        i = i + 1;
+    });
 
+    //console.log(badgeList['hsc'][0]['prompt'])
+
+}

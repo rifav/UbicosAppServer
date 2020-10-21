@@ -65,6 +65,14 @@ class Message(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+class badgeInfo(models.Model):
+    charac = models.CharField(max_length=20)
+    value =  models.CharField(max_length=20)
+    index = models.IntegerField(null=True)
+    badgeName = models.CharField(max_length=20)
+    platform = models.CharField(max_length=20)
+    prompt = models.CharField(max_length=500)
+    sentence_opener = models.CharField(max_length=500);
 
 class badgeModel(models.Model):
     userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

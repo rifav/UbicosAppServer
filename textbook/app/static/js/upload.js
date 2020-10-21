@@ -5,7 +5,7 @@ $(function(){
 
         $("#file-upload").change(function(event){
 
-                enterLogIntoDatabase('upload image', 'gallery image upload attempted' , '', current_pagenumber)
+                enterLogIntoDatabase('upload image', 'gallery image upload attempted' , '', global_current_pagenumber)
 
                 console.log("file changed");
 

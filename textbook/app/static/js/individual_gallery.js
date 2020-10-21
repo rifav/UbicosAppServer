@@ -201,6 +201,7 @@ var postIndMessage = function (){
 
 //this method is used in three places: TODO
 //1)
+//3) gallery.js
 var buildFeedwithMsgs = function(message, container, username){
     var li = $("<li/>").appendTo(container);
     if(logged_in == username){

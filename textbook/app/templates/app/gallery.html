@@ -49,30 +49,29 @@
                         <a href="javascript:void(0)" class="badge-option-closebtn">&times;</a>
                     </div>
                     <div class="badge-option-display">
-                        <div href="#" id="badge1" tabindex="1">
+                        <div href="#" id="badge1" data-char="msc" tabindex="1">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Brainstorm</span>
                         </div>
-                        <div href="#" id="badge2" tabindex="2">
+                        <div href="#" id="badge2" data-char="hsc" tabindex="2">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Elaboration</span>
                        </div>
-                        <div href="#" id="badge3" tabindex="3">
+                        <div href="#" id="badge3" data-char="fam" tabindex="3">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
                            <span>Feedback</span>
                        </div>
-                        <div href="#" id="badge4" tabindex="4">
+                        <div href="#" id="badge4" data-char="none" tabindex="4">
                            <img  src="{% static 'pics/blank.png' %}" alt="">
-                            <span>Reflection</span>
+                            <span>None</span>
                        </div>
 
                     </div>
                     <div class="badge-prompt-text">
-                        <p>Coming up with the solution is difficult! Share your thoughts about the [topic_variable]
-                        so together you can come up with different ideas to solve the problem.</p>
+                        <p>Select an option to get the prompt</p>
                     </div>
                     <div class="badge-option-textarea">
-                        <textarea id="badge-textarea-id">I agree/disagree... </textarea>
+                        <textarea id="badge-textarea-id">Select an option to get the sentence starter </textarea>
                     </div>
                     <div class="badge-option-footer">
                         <button> Copy to the textbox </button>
