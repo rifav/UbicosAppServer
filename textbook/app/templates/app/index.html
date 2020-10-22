@@ -91,10 +91,9 @@
             {%  endifequal %}
 
 
-<!--            <div id="activity-feed-view" class="main-view">-->
-<!--                {% include 'app/activityfeed.html' %}-->
-<!--                <div id ="suggestion_text"></div>-->
-<!--            </div>-->
+            <div id="activity-feed-view" >
+                {% include 'app/badge.html' %}
+            </div>
             
             <!-- 
                 Ideally we'd only have one div.card, whose content is loaded dynamically on click.
@@ -158,7 +157,7 @@
                 {% include 'app/badge.html' %}
             </div>
 
-            <div class="card khanacademy">
+            <div class="card khanacademy active">
                 <a class="close-card"></a>
                 {% include 'app/khanacademy_table.html' %}
             </div>
@@ -179,6 +178,7 @@
     <script src="{% static 'js/digTextBook.js' %}"></script>
     <script src="{% static 'js/talkmoves.js' %}"></script>
     <script src="{% static 'js/utility.js' %}"></script>
+    <script src="{% static 'js/kaform.js' %}"></script>
     <script src="{% static 'js/keywordMatching.js' %}"></script>
     <script src="{% static 'js/awardbanner.js' %}"></script>
     <script src="{% static 'js/upload.js' %}"></script>

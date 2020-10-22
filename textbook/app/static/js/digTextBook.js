@@ -287,7 +287,7 @@ var bindActivityButtons = function(){
 
              //if the card is already extended, put it back to normal
              card_extension_close();
-
+             load_ka_card();
              console.log('card opened');
         }
 //        ---------------------image upload card-----------------------

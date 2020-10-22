@@ -145,9 +145,10 @@ def saveCharacteristic(request):
 
 # returns students characteristic from the student characterisitc model
 # called from utility.js and will save it into local storage
-def getCharacteristic(request):
+def getCharacteristic(request, username):
 
-    info = studentCharacteristicModel.objects.get(user=request.user);
+
+    info = studentCharacteristicModel.objects.get(user=User.objects.get(username=username));
     info = info.__dict__; #returns a dict
     dict = {}
     dict['msc'] = info['has_msc'];
@@ -867,19 +868,50 @@ def insertBadges(request):
 #TODO: read excel and add it to the database method
 
 def getBadges(request):
+    # msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Brainstorm',
+    #                 platform='TA',
+    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+    # msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Brainstorm',
+    #                 platform='TA',
+    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+    # msc = badgeInfo(charac='hsc', value='True', index=1, badgeName='Elaboration',
+    #                 platform='TA', prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
+    #                 sentence_opener='We can combine our opinion into...');
+    # msc.save();
+    # msc = badgeInfo(charac='hsc', value='False', index=1, badgeName='Elaboration',
+    #                 platform='TA',
+    #                 prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
+    #                 sentence_opener='We can combine our opinion into...');
+    # msc.save();
+    # msc = badgeInfo(charac='fam', value='True', index=1, badgeName='Feedback',
+    #                 platform='TA', prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
+    #                 sentence_opener='I would like to suggest...');
+    # msc.save();
+    # msc = badgeInfo(charac='fam', value='False', index=1, badgeName='Feedback',
+    #                 platform='TA',
+    #                 prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
+    #                 sentence_opener='I would like to suggest...');
+    # msc.save();
     # msc = badgeInfo(charac='con',value='True',index=1,badgeName='Reflection',
-    #                 platform='MB',prompt='con high prompt',sentence_opener='con high so');
+    #                 platform='TA',prompt='Look at others solution and reflect whether you agree with them or not.',
+    #                 sentence_opener='This is similar to what I was thinking because…');
     # msc.save();
     # msc = badgeInfo(charac='con', value='False', index=1, badgeName='Reflection',
-    #                 platform='MB', prompt='con low prompt', sentence_opener='con low so');
+    #                 platform='TA', prompt='Look at others solution and reflect whether you agree with them or not.',
+    #                 sentence_opener='This is similar to what I was thinking because…');
     # msc.save();
 
     #get platform from the front end
     if request.method == 'POST':
         platform = request.POST.get('platform');
+        username = request.POST.get('username');
 
     #get the students characteristic from the database
-    charac = getCharacteristic(request);
+    charac = getCharacteristic(request,username);
     #print('accessing charac', charac['msc']);
 
     dict = {};

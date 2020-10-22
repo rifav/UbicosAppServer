@@ -62,19 +62,18 @@ var loadGalleryFeed = function(act_id){
 
 
      //1. make an ajax call and use that to get badge info for gallery
-     //TODO: pass the platform; make this a separate function as this will be called from multiple places
      $.ajax({
         url: '/getBadges',
         type: 'POST',
         async: false,
-        data: {'platform':'MB'}, //TODO: check
+        data: {"username": logged_in, 'platform' : 'MB'}, //passing username so TA code can use the same API
         success: function (data) {
             //here data is a dict, where each key element is a list
-            //console.log(data.badgeList);
+            console.log('gallery.js', data.badgeList);
             //assigning it to a global variable, so we can access it outside this call and update promp/sentence opener as needed
             global_badgeList = data.badgeList;
             //call the method and update the badge-option-view
-            badge_option_div_update(data.badgeList);
+            badge_option_div_update(data.badgeList,"mb");
         }
     });
 
@@ -141,8 +140,8 @@ var galleryMsgBtnAction = function(){
         $('.badge-prompt-text p').text(''); //clear the p tag first
         $('.badge-prompt-text p').text(prompt);
         //set the sentence opener
-        $('#badge-textarea-id').text(''); //clear the p tag first
-        $('#badge-textarea-id').text(sentence_opener);
+        $('.badge-option-textarea textarea').text(''); //clear the p tag first
+        $('.badge-option-textarea textarea').text(sentence_opener);
 
 
       });
@@ -250,17 +249,16 @@ var image_hover_func = function(){
 
 }// end of image_hover_func method
 
-//this method updates the badge option div based on the info retrieved from the database
+//this method updates the badge option div (images) based on the info retrieved from the database
 //use in gallery.js
-//to be used in khan academy and also in TA
-var badge_option_div_update = function(badgeList){
+var badge_option_div_update = function(badgeList,platform){
     //TODO: change the dict to list of lists
     //console.log("from the method", badgeList)
     i = 1;
     $.each(badgeList, function(key, element){
-        console.log(element[0]['badgeName']);
+        //console.log(element[0]['badgeName']);
         //update the badge-option-display div elements but not the prompt
-        $("div#badge"+i+" span").text(element[0]['badgeName']);
+        $("div#"+platform+"-badge"+i+" span").text(element[0]['badgeName']);
         i = i + 1;
     });
 
