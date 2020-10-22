@@ -30,8 +30,10 @@ urlpatterns = [
     #url for chat tool
     url(r'^ajax/chat/$', views.broadcast),
     url('updateFeed/(?P<id>\d+)', views.updateFeed),
-    url('getBadges',views.getBadges),
-
+    #url for khan academy tool
+    url('saveKApost',views.saveKApost),
+    #utility urls
+    url('getBadges',views.getBadges), #used by gallery.js, kaform.js
 
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
@@ -51,7 +53,7 @@ urlpatterns = [
     url('tableData/save/',views.tableEntriesSave),
     # url('submitAnswer',views.submitAnswer),
     #url('uploadKAImage', views.uploadKAImage),
-    #url('submitKAAnswer',views.submitKAAnswer),
+
     #url('getKAPerKAID/(?P<ka_id>[0-9]+)',views.getKAPerKAID),
     #url('checkKAAnswer/(?P<ka_id>\d+)',views.checkKAAnswer),
     #url('dashboardKAInfo/(?P<ka_id>\d+)',views.dashboardKAInfo),

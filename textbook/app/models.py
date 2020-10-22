@@ -53,6 +53,15 @@ class individualMsgComment(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+class KAPostModel(models.Model):
+    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title =  models.CharField(max_length=100)
+    textareaID = models.CharField(max_length=20)
+    content = models.CharField(max_length=400)
+    posted_at = models.DateTimeField(auto_now_add=True)
+
+    def natural_key(self):
+        return (self.posted_by.username)
 
 # activity feed message
 # rename the following method for clarification
