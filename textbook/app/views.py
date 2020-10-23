@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel, badgeInfo
+    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel, badgeInfo, KAPostModel
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -284,6 +284,91 @@ def getSelfGalleryContent(request, act_id):
     return JsonResponse({'success': dict});
 
 
+def getBadges(request):
+    # msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Brainstorm',
+    #                 platform='TA',
+    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+    # msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Brainstorm',
+    #                 platform='TA',
+    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+    # msc = badgeInfo(charac='hsc', value='True', index=1, badgeName='Elaboration',
+    #                 platform='TA', prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
+    #                 sentence_opener='We can combine our opinion into...');
+    # msc.save();
+    # msc = badgeInfo(charac='hsc', value='False', index=1, badgeName='Elaboration',
+    #                 platform='TA',
+    #                 prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
+    #                 sentence_opener='We can combine our opinion into...');
+    # msc.save();
+    # msc = badgeInfo(charac='fam', value='True', index=1, badgeName='Feedback',
+    #                 platform='TA', prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
+    #                 sentence_opener='I would like to suggest...');
+    # msc.save();
+    # msc = badgeInfo(charac='fam', value='False', index=1, badgeName='Feedback',
+    #                 platform='TA',
+    #                 prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
+    #                 sentence_opener='I would like to suggest...');
+    # msc.save();
+    # msc = badgeInfo(charac='con',value='True',index=1,badgeName='Reflection',
+    #                 platform='TA',prompt='Look at others solution and reflect whether you agree with them or not.',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+    # msc = badgeInfo(charac='con', value='False', index=1, badgeName='Reflection',
+    #                 platform='TA', prompt='Look at others solution and reflect whether you agree with them or not.',
+    #                 sentence_opener='This is similar to what I was thinking because…');
+    # msc.save();
+
+    #get platform from the front end
+    if request.method == 'POST':
+        platform = request.POST.get('platform');
+        username = request.POST.get('username');
+
+    #get the students characteristic from the database
+    charac = getCharacteristic(request,username);
+    #print('accessing charac', charac['msc']);
+
+    dict = {};
+    #make 3 separate queries
+    #TODO: how to make it into one query
+    #TODO: handle index for randomization
+    #TODO: separatae no participation badge vs constructive badge
+    msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
+                                              value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
+    dict['msc'] = msc_badge;
+    hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
+                                  value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
+    dict['hsc'] = hsc_badge;
+    fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
+                                              value=charac['fam'], index=1).values('badgeName', 'prompt',
+                                                                                   'sentence_opener'));
+    dict['fam'] = fam_badge;
+
+    #print('872 :: ', type(msc_badge[0]));
+
+    return JsonResponse({'badgeList': dict})
+    #return HttpResponse('');
+
+def saveKApost(request):
+    # get the data
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        pagetitle = request.POST.get('pagetitle');
+        textareaId = request.POST.get('textareaId');
+        content = request.POST.get('content');
+
+    # check if an answer is already present for this textarea, then update else enter
+    if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
+        KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)). \
+            update(content=content);
+    else:
+        ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
+        ka_answer.save();
+    return HttpResponse('');
+
 ###############################################
 ############ handler methods start ############
 def getUsername(request):
@@ -409,10 +494,13 @@ def brainstormDelete(request,note_id):
 def tableEntriesSave(request):
 
     entries = tableChartData(posted_by = request.user, table_id = request.POST.get('table_id'), plot_type = request.POST.get('plot_type'),
-                             plot_data = request.POST.get('plot_data'))
-    entries.save()
+                             plot_data = request.POST.get('plot_data'));
+    entries.save();
 
-    return HttpResponse('')
+    return HttpResponse('');
+
+
+
 
 # delete the following method
 # def uploadKAImage(request):
@@ -867,73 +955,7 @@ def insertBadges(request):
 
 #TODO: read excel and add it to the database method
 
-def getBadges(request):
-    # msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='hsc', value='True', index=1, badgeName='Elaboration',
-    #                 platform='TA', prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
-    #                 sentence_opener='We can combine our opinion into...');
-    # msc.save();
-    # msc = badgeInfo(charac='hsc', value='False', index=1, badgeName='Elaboration',
-    #                 platform='TA',
-    #                 prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
-    #                 sentence_opener='We can combine our opinion into...');
-    # msc.save();
-    # msc = badgeInfo(charac='fam', value='True', index=1, badgeName='Feedback',
-    #                 platform='TA', prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
-    #                 sentence_opener='I would like to suggest...');
-    # msc.save();
-    # msc = badgeInfo(charac='fam', value='False', index=1, badgeName='Feedback',
-    #                 platform='TA',
-    #                 prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
-    #                 sentence_opener='I would like to suggest...');
-    # msc.save();
-    # msc = badgeInfo(charac='con',value='True',index=1,badgeName='Reflection',
-    #                 platform='TA',prompt='Look at others solution and reflect whether you agree with them or not.',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='con', value='False', index=1, badgeName='Reflection',
-    #                 platform='TA', prompt='Look at others solution and reflect whether you agree with them or not.',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
 
-    #get platform from the front end
-    if request.method == 'POST':
-        platform = request.POST.get('platform');
-        username = request.POST.get('username');
-
-    #get the students characteristic from the database
-    charac = getCharacteristic(request,username);
-    #print('accessing charac', charac['msc']);
-
-    dict = {};
-    #make 3 separate queries
-    #TODO: how to make it into one query
-    #TODO: handle index for randomization
-    #TODO: separatae no participation badge vs constructive badge
-    msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
-                                              value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
-    dict['msc'] = msc_badge;
-    hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
-                                  value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
-    dict['hsc'] = hsc_badge;
-    fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
-                                              value=charac['fam'], index=1).values('badgeName', 'prompt',
-                                                                                   'sentence_opener'));
-    dict['fam'] = fam_badge;
-
-    #print('872 :: ', type(msc_badge[0]));
-
-    return JsonResponse({'badgeList': dict})
-    #return HttpResponse('');
 
 
 # def pageParser(request):
@@ -1234,7 +1256,7 @@ def groupAdd(request):
                                users=User.objects.get(username=username))
             member.save();
 
-    return HttpResponse('')
+    return render(request, 'app/login.html', {});
 
 # hacks - end
 
