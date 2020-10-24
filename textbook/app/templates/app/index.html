@@ -10,9 +10,10 @@
     <title>UbiCoS DT</title>
 
     <!-- Styles -->
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/digTextBook.less' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/gallery.css' %}">
     <link rel="stylesheet" href="{% static 'css/individual_gallery.css' %}"/>
-    <link rel="stylesheet/less" type="text/css" href="{% static 'css/digTextBook.less' %}">
+    <link rel="stylesheet" href="{% static 'css/badgeCard.css' %}"/>
     <link rel="stylesheet/less" type="text/css" href="{% static 'js/jqPlot/jquery.jqplot.css' %}">
     <link rel="stylesheet/less" type="text/css" href="{% static 'js/jqPlot/jquery.jqplot.min.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -157,7 +158,7 @@
                 {% include 'app/badge.html' %}
             </div>
 
-            <div class="card khanacademy active">
+            <div class="card khanacademy">
                 <a class="close-card"></a>
                 {% include 'app/khanacademy_table.html' %}
             </div>

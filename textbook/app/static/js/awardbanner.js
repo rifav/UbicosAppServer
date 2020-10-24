@@ -10,6 +10,8 @@ $(function(){
 
 })
 
+
+
 //$( document ).ready(function() {
 //    setInterval(function(){
 //    clearBadges();

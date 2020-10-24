@@ -327,30 +327,33 @@ def getBadges(request):
         platform = request.POST.get('platform');
         username = request.POST.get('username');
 
-    #get the students characteristic from the database
-    charac = getCharacteristic(request,username);
-    #print('accessing charac', charac['msc']);
+        print('line 330 /getBadges :: ', username);
 
-    dict = {};
-    #make 3 separate queries
-    #TODO: how to make it into one query
-    #TODO: handle index for randomization
-    #TODO: separatae no participation badge vs constructive badge
-    msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
-                                              value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
-    dict['msc'] = msc_badge;
-    hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
-                                  value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
-    dict['hsc'] = hsc_badge;
-    fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
-                                              value=charac['fam'], index=1).values('badgeName', 'prompt',
-                                                                                   'sentence_opener'));
-    dict['fam'] = fam_badge;
+        #get the students characteristic from the database
+        charac = getCharacteristic(request,username);
+        #print('accessing charac', charac['msc']);
 
-    #print('872 :: ', type(msc_badge[0]));
+        dict = {};
+        #make 3 separate queries
+        #TODO: how to make it into one query
+        #TODO: handle index for randomization
+        #TODO: separatae no participation badge vs constructive badge
+        msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
+                                                  value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
+        dict['msc'] = msc_badge;
+        hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
+                                      value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
+        dict['hsc'] = hsc_badge;
+        fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
+                                                  value=charac['fam'], index=1).values('badgeName', 'prompt',
+                                                                                       'sentence_opener'));
+        dict['fam'] = fam_badge;
 
-    return JsonResponse({'badgeList': dict})
-    #return HttpResponse('');
+        #print('872 :: ', type(msc_badge[0]));
+
+        return JsonResponse({'badgeList': dict})
+
+    return HttpResponse('');
 
 def saveKApost(request):
     # get the data

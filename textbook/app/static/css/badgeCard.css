@@ -1,0 +1,76 @@
+
+.badgeCardHeader1 {
+    text-align: center;
+}
+
+.badgeCardName, .badgeCardBody {
+  display: flex;
+  cursor: pointer;
+}
+.badgeCardName > div {
+    flex: 1; /*grow*/
+    width: 100px;
+    height: 135px;
+   /*  background: #1ea0e9;
+    border-radius: 45%; */
+    margin: 15px;
+    font-size: smaller;
+}
+
+.badgeDesc img{
+    height: 80px;
+    width: 80px;
+    border-radius: 45%;
+    text-align: center;
+    margin-left: 5px;
+}
+
+.badgeDesc:hover{
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.badgeDesc span{
+    font-style: italic;
+    position: absolute;
+    top: 25%;
+    margin-top: 5%;
+    width: 15%;
+    text-align: center;
+}
+
+.badgeCardHeader2{
+    padding-top: 1rem;
+    text-align: center;
+}
+
+
+.badgeCardBody > div {
+    flex: 1; /*grow*/
+    width: 100px;
+    height: 240px;
+    border: 1px solid #b3b3b3;
+    margin: 15px;
+    font-size: smaller;
+}
+
+.badgeBody {
+    text-align: center; /* puts the element/text in the middle of this div */
+}
+
+.badgeBody > div {
+    margin: 15px;
+
+}
+
+
+.badgeBody img{
+    height: 70px;
+    width: 70px;
+}
+
+.badgeBody span{
+    font-style: italic;
+    display:block;
+}
+
+
