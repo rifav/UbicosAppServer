@@ -283,18 +283,39 @@ def getSelfGalleryContent(request, act_id):
 
     return JsonResponse({'success': dict});
 
+def getBadgeNames(request):
+    if request.method == 'POST':
+        badgeType = request.POST.get('badgeType');
 
-def getBadges(request):
-    # msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
+        badges = list(badgeInfo.objects.filter(charac=badgeType).values('badgeName').distinct());
+        print(badges);
+
+        return JsonResponse({'badgeNames':badges});
+    return HttpResponse('');
+
+
+#this method is called from gallery.js/khan academy content.js, and teachable agent <fileName>
+def getBadgeOptions(request):
+    msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Ask a question',
+                    platform='TA',
+                    prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+                    sentence_opener='This is similar to what I was thinking because…');
+    msc.save();
+    msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Ask a question',
+                    platform='TA',
+                    prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+                    sentence_opener='This is similar to what I was thinking because…');
+    msc.save();
+    msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Critique',
+                    platform='TA',
+                    prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+                    sentence_opener='This is similar to what I was thinking because…');
+    msc.save();
+    msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Critique',
+                    platform='TA',
+                    prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
+                    sentence_opener='This is similar to what I was thinking because…');
+    msc.save();
     # msc = badgeInfo(charac='hsc', value='True', index=1, badgeName='Elaboration',
     #                 platform='TA', prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
     #                 sentence_opener='We can combine our opinion into...');

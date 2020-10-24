@@ -33,7 +33,8 @@ urlpatterns = [
     #url for khan academy tool
     url('saveKApost',views.saveKApost),
     #utility urls
-    url('getBadges',views.getBadges), #used by gallery.js, kaform.js
+    url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
+    url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
 
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
@@ -59,7 +60,7 @@ urlpatterns = [
     #url('dashboardKAInfo/(?P<ka_id>\d+)',views.dashboardKAInfo),
     #badges
     url('insertBadges',views.insertBadges),
-    url('getBadges',views.getBadges),
+
     # url('parser',views.pageParser),
     url('camera',views.camera),
     #url('randomDiscussionGroupCreate',views.random_discussion_group_generator),

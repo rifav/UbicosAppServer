@@ -63,7 +63,7 @@ var loadGalleryFeed = function(act_id){
 
      //1. make an ajax call and use that to get badge info for gallery
      $.ajax({
-        url: '/getBadges',
+        url: '/getBadgeOptions',
         type: 'POST',
         async: false,
         data: {"username": logged_in, 'platform' : 'MB'}, //passing username so TA code can use the same API
