@@ -33,6 +33,7 @@ urlpatterns = [
     #url for khan academy tool
     url('saveKApost',views.saveKApost),
     #utility urls
+    url('insertBadgeInfo',views.insertBadgeInfo), #used by gallery.js, kaform.js
     url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
     url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
 
