@@ -16,7 +16,23 @@ $(function(){
 
         });
 
-        //TODO: highlight the tab menu buttons based on page id
+        //highlight the tab menu buttons based on page id -- start
+        if(global_current_pagenumber >= 1 && global_current_pagenumber < 8) {
+            console.log("current page number :: ", global_current_pagenumber);
+            $('#page-controls a').removeClass('menu-button-selected');
+            $("#tab-week1").addClass('menu-button-selected');
+        }else if(global_current_pagenumber >= 9 && global_current_pagenumber < 21)
+        {
+            console.log("current page number :: ", global_current_pagenumber);
+            $('#page-controls a').removeClass('menu-button-selected');
+            $("#tab-week2").addClass('menu-button-selected');
+        }else{
+            console.log("current page number :: ", global_current_pagenumber);
+            $('#page-controls a').removeClass('menu-button-selected');
+            $("#tab-week3").addClass('menu-button-selected');
+        }
+        //highlight the tab menu buttons based on page id -- end
+
 
         //close the right-side-menu
         $('.right-menu-closebtn').click(function(e){

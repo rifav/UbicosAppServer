@@ -150,7 +150,7 @@ a {
 .page {
     position: absolute;
     padding-right: 80px;
-    margin-top: 8%;
+    margin-top: 5%;
     margin-left: 5%;
     width: 95%;
     box-sizing: border-box;
@@ -169,6 +169,7 @@ a {
     text-align: justify;
     margin: 1rem;
     position: relative;
+    line-height: 1.6;
 }
 
 
@@ -563,6 +564,18 @@ a {
     z-index: 2;
 }
 
+.card h1{
+    padding-top: 1.5rem;
+}
+
+p.cardDescription{
+    position: absolute;
+    top: 5rem;
+    z-index: 1;
+    font-size: 12pt;
+    padding-top: 10px;
+}
+
 .card.active {
     transform: translateX(0);
     transition: all 0.4s;
@@ -676,14 +689,13 @@ a {
     }
 
 #activity-feed {
-
         height: 80%;
         width: 98%;
         padding: 15px 15px 15px 15px;
         overflow-y: auto;
         border-style: dotted;
-        position: fixed;
-        top: 0%;
+        position: absolute;
+        top: 3rem;
 }
 
 #ind-feed {
@@ -897,13 +909,13 @@ a {
     padding: 1.5rem;
 }
 
-.chat_prompt_p {
-    position: fixed;
-    top: 4.5%;
-    z-index: 1;
-    font-size: smaller;
-    padding-top: 10px;
-}
+// .chat_prompt_p {
+//     position: fixed;
+//     top: 4.5%;
+//     z-index: 1;
+//     font-size: smaller;
+//     padding-top: 10px;
+// }
 
 #activity-index {
     margin-top: 90px !important;
@@ -1035,32 +1047,37 @@ a {
     width: 100%;
 }
 
-//TODO: requires updated
 .upload-success-msg{
 
      padding: 5px 20px 0px;
-     background-color: #909497; //background color of the success message
-     color: white;
+     text-align: center;
+     color: black;
+     border: 1px solid #ddd;
+     border-radius: 20px;
+     background-color: #f4f4f4; //background color of the success message
      opacity: 1;
      transition: opacity 0.6s;
-     margin-bottom: 15px;
-     width: 90%
+    // margin-bottom: 15px;
+     width: fit-content;
+     position: absolute;
+     top: 35rem;
+     left: 18%;
 
 }
 
 .upload-success-msg-closebtn {
-  margin-left: 15px;
-  color: white;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
+      margin-left: 15px;
+      color: black;
+      font-weight: bold;
+      float: right;
+      font-size: 22px;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
 }
 
 .upload-success-msg-closebtn:hover {
-  color: black;
+  color: white;
 }
 
 .self-gallery img{
@@ -1778,7 +1795,6 @@ a {
 .badge-option-class{
     position: fixed;
     top: 180px;
-
     height: 440px;
     width: 520px;
     z-index:2;
@@ -1907,6 +1923,7 @@ a {
     top: 4px;
     width:20px;
     height:20px;
+    font-size: 12pt;
 }
 
 .gallery-submission {

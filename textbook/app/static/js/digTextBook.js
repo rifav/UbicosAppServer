@@ -53,6 +53,7 @@ $(function(){
 //1) in digtextbook.js - load the last accessed page
 //2) in activityindex.js - when a page is selected from the side navigation bar
 var reloadPage = function(pageToLoad){
+    global_current_pagenumber = pageToLoad;
     var gotoPage = pageToLoad;
     var container = $('#textbook-content');
 
