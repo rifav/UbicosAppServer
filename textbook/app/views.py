@@ -134,11 +134,13 @@ def login(request):
         return render(request, 'app/login.html', {})
 
 def saveCharacteristic(request):
-    #TODO update from the front-end
-    #loop through all the user and set some values
+    # TODO update from the front-end
+    # loop through all the user and set some values
+    # note: added has_social true for badge update consistency (more into computional model method). while
+    # the other four variables value will come from the survey, has_social will always be true.
     for o in User.objects.all():
         student_char = studentCharacteristicModel(user=o, has_msc=True,
-                                                  has_hsc=True, has_fam=True, has_con=True);
+                                                  has_hsc=True, has_fam=True, has_con=True, has_social=True);
         student_char.save();
 
 
@@ -156,6 +158,7 @@ def getCharacteristic(request, username):
     dict['hsc'] = info['has_hsc'];
     dict['fam'] = info['has_fam'];
     dict['con'] = info['has_con'];
+    dict['social'] = info['has_social'];
 
     return dict;
     #return JsonResponse({'info': dict});
@@ -297,40 +300,34 @@ def getBadgeNames(request):
 
 #this method is called from gallery.js/khan academy content.js, and teachable agent <fileName>
 #https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
-def getBadgeOptions(request):
+def getBadgeOptions(request, username, platform, badgeKey):
 
-    #get platform from the front end
-    if request.method == 'POST':
-        platform = request.POST.get('platform');
-        username = request.POST.get('username');
-        badge = request.POST.get('badges');
-        badgeKey = json.loads(badge);
+    print('line 302 /getBadgeOptions :: ', badgeKey);
 
-        print('line 307 /getBadgeOptions :: ', username, ', platform :: ', platform);
-        print('line 307 /getBadgeOptions :: ', type(badgeKey));
+    #get the students characteristic VALUES from the database
+    charac = getCharacteristic(request, username);
+    #print('line 309 accessing charac list :: ', charac);
+    #print('line 310 accessing charac value :: ', charac['social']);
 
-        #get the students characteristic VALUES from the database
-        charac = getCharacteristic(request,username);
-        #print('accessing charac value :: ', charac['msc']);
+    #separatae no participation badge vs constructive badge -- through badgeKey List
+    dict = {};
+    for elem in badgeKey:
+        original_elem = elem;
 
-        #separatae no participation badge vs constructive badge -- through badgeKey List
-        dict = {};
-        for elem in badgeKey:
-            original_elem = elem;
+        #little adjustment made to display all the three badges un the interface
+        if(elem == 'con1' or elem == 'con2'):
+            elem = elem.replace(elem,"con");
 
-            if(elem == 'con1' or elem == 'con2'):
-                elem = elem.replace(elem,"con");
-
-            # TODO: handle randomization using index key
-            badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
-                                                      value=charac[elem],index=1).values('badgeName','prompt','sentence_opener'));
-            dict[original_elem] = badge_item;
+        # TODO: handle randomization using index key
+        badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
+                                                  value=charac[elem],index=1).values('badgeName','prompt','sentence_opener'));
+        dict[original_elem] = badge_item;
 
 
-        print('line 328 /getbadgeOptions', dict);
-        return JsonResponse({'badgeList': dict})
+    # print('line 327 /getbadgeOptions', dict);
+    return dict;
 
-    return HttpResponse('');
+
 
 def saveKApost(request):
     # get the data
@@ -340,14 +337,62 @@ def saveKApost(request):
         textareaId = request.POST.get('textareaId');
         content = request.POST.get('content');
 
-    # check if an answer is already present for this textarea, then update else enter
-    if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
-        KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)). \
-            update(content=content);
-    else:
-        ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
-        ka_answer.save();
+        # check if an answer is already present for this textarea, then update else enter
+        if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
+            KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)). \
+                update(content=content);
+        else:
+            ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
+            ka_answer.save();
+        return HttpResponse('');
+
     return HttpResponse('');
+
+
+def getParticipationHistory(request, activity_id, platform):
+    #todo incomplete
+    return HttpResponse('');
+
+#modelbook: gallery ID
+#khanacademy: khan academy
+def computationalModel(request):
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        platform = request.POST.get('platform');
+        activity_id = request.POST.get('activity_id');
+
+        #first check if this student will participate or not based on their history
+        #willParticipate = false --> when the student did not participate in the last two activities -- badgeKey = NP related key
+        #willParticipate = true --> when the student participated in the last two activities -- badgeKey = CP related key
+        #todo finalize
+        if(int(activity_id)>=3):
+            #isNP = getParticipationHistory(request, activity_id, platform);
+            willParticipate = True;
+        else:
+            #todo: handle the first two cases
+            willParticipate = True;
+
+
+        #second, using the willParticipate variable, decide whether to call CPmodel or not
+        badgeKey = [];
+        if(willParticipate == True):
+            #call the CP model here to check the likelihood of participation
+            #calculate the equation here.
+            # todo log this (student id, activity id, platform, likelihood)
+            # later from the data will verify whether students participated or not
+            badgeKey = ['msc', 'hsc', 'fam']
+        else:
+            #based on student history, will not participate so display conscien and social badges
+            badgeKey = ['con1', 'con2', 'social']
+
+
+        badgeList = getBadgeOptions(request, username, platform, badgeKey);
+
+        return JsonResponse({'badgeList': badgeList})
+
+    return HttpResponse('');
+
+
 
 ###############################################
 ############ handler methods start ############

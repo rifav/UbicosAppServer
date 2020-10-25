@@ -11,7 +11,16 @@ class studentCharacteristicModel (models.Model):
     has_hsc = models.BooleanField(default=False)
     has_fam = models.BooleanField(default=False)
     has_con = models.BooleanField(default=False)
+    has_social = models.BooleanField(default=False)
 
+class participationHistory (models.Model):
+    platform = models.CharField(max_length=20)
+    activity_id = models.CharField(max_length=20)
+    didParticipate = models.CharField(max_length=20)
+    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    def natural_key(self):
+        return (self.posted_by.username)
 
 # saves the image
 class imageModel(models.Model):

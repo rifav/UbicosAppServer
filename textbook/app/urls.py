@@ -37,10 +37,13 @@ urlpatterns = [
     url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
     url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
 
+    #computational model urls
+    url('computationalModel', views.computationalModel),
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),
     #url('addUserToGroups',views.addUserToGroupsForm),
+    
     #urls for different tool utility
     url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1

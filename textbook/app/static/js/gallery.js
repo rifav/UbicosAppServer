@@ -1,5 +1,5 @@
 var gallery_act_id;
-var global_badgeList;
+
 
 $(function(){
 
@@ -36,6 +36,7 @@ var loadGalleryFeed = function(act_id){
     //get the image primary key which is set above
     var imagePk = $('input[name="image-db-pk"]').val();
 
+    //todo if imagePk is null i.e., no image is uploaded for this activity id, then it generates an error, handle it
     //3. make an ajax call to get the comments and update discussion feed with each image [TODO: get the group member info as well]
      $.ajax({
          type: 'GET',
@@ -61,35 +62,10 @@ var loadGalleryFeed = function(act_id){
              }
      });
 
+    //https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
+    //4. call the computational model method to see whether the student will participate or not; display badge based on that
+    computationalModelMethod(logged_in, 'MB', gallery_act_id);
 
-    //todo call the computational model to see whether the student will participate or not; display badge based on that
-    //output from above: 1. ['msc','hsc','fam'] or 2. ['con','social']
-     var badgeArray = [];
-//     badgeArray.push('msc');
-//     badgeArray.push('hsc');
-//     badgeArray.push('fam');
-     badgeArray.push('con1');
-     badgeArray.push('con2');
-     badgeArray.push('fam');
-     //console.log(badgeArray)
-
-     //https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
-
-     //1. make an ajax call and use that to get badge info for gallery
-     $.ajax({
-        url: '/getBadgeOptions',
-        type: 'POST',
-        async: false,
-        data: {"username": logged_in, 'platform' : 'MB', "badges": JSON.stringify(badgeArray)}, //passing username so TA code can use the same API
-        success: function (data) {
-            //here data is a dict, where each key element is a list
-            console.log('gallery.js', data.badgeList);
-            //assigning it to a global variable, so we can access it outside this call and update promp/sentence opener as needed
-            global_badgeList = data.badgeList;
-            //call the method and update the badge-option-view
-            badge_option_div_update(data.badgeList,"mb");
-        }
-    });
 
 
 } //end of loadGalleryFeed method
@@ -262,24 +238,4 @@ var image_hover_func = function(){
 
 }// end of image_hover_func method
 
-//this method updates the badge option div (images) based on the info retrieved from the database
-//use in gallery.js
-var badge_option_div_update = function(badgeList, platform){
-    //TODO: change the dict to list of lists
-    console.log("from the method", badgeList)
-    i = 1;
-    $.each(badgeList, function(key, element){
-        //console.log(element[0]['badgeName']);
-        //update the badge-option-display div elements with badgeNames but not the prompt
-        $("div#"+platform+"-badge"+i+" span").text(element[0]['badgeName']);
-        //update the data-char
-        //https://stackoverflow.com/questions/51278220/how-to-set-data-attribute-with-jquery
-        $("div#"+platform+"-badge"+i).attr('data-char',key);
-        console.log($("div#"+platform+"-badge"+i).attr('data-char'));
-        //increment the counter
-        i = i + 1;
-    });
 
-    //console.log(badgeList['hsc'][0]['prompt'])
-
-}
