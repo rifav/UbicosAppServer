@@ -25,7 +25,7 @@ var loadGalleryFeed = function(act_id){
             //TODO: display image outside the group
             //display an image randomly -- choose the first image as random
             imageInfo = JSON.parse(data.imageData)[0];
-            console.log(imageInfo);
+            //console.log(imageInfo);
             //set the src
             $('.section img').attr('src','/media/'+imageInfo.fields['image']);
             //set the primary key
@@ -33,21 +33,22 @@ var loadGalleryFeed = function(act_id){
         }
      });
 
-    //get the image primary key
+    //get the image primary key which is set above
     var imagePk = $('input[name="image-db-pk"]').val();
 
-    //3. make an ajax call to get the comments and update discussion feed with each image
+    //3. make an ajax call to get the comments and update discussion feed with each image [TODO: get the group member info as well]
      $.ajax({
          type: 'GET',
          url: '/updateImageFeed/'+imagePk, //get image comment using primary id
          success: function(response){
                 //console.log(response)
 
-                msg_data = response.success
+                msg_data = response.success;
                 var obj = jQuery.parseJSON(msg_data);
                 //console.log(obj)
-                //clear the image feed so it doesn't add to the previous feed
+                //clear the image feed so it doesn't add to the previously loaded feed
                 $('#image-feed').empty();
+                //iterate through the response data to display the comments in the interface
                 $.each(obj, function(key, value){
                     //this method is defined in individual_gallery.js
                     buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0]);
@@ -61,12 +62,25 @@ var loadGalleryFeed = function(act_id){
      });
 
 
+    //todo call the computational model to see whether the student will participate or not; display badge based on that
+    //output from above: 1. ['msc','hsc','fam'] or 2. ['con','social']
+     var badgeArray = [];
+//     badgeArray.push('msc');
+//     badgeArray.push('hsc');
+//     badgeArray.push('fam');
+     badgeArray.push('con1');
+     badgeArray.push('con2');
+     badgeArray.push('fam');
+     //console.log(badgeArray)
+
+     //https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
+
      //1. make an ajax call and use that to get badge info for gallery
      $.ajax({
         url: '/getBadgeOptions',
         type: 'POST',
         async: false,
-        data: {"username": logged_in, 'platform' : 'MB'}, //passing username so TA code can use the same API
+        data: {"username": logged_in, 'platform' : 'MB', "badges": JSON.stringify(badgeArray)}, //passing username so TA code can use the same API
         success: function (data) {
             //here data is a dict, where each key element is a list
             console.log('gallery.js', data.badgeList);
@@ -76,8 +90,6 @@ var loadGalleryFeed = function(act_id){
             badge_option_div_update(data.badgeList,"mb");
         }
     });
-
-    //TODO update the group member info
 
 
 } //end of loadGalleryFeed method
@@ -172,6 +184,7 @@ var postImageMessage = function () {
         }
 
         //console.log('user message :: '+message)
+        //todo: add the keyword matching algo here and display badge based on the algorithm
 
         //get the user name who posted
         var user_name = $("input[name='username']").val()
@@ -251,14 +264,19 @@ var image_hover_func = function(){
 
 //this method updates the badge option div (images) based on the info retrieved from the database
 //use in gallery.js
-var badge_option_div_update = function(badgeList,platform){
+var badge_option_div_update = function(badgeList, platform){
     //TODO: change the dict to list of lists
-    //console.log("from the method", badgeList)
+    console.log("from the method", badgeList)
     i = 1;
     $.each(badgeList, function(key, element){
         //console.log(element[0]['badgeName']);
-        //update the badge-option-display div elements but not the prompt
+        //update the badge-option-display div elements with badgeNames but not the prompt
         $("div#"+platform+"-badge"+i+" span").text(element[0]['badgeName']);
+        //update the data-char
+        //https://stackoverflow.com/questions/51278220/how-to-set-data-attribute-with-jquery
+        $("div#"+platform+"-badge"+i).attr('data-char',key);
+        console.log($("div#"+platform+"-badge"+i).attr('data-char'));
+        //increment the counter
         i = i + 1;
     });
 

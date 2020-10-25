@@ -304,7 +304,7 @@ var bindActivityButtons = function(){
              $('img#default').attr('src', API_URL.picsBase + "/default.png");
              // end of the solution
         }
-//        ---------------------individual discussion-----------------------
+//        ---------------------display (only) individual discussion -----------------------
          if($('.card.self-gallery').hasClass('active')){
 
              //if the card is already extended, put it back to normal

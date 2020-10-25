@@ -16,8 +16,7 @@ class badgeInfoFileRead():
                 else:
                     dict['characteristic'] = row[0];
                     dict['value'] = row[1];
-                    dict['badge_name'] = row[1];
-                    dict['value'] = row[2];
+                    dict['badge_name'] = row[2];
                     dict['index'] = row[3];
                     dict['platform'] = row[4];
                     dict['definition'] = row[5];

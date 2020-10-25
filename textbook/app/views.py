@@ -296,37 +296,38 @@ def getBadgeNames(request):
 
 
 #this method is called from gallery.js/khan academy content.js, and teachable agent <fileName>
+#https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
 def getBadgeOptions(request):
 
     #get platform from the front end
     if request.method == 'POST':
         platform = request.POST.get('platform');
         username = request.POST.get('username');
+        badge = request.POST.get('badges');
+        badgeKey = json.loads(badge);
 
-        print('line 330 /getBadges :: ', username);
+        print('line 307 /getBadgeOptions :: ', username, ', platform :: ', platform);
+        print('line 307 /getBadgeOptions :: ', type(badgeKey));
 
-        #get the students characteristic from the database
+        #get the students characteristic VALUES from the database
         charac = getCharacteristic(request,username);
-        #print('accessing charac', charac['msc']);
+        #print('accessing charac value :: ', charac['msc']);
 
+        #separatae no participation badge vs constructive badge -- through badgeKey List
         dict = {};
-        #make 3 separate queries
-        #TODO: how to make it into one query
-        #TODO: handle index for randomization
-        #TODO: separatae no participation badge vs constructive badge
-        msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
-                                                  value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
-        dict['msc'] = msc_badge;
-        hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
-                                      value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
-        dict['hsc'] = hsc_badge;
-        fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
-                                                  value=charac['fam'], index=1).values('badgeName', 'prompt',
-                                                                                       'sentence_opener'));
-        dict['fam'] = fam_badge;
+        for elem in badgeKey:
+            original_elem = elem;
 
-        #print('872 :: ', type(msc_badge[0]));
+            if(elem == 'con1' or elem == 'con2'):
+                elem = elem.replace(elem,"con");
 
+            # TODO: handle randomization using index key
+            badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
+                                                      value=charac[elem],index=1).values('badgeName','prompt','sentence_opener'));
+            dict[original_elem] = badge_item;
+
+
+        print('line 328 /getbadgeOptions', dict);
         return JsonResponse({'badgeList': dict})
 
     return HttpResponse('');
