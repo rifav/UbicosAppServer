@@ -4,9 +4,19 @@ $(function(){
         //side navigation bar click events -- start
 
         //open the right-side-menu
-        $('#right-side-menu').click(function(e){
+        //$('#right-side-menu').click(function(e){
+        $('#study-menu').click(function(e){
             $("#mySidenav").css("width", "350px");
         });
+
+        //handle the tab menu button actions
+        $('#tab-week1, #tab-week2, #tab-week3').click(function (e){
+
+            handle_tab_menu_buttons($(this), $(this).attr('data-id'));
+
+        });
+
+        //TODO: highlight the tab menu buttons based on page id
 
         //close the right-side-menu
         $('.right-menu-closebtn').click(function(e){
@@ -56,7 +66,7 @@ $(function(){
 
             //highlight one module one at a time within respective <ul> tag
             $("#mySidenav a.nav").removeClass('active'); //remove all the active class so far
-            console.log($(this));
+            console.log('activityindex.js line 62', $(this));
             $(this).toggleClass('active'); //then add active class in the current selected <a> tag
 
             //get the page id, load that page, save the page id as the last accessed page
@@ -72,4 +82,16 @@ $(function(){
         //side navigation bar click events -- end
 
 })
+
+var handle_tab_menu_buttons = function(container, pageID){
+
+    $("#mySidenav").css("width", "0px"); //if the right side menu is open, close it
+    //highlight the current selected tab menu button and non-highlight others
+    $('#page-controls a').removeClass('menu-button-selected');
+    $(container).addClass('menu-button-selected');
+    //load the respective page
+    reloadPage(pageID); //the following function is defined in digTextBook.js
+    localStorage.setItem("pageToBeRefreshed", pageID);//next reload will load this page
+
+}
 

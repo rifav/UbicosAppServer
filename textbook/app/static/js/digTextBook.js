@@ -75,7 +75,7 @@ var reloadPage = function(pageToLoad){
 
     //TODO: update the side navigation bar current status
     //idenfity the a tag with the page id
-    console.log($($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]));
+    //console.log($($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]));
     //then add active class in the current selected <a> tag -- not working
     //$($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]).toggleClass('active');
 

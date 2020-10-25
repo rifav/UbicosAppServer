@@ -186,6 +186,7 @@ a {
     position: relative;
 }
 
+// css related to page navigation bar and other tab menus -- start
 #page-controls {
     position: fixed;
     bottom: 0;
@@ -199,14 +200,28 @@ a {
     position: absolute;
     bottom: 15px;
     height: 52px;
-    width: 52px;
-    border-radius: 50%;
+    //width: 52px;
+    width: 17%;
+    //border-radius: 10%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     background-repeat: no-repeat;
     text-indent: -999999px;
     background-position: center;
     background-size: 30px;
     background-color: #C9DDE4;
+    border: 1px solid #669eb2;
+    /* put the a tag text in the middle */
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+#page-controls > a:hover{
+    background-color: #99becc;
+}
+
+#page-controls a.menu-button-selected{
+    background-color: #99becc;
 }
 
 #page-controls #page-control-number {
@@ -217,22 +232,46 @@ a {
 }
 
 #page-controls #page-control-previous {
-    left: 10px;
+    left: 1px;
     background-image: url(../pics/back-blue.png);
 }
+
 
 .first #page-controls #page-control-previous {
     display: none;
 }
 
+#page-controls #study-menu{
+    left: 106px;
+    background-image: url(../pics/index.png);
+}
+
+#page-controls #tab-week1{
+    left: 211px;
+    text-indent: 0px;
+    vertical-align: middle;
+}
+
+#page-controls #tab-week2{
+    left: 316px;
+    text-indent: 0px;
+}
+
+#page-controls #tab-week3{
+    left: 421px;
+    text-indent: 0px;
+}
+
 #page-controls #page-control-next {
-    right: 15px;
+    left: 526px;
     background-image: url(../pics/next-blue.png);
 }
 
 .last #page-controls #page-control-next {
     display: none;
 }
+
+// css related to page navigation bar and other tab menus -- end
 
 #textbook-content h1 {
     border-bottom: dotted 2px #7AAFB5;
@@ -2190,22 +2229,23 @@ a {
 
 //first page left side menu bar related CSS -- start
 
-#right-side-menu{
-    font-size: 30px;
-    cursor: pointer;
-    position: fixed;
-    top: 25px;
-}
+// #right-side-menu{
+//     font-size: 30px;
+//     cursor: pointer;
+//     position: fixed;
+//     top: 25px;
+// }
 
 .sidenav {
 
-  height: 95%;
+  height: 85%;
   width: 0;
   position: fixed;
   z-index: 1;
-  top: 20px;
+  top: 5%;
   left: 0;
-  background-color: #A1D9CD;
+  background-color: #ccdfe5;
+  border: 1px solid #88b3c3;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
@@ -2239,7 +2279,7 @@ a {
 }
 
 .active {
-    background-color: #4CB7B7;
+    background-color: #669eb2;
 }
 //first page left side menu bar related CSS -- end
 
