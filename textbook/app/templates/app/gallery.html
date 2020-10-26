@@ -72,7 +72,7 @@
                     <div class="badge-option-textarea">
                         <textarea>Select an option to get the sentence starter </textarea>
                     </div>
-                    <div class="badge-option-footer">
+                    <div class="badge-option-footer" id="gallery-copy-button">
                         <button> Copy to the textbox </button>
                     </div>
 
@@ -81,9 +81,8 @@
             </div>
 
             <div id="row-right">
-                <ul id="image-feed" class="feed" style="margin-top: 100px;margin-bottom:100px">
+                <ul id="image-feed" class="feed" style="margin-top: 25px;margin-bottom:100px">
                 </ul>
-
 
                 <div class="message-input">
                     <input type="text" id="image-msg-text" name="image-msg-text" placeholder="Comment on this picture">
@@ -91,6 +90,15 @@
                     <a href="" id="image-msg-send-btn"></a>
                 </div>
             </div>
+
+            <div id="gallery-reward-div" class="reward-div" style="display:block">
+                <a class="reward-div-close-btn"></a>
+                <!--<span id="prompt-p"></span>-->
+                <!--<img id="badge-default" src="{% static 'pics/default.png' %}" alt="">-->
+                <img src="{% static 'pics/ques.png' %}" alt="" >
+                <p> sample praise message this is exciting hang in there really like it</p>
+             </div>
+
     </div>
     </div>
 

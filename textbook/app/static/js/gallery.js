@@ -135,15 +135,20 @@ var galleryMsgBtnAction = function(){
       });
 
         //copy button
-      $('.badge-option-footer button').off().on('click', function(e){
-            var badge_textarea_value = $('#badge-textarea-id').val();
-            //console.log(badge_textarea_value);
+      $('#gallery-copy-button').off().on('click', function(e){
+            var badge_textarea_value = $('.badge-option-textarea textarea').val();
+            console.log(badge_textarea_value);
             //set it to the message textbox
             $('#image-msg-text').val(badge_textarea_value);
 
       });
 
       //badge-option-div related button clicks -- end
+
+      //reward-close-button click event
+      $('.reward-div-close-btn').off().on('click', function(e){
+             $("#gallery-reward-div").css("display", "none");
+      });
 
 } //end of galleryMsgBtnAction method
 
@@ -161,6 +166,9 @@ var postImageMessage = function () {
 
         //console.log('user message :: '+message)
         //todo: add the keyword matching algo here and display badge based on the algorithm
+        //send to the server; server will match and send the badge and praise prompt
+        //in the server -
+        //display the reward-div and update the p tag with the praise prompt
 
         //get the user name who posted
         var user_name = $("input[name='username']").val()

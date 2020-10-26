@@ -361,16 +361,25 @@ def computationalModel(request):
         platform = request.POST.get('platform');
         activity_id = request.POST.get('activity_id');
 
-        #first check if this student will participate or not based on their history
-        #willParticipate = false --> when the student did not participate in the last two activities -- badgeKey = NP related key
-        #willParticipate = true --> when the student participated in the last two activities -- badgeKey = CP related key
-        #todo finalize
-        if(int(activity_id)>=3):
-            #isNP = getParticipationHistory(request, activity_id, platform);
-            willParticipate = True;
+        # first check if this student will participate or not based on their history
+        # willParticipate = false --> when the student did not participate in the last two activities -- badgeKey = NP related key
+        # willParticipate = true --> when the student participated in the last two activities -- badgeKey = CP related key
+
+        willParticipate = False;
+        if (platform == 'TA'):
+            #for TA, willParticipate will come from the csharp server; based on utterance count
+            #True means participate; null means no participate (false)
+            willParticipate = bool(request.POST.get('willParticipate')); #this comes from TA
         else:
-            #todo: handle the first two cases
-            willParticipate = True;
+            #for the other two platforms, calculate will participate variable here
+            #todo finalize
+            if(int(activity_id)>=3):
+                #isNP = getParticipationHistory(request, activity_id, platform);
+                willParticipate = True;
+                #porblemid 1 and problem id 2 has utternace count >= step count -- wp = true/wp=false
+            else:
+                #todo: handle the first two cases
+                willParticipate = True;
 
 
         #second, using the willParticipate variable, decide whether to call CPmodel or not
