@@ -23,16 +23,23 @@
     border-radius: 45%;
     text-align: center;
     margin-left: 5px;
+    margin-top: 10px;
 }
 
 .badgeDesc:hover{
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
+.badgeDesc.badgeDesc-selected{
+    border-radius: 20px;
+    background-color: #bdd1db;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
 .badgeDesc span{
     font-style: italic;
     position: absolute;
-    top: 25%;
+    top: 30%;
     margin-top: 5%;
     width: 15%;
     text-align: center;

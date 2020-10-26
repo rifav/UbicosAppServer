@@ -5,6 +5,10 @@ var dict = {'suggestion': false, 'social' : false, 'relevance' : false, 'reflect
 
 $(function(){
 
+    //load the first set of badge and highlight it
+    updateBadgeCardBody('Understanding Better!', 'msc');
+    //todo highlight
+
     badgeCardActionItems();
 
 
@@ -20,6 +24,9 @@ var badgeCardActionItems = function(){
     Stopping the propagation of that click event to other elements is how to solve this */
         event.stopPropagation();
         event.stopImmediatePropagation();
+
+        $('.badgeDesc').removeClass('badgeDesc-selected');
+        $(this).addClass('badgeDesc-selected');
 
         //access the span element
         var span_text = $(this).find('span').text();
