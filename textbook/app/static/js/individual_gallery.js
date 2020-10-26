@@ -72,9 +72,11 @@ var loadIndividualFeed = function(act_id) {
         //initially no button is grey, so the variable is true
         var noGrey=true;
         $('.slider a').each(function(id,element){
+            console.log('here 1')
               //if there is any a tag element that is grey upon loading, means previously selected, so load the comments for that image
               if($(element).css('background-color') == 'rgb(165, 168, 166)') {
                 var div = $(element).attr('href');
+                console.log('78 ;; ', div);
                 imagePk = $(div+" img").attr("data-imgID");
                 console.log('line 75 :: ',imagePk);
                 retrieveComments(imagePk);
@@ -85,6 +87,7 @@ var loadIndividualFeed = function(act_id) {
 
         //since no button is grey, means the first time loading, color the first button grey and load the comments for that image
         if(noGrey==true) {
+            console.log('here 2')
             $('a[href="#slide-1"]').css('background-color',"#a5a8a6");
             var imagePk = $('#slide-1 img').attr("data-imgID");
             retrieveComments(imagePk);
@@ -152,7 +155,7 @@ var postIndMessage = function (){
     if(!message){
         //message is empty;
         //entry into user log -- TODO fix the language
-        enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber);
+        enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, global_current_pagenumber);
         return;
     }
 
@@ -163,12 +166,12 @@ var postIndMessage = function (){
     //check which image is open, extract that image data attribute (image PK) and pass that with the data to the server
     var imagePk;
     $('.slider a').each(function(id,element){
-              //console.log($(element));
-              if($(element).css('background-color') == 'rgb(165, 168, 166)') {
-                var div = $(element).attr('href');
-                imagePk = $(div+" img").attr("data-imgID");
-                console.log('post message in the server ', imagePk);
-              }
+          //console.log($(element));
+          if($(element).css('background-color') == 'rgb(165, 168, 166)') {
+            var div = $(element).attr('href');
+            imagePk = $(div+" img").attr("data-imgID");
+            console.log('post message in the server ', imagePk);
+          }
     });
 
 //    //triggers the event in views.py
@@ -185,7 +188,7 @@ var postIndMessage = function (){
             $("input[name='ind-msg-text']").val('');
 
             //display the message in the feed when posted
-            buildFeedwithMsgs(message);
+            buildFeedwithMsgs(message, "#ind-feed", logged_in);
 
         },
         error: function(){
@@ -199,30 +202,7 @@ var postIndMessage = function (){
 
 } // end of postIndMessage method
 
-//this method is used in three places: TODO
-//1)
-//3) gallery.js
-var buildFeedwithMsgs = function(message, container, username){
-    var li = $("<li/>").appendTo(container);
-    if(logged_in == username){
-       li.addClass('message self');
-    }else{
-       li.addClass('message');
-    }
-    var div = $("<div/>").appendTo(li);
-    div.addClass('user-image');
-    var span = $('<span/>', {text: username}).appendTo(div); //logged_in from utility.js
-    var p = $('<p/>', {text: message}).appendTo(li);
-    var div_msg = $("<div/>").appendTo(li);
-    div_msg.addClass('msg-timestamp');
-    var span_timestap = $('<span/>', {
-              text: "add_timestamp"}).appendTo(div_msg);
 
-    //TODO change this into a dynamic if else
-    $(container).animate({ scrollTop: $(container).height() }, 400);
-    //$(container).scrollTop($(container)[0].scrollHeight);
-
-}// end of buildFeedwithMsgs method
 
 var retrieveComments = function(imagePk){
 
@@ -241,6 +221,7 @@ var retrieveComments = function(imagePk){
                 //show the first image comments with the loading of the images
                 //console.log(loaded_comments[0].fields['content']);
                 //TODO loop through loaded_comments to display all the messages; [0] only displays the first comment
+                //defined in utility.js
                 buildFeedwithMsgs(loaded_comments[0].fields['content'], "#ind-feed",logged_in);
               }
 
@@ -275,6 +256,7 @@ var loadSelfImageFeed = function(act_id) {
                 //loop through the img msg data to access each commment and display under the images
                 $.each(img_msg, function(key, value){
                     //console.log(value);
+                    //defined in utility.j
                     buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username']);
                 });//end of the each loop
             }//end of the success for the post ajax

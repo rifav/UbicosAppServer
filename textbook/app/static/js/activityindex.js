@@ -17,20 +17,23 @@ $(function(){
         });
 
         //highlight the tab menu buttons based on page id -- start
-        if(global_current_pagenumber >= 1 && global_current_pagenumber < 8) {
+        //adding this only here will work on reload but not with back/forward clicking
+        //make it a function and call it everytime as well
+        if(global_current_pagenumber >= 2 && global_current_pagenumber <= 11) {
             console.log("current page number :: ", global_current_pagenumber);
             $('#page-controls a').removeClass('menu-button-selected');
             $("#tab-week1").addClass('menu-button-selected');
-        }else if(global_current_pagenumber >= 9 && global_current_pagenumber < 21)
+        }else if(global_current_pagenumber >= 12 && global_current_pagenumber <= 24)
         {
             console.log("current page number :: ", global_current_pagenumber);
             $('#page-controls a').removeClass('menu-button-selected');
             $("#tab-week2").addClass('menu-button-selected');
-        }else{
+        }else if(global_current_pagenumber >= 25 && global_current_pagenumber <= 36){
             console.log("current page number :: ", global_current_pagenumber);
             $('#page-controls a').removeClass('menu-button-selected');
             $("#tab-week3").addClass('menu-button-selected');
         }
+
         //highlight the tab menu buttons based on page id -- end
 
 

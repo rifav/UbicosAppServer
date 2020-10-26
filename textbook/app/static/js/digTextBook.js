@@ -15,7 +15,7 @@ window.onerror = function(message, file, line) {
     It is also used in: activityindex.js
 */
 
-var NUM_PAGES = 33;
+var NUM_PAGES = 36;
 
 //load all init function required for the digital textbook to load here
 $(function(){
@@ -30,7 +30,6 @@ $(function(){
 
     //check for the last accessed page in the local storage
     if(localStorage.getItem("pageToBeRefreshed")){
-
         var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
         console.log("last accessed page (digTextBook.js)::", pageToBeRefreshed);
         reloadPage(pageToBeRefreshed);
@@ -229,14 +228,14 @@ var bindActivityButtons = function(){
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
 
-//        ------------------------------VIDEO-----------------------
+//        --------------------------VIDEO/WHITEBOARD-----------------------
         // if video tab is active get the video url and display in video.html
         //display the video url in a new tab instead of the card
-        if(type == 'video'){
+        if(type == 'video' || type == 'whiteboard'){
             //lastOpenedTool = 'video';
             $('.card.active').removeClass('active');
             var video_url = activityButton.attr('data-video-url');
-            window.open(video_url, '_blank'); //open paint splash game in a new window
+            window.open(video_url, '_blank'); //open any external video in a new window
         }
 //        ------------------------------TABLE-----------------------
         //if the table tab is active

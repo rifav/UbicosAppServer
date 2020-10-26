@@ -64,3 +64,33 @@ var badge_option_div_update = function(badgeList, platform){
 
 }
 
+//this method is used in three places: TODO
+//1) individual_gallery.js (#ind-feed)
+//2) gallery.js (#image-feed)
+//3) activityfeed.js (#activity-feed)
+var buildFeedwithMsgs = function(message, container, username){
+    var li = $("<li/>").appendTo(container);
+    if(logged_in == username){
+       li.addClass('message self');
+    }else{
+       li.addClass('message');
+    }
+    var div = $("<div/>").appendTo(li);
+    div.addClass('user-image');
+    var span = $('<span/>', {text: username}).appendTo(div); //logged_in from utility.js
+    var p = $('<p/>', {text: message}).appendTo(li);
+    var div_msg = $("<div/>").appendTo(li);
+    div_msg.addClass('msg-timestamp');
+    var span_timestap = $('<span/>', {
+              text: "add_timestamp"}).appendTo(div_msg);
+
+    //TODO change this into a dynamic if else
+    $(container).animate({ scrollTop: $(container).height() }, 400);
+    //$(container).scrollTop($(container)[0].scrollHeight);
+
+}// end of buildFeedwithMsgs method
+
+var updateTabMenuHighlight = function(){
+
+}
+

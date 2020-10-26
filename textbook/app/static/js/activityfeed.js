@@ -22,6 +22,7 @@ function updateActivityFeedRealtime(){
     my_channel.bind("an_event", function (data) {
 
         //  add in the thread itself
+        //defined in utility.js
         buildFeedwithMsgs(data.message, "#activity-feed", data.name);
 
     });
