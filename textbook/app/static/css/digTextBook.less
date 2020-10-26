@@ -8,8 +8,10 @@
 @brainstorm3: #ff9933; /* brainstorm model so far */
 @brainstorm4: #e67300; /* brainstorm model so far */
 @gallery_link: #2DB872;
-@gallery1: #cdeba0;
-@gallery2: #c2e68b;
+/*@gallery1: #cdeba0;
+@gallery2: #c2e68b;*/
+@gallery1: #d9f2d9;
+@gallery2: #c6ecc6;
 @moreInfo1: rgb(105, 119, 128);
 @moreInfo2: rgb(109, 156, 194);
 @table1: #B182D9;
@@ -542,8 +544,8 @@ a {
 */
 
 .card {
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* overflow-y: auto;
+    overflow-x: hidden;*/ /* removing these two stopped overall card scrolling */
     -webkit-overflow-scrolling: touch;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
     position: fixed;
@@ -1984,9 +1986,9 @@ p.cardDescription{
 .reward-div {
     position: absolute;
     top: 25%;
-    left: 65%;
+    left: 57%;
     height: 15em;
-    width: 20em;
+    width: 25em;
     /*transform: translateX(100%);
     transition: all 0.4s;
     transition-timing-function: ease-out;*/
@@ -1994,18 +1996,17 @@ p.cardDescription{
     z-index: 2;
     border: 1px solid #ddd;
     background-color: #f4f4f4;
+    font-size: 12pt;
 
     img{
         width: 25%;
         height: 60%;
-        margin-top: 10%;
         margin-left: 5%;
+        margin-right: 5%;
+        padding-bottom: 10px;
+        float: left;
     }
 
-    p{
-        margin-left: 32%;
-        margin-top: -35%;
-    }
 }
 
 .reward-div-close-btn {
@@ -2021,6 +2022,15 @@ p.cardDescription{
 }
 
 
+#reward-div-selection{
+    margin-left: 20%;
+
+}
+
+#reward-div-prompt{
+    width: fit-content;
+    margin-top: 10%;
+}
 
 
 

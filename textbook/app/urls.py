@@ -39,6 +39,8 @@ urlpatterns = [
 
     #computational model urls
     url('computationalModel', views.computationalModel),
+    url('matchKeywords', views.matchKeywords),
+
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),

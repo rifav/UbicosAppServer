@@ -14,6 +14,7 @@ from django.core import serializers
 from .parser import parser
 from .randomGroupGenerator import randomGroupGenerator
 from .badgeInfoFileRead import badgeInfoFileRead
+from .keywordMatch import keywordMatch
 import json, random
 from datetime import datetime, timedelta
 from collections import Counter
@@ -401,7 +402,27 @@ def computationalModel(request):
 
     return HttpResponse('');
 
+def matchKeywords(request):
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        activity_id = request.POST.get('activity_id');
+        platform = request.POST.get('platform');
+        message = request.POST.get('message');
+        selected_badge = request.POST.get('selected_badge');
 
+        #log user selection for this particular event
+        #todo create a table to log this
+
+        isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
+        #isMatch = true; update badgecount #todo maintain another table for this, this will be used to update the badgeCard
+        #isMatch = false;
+
+        #todo think about a table with specific activity name
+        #todo randomize praise message
+
+        return JsonResponse({'isMatch': isMatch});
+
+    return HttpResponse('');
 
 ###############################################
 ############ handler methods start ############
@@ -549,9 +570,6 @@ def tableEntriesSave(request):
     entries.save();
 
     return HttpResponse('');
-
-
-
 
 # delete the following method
 # def uploadKAImage(request):

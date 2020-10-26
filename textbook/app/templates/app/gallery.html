@@ -60,7 +60,7 @@
                             <img  src="{% static 'pics/blank.png' %}" alt="">
                             <span>Badge 3</span>
                        </div>
-                        <div href="#" id="mb-badge4" data-char="none" tabindex="4">
+                        <div href="#" id="mb-badge4" data-char="other" tabindex="4">
                             <img  src="{% static 'pics/blank.png' %}" alt="">
                             <span>None</span>
                        </div>
@@ -92,11 +92,9 @@
             </div>
 
             <div id="gallery-reward-div" class="reward-div" style="display:block">
-                <a class="reward-div-close-btn"></a>
-                <!--<span id="prompt-p"></span>-->
-                <!--<img id="badge-default" src="{% static 'pics/default.png' %}" alt="">-->
+                <p id="reward-div-selection"> You selected [badge_name] badge! </p>
                 <img src="{% static 'pics/ques.png' %}" alt="" >
-                <p> sample praise message this is exciting hang in there really like it</p>
+                <p id="reward-div-prompt"> sample praise message example, send from server </p>
              </div>
 
     </div>

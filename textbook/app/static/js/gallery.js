@@ -1,5 +1,5 @@
 var gallery_act_id;
-
+var global_badge_selected = '';
 
 $(function(){
 
@@ -112,10 +112,12 @@ var galleryMsgBtnAction = function(){
         //set the selected background color to
         $(this).css({backgroundColor: '#d9d9d9'});
         var char = $(this).attr('data-char');
-        console.log(char);
+        //console.log(char);
+        //get the badgeName
+        global_badge_selected = $(this).children('span').text();
         var prompt;
         var sentence_opener;
-        if(char === 'none'){
+        if(char === 'other'){
             prompt = "You can proceed without selecting any of the three options";
             sentence_opener = "";
         }else{
@@ -165,11 +167,33 @@ var postImageMessage = function () {
         }
 
         //console.log('user message :: '+message)
-        //todo: add the keyword matching algo here and display badge based on the algorithm
         //send to the server; server will match and send the badge and praise prompt
         //in the server -
         //display the reward-div and update the p tag with the praise prompt
+        //todo: add the keyword matching algo here and display badge based on the algorithm
+        //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
+        console.log(global_badge_selected);
+        if(global_badge_selected != 'None' && global_badge_selected != ''){
+            //user selected any of the three badges
+            //2. make the api call and send the user message and selected badge in the server
+            //to do make this a function in utility.js
+            $.ajax({
+             type: 'POST',
+             url: '/matchKeywords/',
+             data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
+                'platform': 'MB', 'activity_id': gallery_act_id},
+             success: function(response){
+                    console.log(response.isMatch);
+                    if(response.isMatch === 'True'){
+                        $("#gallery-reward-div").css("display", "block");
+                        //set up the values
+                    }
+                 }
+            });
 
+
+
+        }
         //get the user name who posted
         var user_name = $("input[name='username']").val()
         console.log(user_name);
