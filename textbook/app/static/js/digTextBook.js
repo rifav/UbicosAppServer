@@ -20,6 +20,8 @@ var NUM_PAGES = 36;
 //load all init function required for the digital textbook to load here
 $(function(){
 
+
+
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
     loadPage(1, $('.page:not(.previous):not(.next)'));

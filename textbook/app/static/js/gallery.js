@@ -143,6 +143,9 @@ var galleryMsgBtnAction = function(){
             //set it to the message textbox
             $('#image-msg-text').val(badge_textarea_value);
 
+//            setTimeout($("#gallery-reward-div").css("display", "none");,
+//            2000);
+
       });
 
       //badge-option-div related button clicks -- end
@@ -166,17 +169,30 @@ var postImageMessage = function () {
             return;
         }
 
+
         //console.log('user message :: '+message)
-        //send to the server; server will match and send the badge and praise prompt
-        //in the server -
-        //display the reward-div and update the p tag with the praise prompt
+        //check for the message length
+        //get the length of the message
+        var msg = message.split(" ");
+        var lengthOfMsg = msg.length;
+
+        //check the length condition first
+        if(lengthOfMsg == 0) return false; //todo display a prompt
+
+//        if(platform === 'ka'){
+//            if(lengthOfMsg < 20) return false;//word based
+//        }else{
+//            if(lengthOfMsg < 7) return false;//word based
+//        }
+
+
         //todo: add the keyword matching algo here and display badge based on the algorithm
         //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
-        console.log(global_badge_selected);
         if(global_badge_selected != 'None' && global_badge_selected != ''){
             //user selected any of the three badges
             //2. make the api call and send the user message and selected badge in the server
             //to do make this a function in utility.js
+            console.log('selected badge for gallery.js ::', global_badge_selected);
             $.ajax({
              type: 'POST',
              url: '/matchKeywords/',
@@ -184,7 +200,8 @@ var postImageMessage = function () {
                 'platform': 'MB', 'activity_id': gallery_act_id},
              success: function(response){
                     console.log(response.isMatch);
-                    if(response.isMatch === 'True'){
+                    if(response.isMatch === "true"){
+                        console.log('inside the if else loop')
                         $("#gallery-reward-div").css("display", "block");
                         //set up the values
                     }
