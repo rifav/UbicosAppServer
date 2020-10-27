@@ -6,7 +6,7 @@ var dict = {'suggestion': false, 'social' : false, 'relevance' : false, 'reflect
 $(function(){
 
     //load the first set of badge and highlight it
-    updateBadgeCardBody('Understanding Better!', 'msc');
+    updateBadgeCardBody('Understand Better!', 'msc');
     //todo highlight
 
     badgeCardActionItems();

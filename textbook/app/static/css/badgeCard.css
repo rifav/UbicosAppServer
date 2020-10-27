@@ -17,6 +17,10 @@
     font-size: smaller;
 }
 
+.badgeDesc{
+    text-align: center;
+}
+
 .badgeDesc img{
     height: 80px;
     width: 80px;
@@ -38,8 +42,8 @@
 
 .badgeDesc span{
     font-style: italic;
-    position: absolute;
-    top: 30%;
+    position: relative;
+    top: 0%;
     margin-top: 5%;
     width: 15%;
     text-align: center;
