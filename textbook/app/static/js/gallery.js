@@ -4,7 +4,6 @@ var global_badge_selected = '';
 $(function(){
 
     galleryMsgBtnAction();
-    image_hover_func();
     realTimeMsgTransfer();
 
  });
@@ -64,6 +63,7 @@ var loadGalleryFeed = function(act_id){
 
     //https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
     //4. call the computational model method to see whether the student will participate or not; display badge based on that
+    //defined in utility.js
     computationalModelMethod(logged_in, 'MB', gallery_act_id);
 
 
@@ -120,6 +120,7 @@ var galleryMsgBtnAction = function(){
         //console.log(char);
         //get the badgeName
         global_badge_selected = $(this).children('span').text();
+        console.log('gallery.js global_badge_selected :: ', global_badge_selected);
         var prompt;
         var sentence_opener;
         if(char === 'other'){
@@ -127,7 +128,7 @@ var galleryMsgBtnAction = function(){
             sentence_opener = "";
         }else{
             prompt = global_badgeList[char][0]['prompt'];
-            sentence_opener = global_badgeList[char][0]['sentence_opener'];
+            sentence_opener = global_badgeList[char][0]['sentence_opener1'];
         }
 
         //set the prompt
@@ -185,7 +186,7 @@ var postImageMessage = function () {
         var lengthOfMsg = msg.length;
 
         //check the length condition first
-        if(lengthOfMsg == 0) return false; //todo display a prompt
+        if(lengthOfMsg == 0) return false; //todo display a prompt 'Your answer is too brief. Try writing a more specific answer.'
 
 //        if(platform === 'ka'){
 //            if(lengthOfMsg < 20) return false;//word based
@@ -209,9 +210,12 @@ var postImageMessage = function () {
              success: function(response){
                     console.log(response.isMatch); //returns true if match found, else false
                     if(response.isMatch){
-                        console.log('inside the if else loop')
-                        $("#gallery-reward-div").css("display", "block");
+                        console.log('inside the if else loop');
+                        $("#gallery-reward").css("display", "block");
                         //set up the values
+                        $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
+                        $('#reward-div-prompt').text(response.praiseText);
+
                     }
                  }
             });
@@ -275,24 +279,5 @@ var realTimeMsgTransfer = function(){
 
 }// end of realTimeMsgTransfer method
 
-
-//TODO: this hover changes the original position; fix it
-var image_hover_func = function(){
-
-     //hovering effect-start
-    $('.section div').hover(function(){
-    $(this).css({ "-webkit-transform": "scale(1.2)",
-           "transform":"scale(1.2) " ,
-           "transform-origin": "center",
-           "transition":"transform 0.25s ease"
-           });
-    }, function(){ //remove hovering effect
-        $(this).css({ "-webkit-transform": "scale(1)",
-               "transform":"scale(1)" ,
-               "transition":"transform 0.25s ease"});
-    });
-    //hovering effect-end
-
-}// end of image_hover_func method
 
 

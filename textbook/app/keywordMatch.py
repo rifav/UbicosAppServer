@@ -6,23 +6,25 @@ import string
 #3. previous data
 
 #the following dict contains keywords from #1 and #2
+#the keywords are the badgenames (so check with the excel sheet and be consistent, else error)
 keywords_dict = \
-    { 'brainstorm' : ['this is similar', 'think about a'] ,
-      'question' : ['how', 'what', 'where', 'why', 'can you' , 'can', 'did' , 'do', 'does'] ,
-      'critique' : ['what evidence'] ,
-      'elaborate' : ['we can combine', 'this is because', 'because' , 'would be' , 'but' , 'since' , 'for example' , 'an example', 'cause'],
-      'share' : ['here is a clarification', 'let me clarify'],
-      'challenge' : ['are you sure', 'what if'],
-      'feedback': ['i think', 'should', 'could', 'next time', ''],
-      'add': ['would like to add'],
-      'summarize': ['to summarize'],
-      'answer': ['to answer'],
-      'reflection': ['i agree', 'i disagree'],
-      'assess': ['is this the same as'],
-      'post': [''],
-      'appreciate': ["thank you", "thanks", "good job", "great job", "great work"],
-      'encouragement': ''
-    }
+    {'brainstorm': ['this is similar', 'think about a'],
+     'question': ['how', 'what', 'where', 'why', 'can you', 'can', 'did', 'do', 'does'],
+     'critique': ['what evidence'],
+     'elaborate': ['we can combine', 'this is because', 'because', 'would be', 'but', 'since', 'for example',
+                   'an example', 'cause'],
+     'share': ['here is a clarification', 'let me clarify'],
+     'challenge': ['are you sure', 'what if'],
+     'feedback': ['i think', 'should', 'could', 'next time', ''],
+     'addon': ['would like to add'],
+     'summarize': ['to summarize'],
+     'answer': ['to answer'],
+     'reflect': ['i agree', 'i disagree'],
+     'assess': ['is this the same as'],
+     'participate': [''],
+     'appreciation': ["thank you", "thanks", "good job", "great job", "great work"],
+     'encouragement': ''
+     }
 
 week1_relevance = [];
 
@@ -34,7 +36,6 @@ class keywordMatch():
         #TODO: pre-process messages
         # remove punctuation
         # print(message.translate(str.maketrans('', '', string.punctuation)));
-
 
         if(selected_badge == 'question'):
             # todo use the rule-based classifier that I have

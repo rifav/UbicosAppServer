@@ -303,7 +303,7 @@ def getBadgeNames(request):
 #https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
 def getBadgeOptions(request, username, platform, badgeKey):
 
-    print('line 302 /getBadgeOptions :: ', badgeKey);
+    print('line 306 /getBadgeOptions :: ', badgeKey);
 
     #get the students characteristic VALUES from the database
     charac = getCharacteristic(request, username);
@@ -321,12 +321,12 @@ def getBadgeOptions(request, username, platform, badgeKey):
 
         # TODO: handle randomization using index key
         badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
-                                                  value=charac[elem],index=1).values('badgeName','prompt','sentence_opener'));
+                                                  value=charac[elem],index=1).values('badgeName','prompt','sentence_opener1'));
         dict[original_elem] = badge_item;
 
 
     # print('line 327 /getbadgeOptions', dict);
-    return dict;
+    return dict; #goes back to computationalModel method
 
 
 
@@ -398,17 +398,39 @@ def computationalModel(request):
 
         badgeList = getBadgeOptions(request, username, platform, badgeKey);
 
-        return JsonResponse({'badgeList': badgeList})
+        return JsonResponse({'badgeList': badgeList}); #goes back to utility.js
 
     return HttpResponse('');
 
 def matchKeywords(request):
+    praise_messages_part1_list = ['Very Good!', 'Well Done!', 'Way to go!', 'Wonderful!', 'Great Effort!', 'Nice One!'];
+    praise_messages_part1 = random.choice(praise_messages_part1_list);
+
+    # the keywords are the badgenames (so check with the excel sheet and be consistent, else error)
+    praise_message_part2_dict = \
+        {'brainstorm': 'This will help you to understand better.',
+         'question': 'Asking questions helps you to understand better.',
+         'critique': 'This will help you to understand better.',
+         'elaborate': 'This will benefit your help-giving skills.',
+         'share': 'Sharing thoughts helps you to put them into words',
+         'challenge': 'This will benefit your help-giving skills.',
+         'feedback': 'Your feedback to others is highly appreciated!',
+         'addon': 'Adding to an existing conversation is useful.',
+         'summarize': 'Summarizing is a great skill.',
+         'answer': 'Responding to others is a great way of learning.',
+         'reflect': 'Reflecting on others work is good.',
+         'assess': 'Evaluating others work is a skill!',
+         'participate': 'Participation is a great collaborative technique!',
+         'appreciation': 'Appreciating others encourages collaboration ',
+         'encouragement': 'Encouraging others helps in a collaboration'
+         }
+
     if request.method == 'POST':
         username = request.POST.get('username');
         activity_id = request.POST.get('activity_id');
         platform = request.POST.get('platform');
         message = request.POST.get('message');
-        selected_badge = request.POST.get('selected_badge');
+        selected_badge = request.POST.get('selected_badge').lower();
 
         #log user selection for this particular event
         #todo create a table to log this
@@ -420,7 +442,10 @@ def matchKeywords(request):
         #todo think about a table with specific activity name
         #todo randomize praise message
 
-        return JsonResponse({'isMatch': isMatch});
+        praiseText = praise_messages_part1 +' '+praise_message_part2_dict[selected_badge];
+
+
+        return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText});
 
     return HttpResponse('');
 
