@@ -292,10 +292,10 @@ def getBadgeNames(request):
     if request.method == 'POST':
         badgeType = request.POST.get('badgeType');
 
-        badges = list(badgeInfo.objects.filter(charac=badgeType).values('badgeName').distinct());
-        print(badges);
+        badges = list(badgeInfo.objects.filter(charac=badgeType).values('badgeName', 'imgName', 'definition').distinct());
+        print('line 296', badges);
 
-        return JsonResponse({'badgeNames':badges});
+        return JsonResponse({'badgeNames': badges});
     return HttpResponse('');
 
 
@@ -466,8 +466,9 @@ def insertBadgeInfo(request):
     # 2. insert into the table
     for badgeElem in bagdeInfoList:
         #print(badgeElem['characteristic'])
-        entry = badgeInfo(charac = badgeElem['characteristic'], value = badgeElem['value'], index = badgeElem['index'], badgeName = badgeElem['badge_name'],
-                    platform = badgeElem['platform'], prompt = badgeElem['badge_prompt'], sentence_opener = badgeElem['badge_ss1']);
+        entry = badgeInfo(charac = badgeElem['characteristic'], value = badgeElem['value'], badgeName = badgeElem['badge_name'], index = badgeElem['index'],
+                    platform = badgeElem['platform'], imgName = badgeElem['imgName'], definition = badgeElem['definition'],
+                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'], sentence_opener2 = badgeElem['badge_ss2']);
         entry.save();
 
     return HttpResponse('');

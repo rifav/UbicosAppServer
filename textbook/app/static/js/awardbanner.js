@@ -29,7 +29,7 @@ var badgeCardActionItems = function(){
         $(this).addClass('badgeDesc-selected');
 
         //access the span element
-        var span_text = $(this).find('span').text();
+        var span_text = $(this).find('span.badge-description-name').text();
         //get the data attribute
         var badgeType = $(this).attr('data-id');
         //console.log('line 28 :: ', badgeType)
@@ -59,6 +59,8 @@ var updateBadgeCardBody = function(span_text, badgeType){
                 $.each(badgeNames, function(key,elem){
                     //console.log(badgeNames[key]['badgeName']);
                     $('#badgeCard-badgeName'+i).text(badgeNames[key]['badgeName']);
+                    $('#badgeCard-desc'+i).text(badgeNames[key]['definition']);
+
                     i = i + 1;
                 });
             }

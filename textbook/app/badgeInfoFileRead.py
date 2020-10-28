@@ -19,9 +19,11 @@ class badgeInfoFileRead():
                     dict['badge_name'] = row[2];
                     dict['index'] = row[3];
                     dict['platform'] = row[4];
-                    dict['definition'] = row[5];
-                    dict['badge_prompt'] = row[6];
-                    dict['badge_ss1'] = row[7];
+                    dict['imgName'] = row[5];
+                    dict['definition'] = row[6];
+                    dict['badge_prompt'] = row[7];
+                    dict['badge_ss1'] = row[8];
+                    dict['badge_ss2'] = row[9];
                     #print(dict);
 
                     bagdeInfoList.append(dict);

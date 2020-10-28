@@ -81,6 +81,7 @@ var galleryMsgBtnAction = function(){
 
     });
 
+
     //adding event lister for 'enter' button
     $('#image-msg-text').off().on('keypress', function (e) {
         if (e.which == 13) {
@@ -92,8 +93,12 @@ var galleryMsgBtnAction = function(){
 
       //badge-option-div related button clicks -- start
 
-      $('.badge-option-closebtn').off().on('click', function(e){
-             $("#badge-option").css("display", "none");
+      $('.badge-option-closebtn, .gallery-reward-closebtn').off().on('click', function(e){
+             var className = $(this).attr('class');
+             var remove = className.split('-').pop(); //will return closebtn
+             var itemToClose = className.replace("-"+remove, "");
+             console.log(itemToClose);
+             $("#"+itemToClose).css("display", "none");
       });
 
       $('.badgeRequest img').on('click', function(e){
@@ -142,6 +147,9 @@ var galleryMsgBtnAction = function(){
             console.log(badge_textarea_value);
             //set it to the message textbox
             $('#image-msg-text').val(badge_textarea_value);
+
+            //$("div#badge-option").css("display", "none");
+            $(this).closest('div#badge-option').fadeOut();
 
 //            setTimeout($("#gallery-reward-div").css("display", "none");,
 //            2000);
@@ -199,8 +207,8 @@ var postImageMessage = function () {
              data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
                 'platform': 'MB', 'activity_id': gallery_act_id},
              success: function(response){
-                    console.log(response.isMatch);
-                    if(response.isMatch === "true"){
+                    console.log(response.isMatch); //returns true if match found, else false
+                    if(response.isMatch){
                         console.log('inside the if else loop')
                         $("#gallery-reward-div").css("display", "block");
                         //set up the values
