@@ -289,7 +289,8 @@ var bindActivityButtons = function(){
 
              //if the card is already extended, put it back to normal
              card_extension_close();
-             load_ka_card(id);
+             var video_url = activityButton.attr('data-video-url');
+             load_ka_card(id, video_url); //defined in kaform.js
              console.log('card opened');
         }
 //        ---------------------image upload card-----------------------
@@ -335,7 +336,9 @@ var bindActivityButtons = function(){
             card_extension();
 
             //update the heading in the card
-           // $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
+            $('#gallery-description').text(activityButton.attr('data-description') +
+            ' Use the badge option on the top-right corner to get an idea about how to help others.');
+
 
             loadGalleryFeed(id);
 

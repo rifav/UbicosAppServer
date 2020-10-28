@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel, badgeInfo, KAPostModel
+    userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -319,9 +319,11 @@ def getBadgeOptions(request, username, platform, badgeKey):
         if(elem == 'con1' or elem == 'con2'):
             elem = elem.replace(elem,"con");
 
-        # TODO: handle randomization using index key
+        #handle randomization using index key
+        index_list = [1,2,3];
+        so = [1,2];
         badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
-                                                  value=charac[elem],index=1).values('badgeName','prompt','sentence_opener1'));
+                                                  value=charac[elem],index=random.choice(index_list)).values('badgeName','prompt','sentence_opener1'));
         dict[original_elem] = badge_item;
 
 
@@ -333,8 +335,8 @@ def getBadgeOptions(request, username, platform, badgeKey):
 def saveKApost(request):
     # get the data
     if request.method == 'POST':
-        username = request.POST.get('username');
-        pagetitle = request.POST.get('pagetitle');
+        username = request.POST.get('username').lower();
+        pagetitle = request.POST.get('pageURL');
         textareaId = request.POST.get('textareaId');
         content = request.POST.get('content');
 
@@ -345,6 +347,24 @@ def saveKApost(request):
         else:
             ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
             ka_answer.save();
+        return HttpResponse('successfully inserted');
+
+    return HttpResponse('');
+
+def saveBadgeSelection(request):
+    # get the data
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        platform = request.POST.get('platform');
+        activity_id = request.POST.get('activity_id');
+        title = request.POST.get('title');
+        selected_badge = request.POST.get('selected_badge');
+
+        #save users' selected badge
+        badge_Selected = badgeSelected(userid=User.objects.get(username=username), platform=platform, activity_id=activity_id, title=title,
+                                badgeTypeSelected=selected_badge);
+        badge_Selected.save();
+
         return HttpResponse('');
 
     return HttpResponse('');
@@ -426,26 +446,35 @@ def matchKeywords(request):
          }
 
     if request.method == 'POST':
-        username = request.POST.get('username');
+        username = request.POST.get('username').lower();
+        print('line 448 from KA', username);
         activity_id = request.POST.get('activity_id');
         platform = request.POST.get('platform');
         message = request.POST.get('message');
-        selected_badge = request.POST.get('selected_badge').lower();
+        selected_badge = request.POST.get('selected_badge');
 
-        #log user selection for this particular event
-        #todo create a table to log this
 
+        if(platform == 'KA'):
+            #get the selected badge using the URL sent
+            ka_url = request.POST.get('ka_url');
+            entry = badgeSelected.objects.all().filter(userid_id=User.objects.get(username=username)).filter(platform=platform).\
+                                filter(title=ka_url).values('activity_id','badgeTypeSelected').last();
+            activity_id = entry['activity_id'];
+            selected_badge = entry['badgeTypeSelected'];
+            print('line 458 :: ', entry);
+
+
+        selected_badge = selected_badge.lower();
         isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
         #isMatch = true; update badgecount #todo maintain another table for this, this will be used to update the badgeCard
         #isMatch = false;
 
         #todo think about a table with specific activity name
-        #todo randomize praise message
-
+        #praised text generated randomly
         praiseText = praise_messages_part1 +' '+praise_message_part2_dict[selected_badge];
 
 
-        return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText});
+        return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText, 'selected_badge': selected_badge});
 
     return HttpResponse('');
 
@@ -1042,7 +1071,7 @@ def getDashboard(request):
     return render(request, 'app/dashboard.html');
 
 def insertBadges(request):
-    badge = badgeModel(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
+    badge = badgeReceived(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
                        platform = request.POST.get('platform'), userid = request.user)
     badge.save()
 

@@ -111,6 +111,7 @@ var galleryMsgBtnAction = function(){
             }
       });
 
+        //this works both in khan academy and gallery divs
       $('.badge-option-display div').off().on('click', function(e){
         //set all background color to original
         $(this).siblings().css({backgroundColor: '#f4f4f4'});
@@ -208,6 +209,7 @@ var postImageMessage = function () {
              data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
                 'platform': 'MB', 'activity_id': gallery_act_id},
              success: function(response){
+                    console.log(response);
                     console.log(response.isMatch); //returns true if match found, else false
                     if(response.isMatch){
                         console.log('inside the if else loop');

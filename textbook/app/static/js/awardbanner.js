@@ -58,8 +58,12 @@ var updateBadgeCardBody = function(span_text, badgeType){
                 i = 1;
                 $.each(badgeNames, function(key,elem){
                     //console.log(badgeNames[key]['badgeName']);
+                    //set the badge name
                     $('#badgeCard-badgeName'+i).text(badgeNames[key]['badgeName']);
+                    //set the description which is displayed upon hover
                     $('#badgeCard-desc'+i).text(badgeNames[key]['definition']);
+                    //set the image source
+                    $('#badgeCard-img'+i).attr('src', '/static/pics/'+badgeNames[key]['imgName']+'.png');
 
                     i = i + 1;
                 });

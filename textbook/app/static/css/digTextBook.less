@@ -207,7 +207,7 @@ a {
     position: absolute;
     bottom: 15px;
     height: 52px;
-    width: 17%;
+    width: 52px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     background-repeat: no-repeat;
     text-indent: -999999px;
@@ -238,7 +238,8 @@ a {
 }
 
 #page-controls #page-control-previous {
-    left: 1px;
+    left: 255px;
+    border-radius: 50%;
     background-image: url(../pics/back-blue.png);
 }
 
@@ -248,7 +249,8 @@ a {
 }
 
 #page-controls #study-menu{
-    left: 106px;
+    left: 10px;
+
     background-image: url(../pics/index.png);
 }
 
@@ -269,7 +271,8 @@ a {
 }
 
 #page-controls #page-control-next {
-    left: 526px;
+    left: 320px;
+    border-radius: 50%;
     background-image: url(../pics/next-blue.png);
 }
 
@@ -306,7 +309,9 @@ a {
     border-radius: 40px;
 }
 
-
+a.assignment {
+    color: black;
+}
 //different card styling -- start
 
 /* chat card class color + activity button color */
@@ -331,7 +336,7 @@ a {
     color: @brainstorm_link;
 }
 .activity-button.brainstorm {
-    background-image: url('/static/pics/brainstorm.png');
+    background-image: url('/static/pics/brainstormT.png');
 }
 .activity-button.brainstorm:after {
     background: linear-gradient(@brainstorm_link, @brainstorm2);
@@ -597,6 +602,8 @@ p.cardDescription{
     z-index: 1;
     font-size: 12pt;
     padding-top: 10px;
+    width: 45%;
+    line-height: 1.6;
 }
 
 .card.active {
@@ -734,7 +741,7 @@ p.cardDescription{
     //border-style: dotted;
     overflow-y: auto;
     position: relative;
-    top: 40%;
+    top: 45%;
 }
 
 .award-holder{
@@ -976,7 +983,7 @@ p.cardDescription{
 
             &.video span { .bg-color-image(@video1, url(../pics/video.png)); }
             &.gallery span { .bg-color-image(@gallery1, url(../pics/gallery.png)); }
-            &.brainstorm span { .bg-color-image(@brainstorm1, url(../pics/brainstorm.png)); }
+            &.brainstorm span { .bg-color-image(@brainstorm1, url(../pics/brainstormT.png)); }
             &.table span { .bg-color-image(@table1, url(../pics/graph.png)); }
             &.moreinfo span { .bg-color-image(@moreInfo1, url(../pics/more.png)); }
             &.multQues span { .bg-color-image(@multQues1, url(../pics/answer.png)); }
@@ -1101,7 +1108,7 @@ p.cardDescription{
     width: 400px;
     position: fixed;
     left: 50%;
-    top: 35%;
+    top: 40%;
     transform: translate(-50%, -50%);
 }
 

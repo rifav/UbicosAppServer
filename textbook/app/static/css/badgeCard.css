@@ -95,7 +95,7 @@
 .badgeCardBody > div {
     flex: 1; /*grow*/
     width: 100px;
-    height: 240px;
+    height: 250px;
     border: 1px solid #b3b3b3;
     margin: 15px;
     font-style: italic;
@@ -114,7 +114,7 @@
 }
 
 .badgeBody img{
-    height: 70px;
+    height: 80px;
     width: 70px;
 }
 

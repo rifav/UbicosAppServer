@@ -13,6 +13,7 @@ class studentCharacteristicModel (models.Model):
     has_con = models.BooleanField(default=False)
     has_social = models.BooleanField(default=False)
 
+#saves students participation history
 class participationHistory (models.Model):
     platform = models.CharField(max_length=20)
     activity_id = models.CharField(max_length=20)
@@ -22,7 +23,7 @@ class participationHistory (models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
-# saves the image
+# saves the image uploaded in the gallery
 class imageModel(models.Model):
 
     gallery_id = models.IntegerField()
@@ -62,6 +63,7 @@ class individualMsgComment(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+# saves KA messages
 class KAPostModel(models.Model):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title =  models.CharField(max_length=100)
@@ -72,8 +74,7 @@ class KAPostModel(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
-# activity feed message
-# rename the following method for clarification
+# saves messages from the chat activity; activity feed message
 class Message(models.Model):
     content = models.CharField(max_length=400)
     activity_id = models.IntegerField(null=True)
@@ -83,6 +84,7 @@ class Message(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+# holds the badge Info, updated from an excel sheet
 class badgeInfo(models.Model):
     charac = models.CharField(max_length=20)
     value =  models.CharField(max_length=20)
@@ -95,16 +97,30 @@ class badgeInfo(models.Model):
     sentence_opener1 = models.CharField(max_length=1000);
     sentence_opener2 = models.CharField(max_length=1000);
 
-class badgeModel(models.Model):
+# logs what badge user selected
+class badgeSelected(models.Model):
     userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    message = models.CharField(max_length=400)
-    badgeType = models.CharField(max_length=400)
     platform = models.CharField(max_length=10)
+    activity_id = models.IntegerField(null=True)
+    title = models.CharField(max_length=400)  # can be used for mapping; for gallery it will be the title, for KA it will be the link
+    badgeTypeSelected = models.CharField(max_length=400)
+
 
     def natural_key(self):
         return (self.userid.username)
 
+# logs what badge user received
+class badgeReceived(models.Model):
+    userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    platform = models.CharField(max_length=10)
+    activity_id = models.IntegerField(null=True)
+    message = models.CharField(max_length=400)
+    badgeTypeReceived = models.CharField(max_length=400)
 
+    def natural_key(self):
+        return (self.userid.username)
+
+# saves the different notes that is created
 class brainstormNote(models.Model):
     brainstormID = models.IntegerField(null=True)
     ideaText = models.CharField(max_length=400)
@@ -116,12 +132,14 @@ class brainstormNote(models.Model):
     def natural_key(self):
         return (self.posted_by.username)
 
+# saves the students table data
 class tableChartData(models.Model):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     table_id = models.IntegerField(null=True)
     plot_type = models.CharField(max_length=20) #enumeration
     plot_data = jsonfield.JSONField() #https://stackoverflow.com/questions/37007109/django-1-9-jsonfield-in-models
 
+# saves the students individual work data
 class userQuesAnswerTable(models.Model):
     questionIDbyPage = models.IntegerField(null=True)
     answer = jsonfield.JSONField()
@@ -138,7 +156,7 @@ class groupInfo(models.Model):
         return '%s %s' % (self.activityID, self.group)
 #temp solution for pilot-1 -- end
 
-
+# logs user action
 class userLogTable(models.Model):
     username = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     action = models.CharField(max_length=20)

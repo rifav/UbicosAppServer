@@ -32,10 +32,12 @@ urlpatterns = [
     url('updateFeed/(?P<id>\d+)', views.updateFeed),
     #url for khan academy tool
     url('saveKApost',views.saveKApost),
+
     #utility urls
     url('insertBadgeInfo',views.insertBadgeInfo), #used by gallery.js, kaform.js
     url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
     url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
+    url('saveBadgeSelection', views.saveBadgeSelection), #used by gallery.js, kaform.js
 
     #computational model urls
     url('computationalModel', views.computationalModel),
@@ -59,7 +61,7 @@ urlpatterns = [
     url('brainstorm/del/(?P<note_id>\d+)', views.brainstormDelete),
     url('tableData/save/',views.tableEntriesSave),
     # url('submitAnswer',views.submitAnswer),
-    #url('uploadKAImage', views.uploadKAImage),
+
 
     #url('getKAPerKAID/(?P<ka_id>[0-9]+)',views.getKAPerKAID),
     #url('checkKAAnswer/(?P<ka_id>\d+)',views.checkKAAnswer),
