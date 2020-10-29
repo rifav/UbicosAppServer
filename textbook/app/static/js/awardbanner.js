@@ -45,6 +45,7 @@ var updateBadgeCardBody = function(span_text, badgeType){
 
     //send badgeType to db and get the badge names
     //TODO update the counts for each platform
+
      $.ajax({
 
             type:'POST',
@@ -67,6 +68,28 @@ var updateBadgeCardBody = function(span_text, badgeType){
 
                     i = i + 1;
                 });
+
+                //update the count now
+                badgeCount = response.badgeCount;
+                //console.log(badgeCount);
+                //outer loop maintaining the three badges
+                i=1;
+                $.each(badgeCount, function(key,elem){
+                    //console.log(elem['badgeName']);
+                    //console.log(elem['count_List']); //badge count list for each of the three badges
+                    //inner loop for maintaining the count for three platforms
+                    j=1;
+                    platform = ['Modelbook', 'Khan Academy', 'Cobi'];
+                    $.each(elem['count_List'], function(key1, elem1){
+                        //updates the span
+                        //console.log(elem1);
+                        $('#badgePlatformC'+i+' .badge-count-platform-'+j).text(platform[key1]+': '+elem1['badgeCount']);
+                        j = j + 1;
+                    });
+                    i = i + 1;
+
+                });
+
             }
         });
 }

@@ -269,6 +269,47 @@ def getIndividualCommentMsgs(request,imageId):
     return JsonResponse({'imageCommments': imageCommments});
 
 #used in gallery.js
+def getGalleryImage(request, act_id):
+    # first get the images from the group-members
+
+    # get the group members of the current users
+    member_list = getGroupMembers(request, act_id);
+
+    #get all the user member list
+    # user_query = User.objects.all().values('id');
+    # all_user_id = [item['id'] for item in user_query]
+    # outside_member = list(set(all_user_id) - set(member_list))
+    # random_member_id = random.choice(outside_member);
+    # print('chosen random member :: ', random_member_id, User.objects.get(id=random_member_id).username);
+
+    #TODO:
+    #get all the image id by the member list
+    member_image_id_query= imageModel.objects.filter(posted_by__in=member_list).values('id');
+    member_image_id_list = [item['id'] for item in member_image_id_query];
+    print('line 289 :: ', member_image_id_list);
+
+    all_image_id_query = imageModel.objects.all().values('id');
+    all_image_id_list = [item['id'] for item in all_image_id_query];
+    print('line 293 :: ', all_image_id_list);
+
+    outside_group_image = list(set(all_image_id_list) - set(member_image_id_list))
+    outside_group_image_id = random.choice(outside_group_image);
+    print('line 297 :: ', outside_group_image_id);
+
+    images = imageModel.objects.filter(id=outside_group_image_id).values('image');
+    dict = {}
+    dict['imagePk'] = outside_group_image_id;
+    dict['url'] = images[0]['image'];
+
+    #print(dict);
+    return JsonResponse({'imageData':dict});
+
+
+    return HttpResponse('');
+
+
+
+#used in gallery.js
 def updateImageFeed(request, img_id):
 
     print('updateImageFeed (image_id) :: ' + img_id);
@@ -299,14 +340,47 @@ def getSelfGalleryContent(request, act_id):
 
     return JsonResponse({'success': dict});
 
+#very poor coding, fix when time
 def getBadgeNames(request):
     if request.method == 'POST':
         badgeType = request.POST.get('badgeType');
+        #print('346 :: ', badgeType)
 
-        badges = list(badgeInfo.objects.filter(charac=badgeType).values('badgeName', 'imgName', 'definition').distinct());
-        print('line 296', badges);
+        #used value = "True" to get the three badgenames; true/false either way we have three badges
+        badges = list(badgeInfo.objects.filter(charac=badgeType, value="True").values('badgeName', 'imgName', 'definition').distinct());
 
-        return JsonResponse({'badgeNames': badges});
+        #print('line 296', badges);
+
+        badgeCountList = [];
+        for badge in badges:
+            dict = {}
+            dict['badgeName'] = badge['badgeName'];
+            #print(dict['badgeName']);
+            platform = ['MB', 'KA', 'TA'];
+            count_list = [];
+            for i in platform:
+                count = {}
+                #print(i);
+                #get the badgecount for each platform
+                count['platform'] = i;
+                badge_count = badgeReceived.objects.filter(userid_id=request.user, badgeTypeReceived = dict['badgeName'].lower(), platform=i).values('platform')\
+                    .annotate(Count('platform'));
+                #print(badge_count);
+                if badge_count:
+                    count['badgeCount'] = badge_count[0]['platform__count'];
+                else:
+                    count['badgeCount'] = 0;
+
+                count_list.append(count);
+
+            #print('line 376 (debug purpose):: ', count_list);
+            dict['count_List'] = count_list;
+            #append this to the main list
+            badgeCountList.append(dict);
+
+        #print('line 382 badge count list (debug) :: ', badgeCountList);
+
+        return JsonResponse({'badgeNames': badges, 'badgeCount': badgeCountList});
     return HttpResponse('');
 
 
@@ -477,9 +551,12 @@ def matchKeywords(request):
             selected_badge = entry['badgeTypeSelected'];
 
 
-
         selected_badge = selected_badge.lower();
         isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
+        if(isMatch):
+            entry = badgeReceived(userid_id=User.objects.get(username=username).pk, platform=platform,
+                                  activity_id = activity_id, message = message, badgeTypeReceived = selected_badge);
+            entry.save();
         #isMatch = true; update badgecount #todo maintain another table for this, this will be used to update the badgeCard
         #isMatch = false;
 
@@ -554,7 +631,7 @@ def getImageID(request,img_filename):
     print('receiving parameter :: file name :: ' + img_filename);
 
     img = imageModel.objects.filter(image='images/'+img_filename)
-    image_data = serializers.serialize('json', img, use_natural_foreign_keys=True)
+    image_data = serializers.serialize('json', img, use_natural_foreign_keys=True);
     #print(image_data[0].fields)
     #print(img[0].pk)
     return JsonResponse({'imageData': image_data})

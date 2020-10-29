@@ -1,5 +1,6 @@
 var gallery_act_id;
 var global_badge_selected = '';
+var global_char = ''; //to be used in postImageMessage
 
 $(function(){
 
@@ -18,17 +19,17 @@ var loadGalleryFeed = function(act_id){
     //2. display them
      $.ajax({
         type:'GET',
-        url:'http://'+ host_url +'/getIndividualImages/'+act_id, //same url as this already gives us the images from all the group members
+        url:'http://'+ host_url +'/getGalleryImage/'+act_id, //this should return image outside this group randomly
         async: false, //wait for ajax call to finish
         success: function(data){
-            //TODO: display image outside the group
-            //display an image randomly -- choose the first image as random
-            imageInfo = JSON.parse(data.imageData)[0];
-            //console.log(imageInfo);
+
+            //display an image randomly outside the group
+            imageInfo = data.imageData;
+            //console.log('line 27 :: ', imageInfo);
             //set the src
-            $('.section img').attr('src','/media/'+imageInfo.fields['image']);
+            $('.section img').attr('src','/media/'+imageInfo['url']);
             //set the primary key
-            $('input[name="image-db-pk"]').val(imageInfo.pk);
+            $('input[name="image-db-pk"]').val(imageInfo['imagePk']);
         }
      });
 
@@ -112,20 +113,22 @@ var galleryMsgBtnAction = function(){
       });
 
         //this works both in khan academy and gallery divs
+
       $('.badge-option-display div').off().on('click', function(e){
         //set all background color to original
         $(this).siblings().css({backgroundColor: '#f4f4f4'});
         //set the selected background color to
         $(this).css({backgroundColor: '#d9d9d9'});
         var char = $(this).attr('data-char');
+        global_char = char;
         //console.log(char);
         //get the badgeName
-        global_badge_selected = $(this).children('span').text();
+        global_badge_selected = $(this).children('span').text(); //todo: this needs to go in the database
         console.log('gallery.js global_badge_selected :: ', global_badge_selected);
         var prompt;
         var sentence_opener;
         if(char === 'other'){
-            prompt = "You can proceed without selecting any of the three options";
+            prompt = "You can proceed without selecting any of the three options. Hit the close button and continue.";
             sentence_opener = "";
         }else{
             prompt = global_badgeList[char][0]['prompt'];
@@ -175,7 +178,7 @@ var postImageMessage = function () {
 
         if(!message){
             //entry into user log -- TODO fix the language
-            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber)
+            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, global_current_pagenumber)
             return;
         }
 
@@ -185,22 +188,37 @@ var postImageMessage = function () {
         //get the length of the message
         var msg = message.split(" ");
         var lengthOfMsg = msg.length;
-
         //check the length condition first
-        if(lengthOfMsg == 0) return false; //todo display a prompt 'Your answer is too brief. Try writing a more specific answer.'
+        if(lengthOfMsg == 0){
+            $("#gallery-notifier").text('');
+            $("#gallery-notifier").text('Your answer is too brief. Try writing a more specific answer.');
+            $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+            return false;
+        }
 
-//        if(platform === 'ka'){
-//            if(lengthOfMsg < 20) return false;//word based
-//        }else{
-//            if(lengthOfMsg < 7) return false;//word based
-//        }
-
+        if(global_badgeList[global_char][0]['sentence_opener1'] === message) {
+            $("#gallery-notifier").text('');
+            $("#gallery-notifier").text('Your message exactly matches with suggestion. Try adding your thoughts.');
+            $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+            return false;
+        }
 
         //todo: add the keyword matching algo here and display badge based on the algorithm
         //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
         if(global_badge_selected != 'None' && global_badge_selected != ''){
             //user selected any of the three badges
-            //2. make the api call and send the user message and selected badge in the server
+            //2. save the selected badge in the database
+             //save selected badge info to the database
+                $.ajax({
+                 type: 'POST',
+                 url: '/saveBadgeSelection/',
+                 data: {'username': logged_in, 'platform': 'MB', 'activity_id': gallery_act_id, 'title': '',
+                    'selected_badge' : global_badge_selected},
+                 success: function(response){
+                        console.log(response);
+                     }
+                });
+            //3. make the api call and send the user message and selected badge in the server
             //to do make this a function in utility.js
             console.log('selected badge for gallery.js ::', global_badge_selected);
             $.ajax({
@@ -215,15 +233,14 @@ var postImageMessage = function () {
                         console.log('inside the if else loop');
                         $("#gallery-reward").css("display", "block");
                         //set up the values
+                        var imgName = global_badge_selected.toLowerCase();
+                        $('#gallery-reward img').attr('src', '/static/pics/'+imgName+'.png');
                         $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
                         $('#reward-div-prompt').text(response.praiseText);
 
                     }
                  }
             });
-
-
-
         }
         //get the user name who posted
         var user_name = $("input[name='username']").val()
@@ -273,7 +290,15 @@ var realTimeMsgTransfer = function(){
         //if student commenting on one image is the same as the other user is viewing show the comment else don't show
         if(data.imageid == $("input[name='image-db-pk']").val()){
             //call to the method to post the message in the feed
-            buildFeedwithMsgs(data.message, "#image-feed", data.name);
+            var currentdate = new Date();
+            var datetime = "" + currentdate.getDate() + "/"
+            + (currentdate.getMonth()+1)  + "/"
+            + currentdate.getFullYear() + " "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
+            //defined in utility.js
+            buildFeedwithMsgs(data.message, "#image-feed", data.name, datetime);
 
         }
 

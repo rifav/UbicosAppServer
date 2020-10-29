@@ -20,6 +20,7 @@ urlpatterns = [
     url('saveIndividualCommentMsgs', views.saveIndividualCommentMsgs),
     url('getIndividualCommentMsgs/(?P<imageId>\d+)', views.getIndividualCommentMsgs),
     #urls for gallery image tool
+    url('getGalleryImage/(?P<act_id>\d+)', views.getGalleryImage),
     url('imageComment', views.broadcastImageComment),
     url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
     #urls for self-gallery tool

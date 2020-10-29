@@ -45,7 +45,6 @@ var computationalModelMethod = function(logged_in, platform, activity_id){
 
 //this method updates the badge option div (images) based on the info retrieved from the database
 //for gallery.html and khanacademy_table.html≠
-//for teachable agent todo
 var badge_option_div_update = function(badgeList, platform){
     //TODO: change the dict to list of lists
     //console.log("utility.js :: ", badgeList)
@@ -58,6 +57,8 @@ var badge_option_div_update = function(badgeList, platform){
         //https://stackoverflow.com/questions/51278220/how-to-set-data-attribute-with-jquery
         $("div#"+platform+"-badge"+i).attr('data-char',key);
         //console.log($("div#"+platform+"-badge"+i).attr('data-char'));
+        //update the badge display option images
+        $("div#"+platform+"-badge"+i+" img").attr('src', '/static/pics/'+element[0]['badgeName'].toLowerCase()+'.png');
         //increment the counter
         i = i + 1;
     });
@@ -68,7 +69,7 @@ var badge_option_div_update = function(badgeList, platform){
 //1) individual_gallery.js (#ind-feed)
 //2) gallery.js (#image-feed)
 //3) activityfeed.js (#activity-feed)
-var buildFeedwithMsgs = function(message, container, username){
+var buildFeedwithMsgs = function(message, container, username, time){
     var li = $("<li/>").appendTo(container);
     if(logged_in == username){
        li.addClass('message self');
@@ -81,8 +82,10 @@ var buildFeedwithMsgs = function(message, container, username){
     var p = $('<p/>', {text: message}).appendTo(li);
     var div_msg = $("<div/>").appendTo(li);
     div_msg.addClass('msg-timestamp');
+    // todo fix with the database
+
     var span_timestap = $('<span/>', {
-              text: "add_timestamp"}).appendTo(div_msg);
+              text: time}).appendTo(div_msg);
 
     //TODO change this into a dynamic if else
     $(container).animate({ scrollTop: $(container).height() }, 400);
@@ -90,7 +93,4 @@ var buildFeedwithMsgs = function(message, container, username){
 
 }// end of buildFeedwithMsgs method
 
-var updateTabMenuHighlight = function(){
-
-}
 
