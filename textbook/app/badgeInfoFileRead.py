@@ -24,6 +24,7 @@ class badgeInfoFileRead():
                     dict['badge_prompt'] = row[7];
                     dict['badge_ss1'] = row[8];
                     dict['badge_ss2'] = row[9];
+                    dict['badge_ss3'] = row[10];
                     #print(dict);
 
                     bagdeInfoList.append(dict);

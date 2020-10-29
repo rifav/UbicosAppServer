@@ -17,13 +17,13 @@ keywords_dict = \
      'challenge': ['are you sure', 'what if'],
      'feedback': ['i think', 'should', 'could', 'next time', ''],
      'addon': ['would like to add'],
-     'summarize': ['to summarize'],
-     'answer': ['to answer'],
+     'summarize': ['to summarize', 'let me summarize', 'summarize', 'summarizing', 'summarized', 'in summary'],
+     'answer': ['to answer', 'answering'],
      'reflect': ['i agree', 'i disagree'],
      'assess': ['is this the same as'],
      'participate': [''],
-     'appreciation': ["thank you", "thanks", "good job", "great job", "great work"],
-     'encouragement': ''
+     'appreciate': ["thank you", "thanks", "good job", "great job", "great work"],
+     'ecourage': ['']
      }
 
 week1_relevance = [];
@@ -42,6 +42,9 @@ class keywordMatch():
             # split messages based on sentence; and see if the
             # keywords are used in the beginning of the sentence
             print('question');
+        if(selected_badge == 'participate'):
+            #check for the length
+            print()
 
         # for each keywords in the selected list, check if the keyword is present in the user message
         for elem in keywords_dict[selected_badge]:

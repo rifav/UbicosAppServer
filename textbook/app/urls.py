@@ -33,7 +33,7 @@ urlpatterns = [
     #url for khan academy tool
     url('saveKApost',views.saveKApost),
 
-    #utility urls
+    #badge related urls
     url('insertBadgeInfo',views.insertBadgeInfo), #used by gallery.js, kaform.js
     url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
     url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
@@ -43,6 +43,9 @@ urlpatterns = [
     url('computationalModel', views.computationalModel),
     url('matchKeywords', views.matchKeywords),
 
+
+    #computational model urls
+    url('getCurrentUserGroupID/(?P<act_id>\d+)', views.getCurrentUserGroupID),
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),

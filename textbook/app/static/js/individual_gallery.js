@@ -25,22 +25,24 @@ var loadIndividualFeed = function(act_id) {
             url:'http://'+ host_url +'/getIndividualImages/'+act_id,
             async: false, //wait for ajax call to finish
             success: function(data){
+
                 data = JSON.parse(data.imageData);
-                //console.log(data)
+                //console.log('individual_gallery :: ', data)
                 //console.log(data[0].fields['gallery_id']);
 
                 //loop through the data to access each image and display the images
                 $.each(data, function(key, value){
-                    image_src = value.fields['image'];
-                    image_posted_by = value.fields['posted_by'];
+                    image_src = value['url'];
+                    image_pk = value['image_id'];
+                    image_posted_by = value['posted_by'];
                     var id=key+1;
+                    //we are only updating the a tags with the appropriate values;
                     //update the image src in the a tag
-                    $("a[href='#slide-"+id).attr('data-imgSrc','/media/'+image_src);
-                    console.log($("a[href='#slide-"+id).attr('data-imgSrc'));
+                    $("a[href='#slide-"+id).attr('data-imgSrc', image_src);
+                    //console.log($("a[href='#slide-"+id).attr('data-imgSrc'));
                     //update the img primary key in the a tag
-                    $("a[href='#slide-"+id).attr('data-imgID', value.pk);
-                    console.log($("a[href='#slide-"+id).attr('data-imgID'));
-                    //TODO: display who posted the image
+                    $("a[href='#slide-"+id).attr('data-imgID', image_pk);
+                    //console.log($("a[href='#slide-"+id).attr('data-imgID'));
 
                 });//end of the each loop
             }//end of the success for the post ajax
@@ -50,7 +52,7 @@ var loadIndividualFeed = function(act_id) {
         //step #3 is done below
         //display the comments of the first image, clear the feed first to remove any previous additions
         $('#ind-feed').empty();
-
+//
         //get the primary key of the first image from the a tag
         var imagePk = $("a[href='#slide-1").attr("data-imgID");
         //console.log('line 62 :: ', typeof(imagePk));
@@ -175,7 +177,7 @@ var postIndMessage = function (){
         error: function(){
             //inputEl.prop('disabled', false);
             $("input[name='ind-msg-text']").val('');
-            alert("select an image first using the numbered circular buttons.");
+            alert("Select a number that has image associated with it.");
 
             return false;
         }
@@ -197,13 +199,18 @@ var retrieveComments = function(imagePk){
               //console.log("when the page is loading :: ", loaded_comments);
               //console.log(jQuery.type(data));
               if(loaded_comments==0){//if no comment this data will be empty
-                console.log("no comment data");
+                console.log("no comment in this photo", imagePk);
               }else{
                 //show the first image comments with the loading of the images
                 //console.log(loaded_comments[0].fields['content']);
                 //TODO loop through loaded_comments to display all the messages; [0] only displays the first comment
                 //defined in utility.js
-                buildFeedwithMsgs(loaded_comments[0].fields['content'], "#ind-feed",logged_in);
+
+                    $.each(loaded_comments, function(key, value){
+                        //console.log(value['fields']['content']);
+                        buildFeedwithMsgs(value['fields']['content'], "#ind-feed",logged_in);
+                    });
+
               }
 
         },

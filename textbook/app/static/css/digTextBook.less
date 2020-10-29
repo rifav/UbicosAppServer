@@ -206,8 +206,8 @@ a {
     display: inline-block;
     position: absolute;
     bottom: 15px;
-    height: 52px;
-    width: 52px;
+    height: 40px;
+    width: 40px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     background-repeat: no-repeat;
     text-indent: -999999px;
@@ -220,6 +220,7 @@ a {
     justify-content: center; /* align horizontal */
     align-items: center; /* align vertical */
     text-decoration: none;
+    border-radius: 50%;
 }
 
 #page-controls > a:hover{
@@ -238,8 +239,8 @@ a {
 }
 
 #page-controls #page-control-previous {
-    left: 255px;
-    border-radius: 50%;
+    left: 525px;
+
     background-image: url(../pics/back-blue.png);
 }
 
@@ -250,28 +251,13 @@ a {
 
 #page-controls #study-menu{
     left: 10px;
-
     background-image: url(../pics/index.png);
 }
 
-#page-controls #tab-week1{
-    left: 211px;
-    text-indent: 0px;
-    vertical-align: middle;
-}
 
-#page-controls #tab-week2{
-    left: 316px;
-    text-indent: 0px;
-}
-
-#page-controls #tab-week3{
-    left: 421px;
-    text-indent: 0px;
-}
 
 #page-controls #page-control-next {
-    left: 320px;
+    left: 575px;
     border-radius: 50%;
     background-image: url(../pics/next-blue.png);
 }
@@ -602,7 +588,7 @@ p.cardDescription{
     z-index: 1;
     font-size: 12pt;
     padding-top: 10px;
-    width: 45%;
+    width: 560px;
     line-height: 1.6;
 }
 
@@ -729,7 +715,7 @@ p.cardDescription{
 }
 
 #ind-feed {
-    height: 30%;
+    height: 20%;
     padding: 15px 15px 15px 15px;
     //border-style: dotted;
     overflow-y: auto;
@@ -1066,7 +1052,7 @@ p.cardDescription{
     align-items: center;
     margin: 0;
     position: absolute;
-    top: 25%;
+    top: 30%;
     width: 100%;
 }
 
@@ -1077,13 +1063,13 @@ p.cardDescription{
      color: black;
      border: 1px solid #ddd;
      border-radius: 20px;
-     background-color: #f4f4f4; //background color of the success message
+     background-color: #ffffcc; //background color of the success message
      opacity: 1;
      transition: opacity 0.6s;
     // margin-bottom: 15px;
      width: 400px;
      position: absolute;
-     top: 35rem;
+     top: 25rem;
      left: 18%;
 
 }
@@ -1938,15 +1924,6 @@ p.cardDescription{
 
 /* css related to badge prompt shown in gallery.html -- end*/
 
-
-#mySidenav a img{
-    position: relative;
-    top: 4px;
-    width:20px;
-    height:20px;
-    font-size: 12pt;
-}
-
 .gallery-submission {
     background-color: #2DB872;
     border: #56EF2C;
@@ -2230,6 +2207,13 @@ p.cardDescription{
 //     position: fixed;
 //     top: 25px;
 // }
+#mySidenav a img{
+    position: relative;
+    top: 4px;
+    width:20px;
+    height:20px;
+    font-size: 12pt;
+}
 
 .sidenav {
 
@@ -2258,7 +2242,7 @@ p.cardDescription{
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #88b3c3;
 }
 
 .sidenav .right-menu-closebtn {

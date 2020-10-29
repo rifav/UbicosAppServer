@@ -146,6 +146,16 @@ class userQuesAnswerTable(models.Model):
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     posted_at = models.DateTimeField(auto_now_add=True)
 
+#whiteboard table info table
+# 5 group of 3 students, one group of 4 students
+class whiteboardInfoTable(models.Model):
+    whiteboard_acticityID = models.IntegerField(null=True)
+    userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    whiteboard_link = models.CharField(max_length=300)
+
+    def natural_key(self):
+        return (self.posted_by.username)
+
 #temp solution for pilot-1 -- start
 class groupInfo(models.Model):
     activityID = models.IntegerField(null=True)

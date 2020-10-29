@@ -172,11 +172,11 @@ def uploadImage(request):
 
         #get the gallery ID
         gallery_id = request.POST.get('act-id')
-        print('gallery_id :: ', gallery_id)
+        print('gallery_id :: ', gallery_id);
 
-        #get the student group ID
-        group_id = request.POST.get('group-id')
-        print('group_id :: ', group_id)
+        #made a query here to get the student group ID
+        group_id = getGroupID(request, gallery_id);
+        print('group_id :: ', group_id);
 
         # print(type(request.FILES['gallery_img'].name))
         # django.core.files.uploadedfile.InMemoryUploadedFile
@@ -184,7 +184,7 @@ def uploadImage(request):
         #get the logged in username
         username = ''
         if request.user.is_authenticated:
-            print('username :: ', request.user.get_username())
+            print('username :: ', request.user.get_username());
             username = request.user.get_username();
         else:
             print('user not signed in') #add in log
@@ -192,7 +192,7 @@ def uploadImage(request):
 
         #insert values in the database
         #TODO: restrict insertion if user is not signed in
-        img = imageModel(gallery_id=gallery_id, group_id = group_id , posted_by = request.user, image=request.FILES['gallery_img'])
+        img = imageModel(gallery_id=gallery_id, group_id = group_id , posted_by = request.user, image=request.FILES['gallery_img']);
         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
         img.save()
 
@@ -234,12 +234,23 @@ def getIndividualImages(request, act_id):
     #get the group members of the current users
     member_list = getGroupMembers(request, act_id);
     print("getIndividualImages member id list :: ", member_list);
-    #retrieve images from Image Model for each user in member_list
-    images = imageModel.objects.filter(posted_by_id__in=member_list);
-    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True);
-    #print('debug, get individual images method :: ', image_data)
+    #retrieve the LAST image uploaded from Image Model for each user in member_list
 
-    return JsonResponse({'imageData': image_data});
+    image_list = [];
+    for user_id in member_list:
+        #get the LAST image uploaded by the user_id
+        images = imageModel.objects.filter(posted_by_id = user_id).last();
+        dict = {};
+        if images:
+            dict['posted_by'] = images.posted_by.get_username();
+            dict['image_id'] = images.pk;
+            dict['url'] = images.image.url;
+            image_list.append(dict);
+
+    #print('get individual images :: ', image_list);
+
+    return JsonResponse({'imageData': json.dumps(image_list)});
+    #return HttpResponse('');
 
 def saveIndividualCommentMsgs(request):
     #insert into the model
@@ -328,6 +339,7 @@ def getBadgeOptions(request, username, platform, badgeKey):
 
 
     # print('line 327 /getbadgeOptions', dict);
+    #todo handle topic_variable here
     return dict; #goes back to computationalModel method
 
 
@@ -432,7 +444,7 @@ def matchKeywords(request):
          'question': 'Asking questions helps you to understand better.',
          'critique': 'This will help you to understand better.',
          'elaborate': 'This will benefit your help-giving skills.',
-         'share': 'Sharing thoughts helps you to put them into words',
+         'share': 'Sharing thoughts helps you to put them into words.',
          'challenge': 'This will benefit your help-giving skills.',
          'feedback': 'Your feedback to others is highly appreciated!',
          'addon': 'Adding to an existing conversation is useful.',
@@ -441,8 +453,8 @@ def matchKeywords(request):
          'reflect': 'Reflecting on others work is good.',
          'assess': 'Evaluating others work is a skill!',
          'participate': 'Participation is a great collaborative technique!',
-         'appreciation': 'Appreciating others encourages collaboration ',
-         'encouragement': 'Encouraging others helps in a collaboration'
+         'appreciate': 'Appreciating others encourages collaboration.',
+         'encourage': 'Encouraging others helps in a collaboration.'
          }
 
     if request.method == 'POST':
@@ -457,11 +469,13 @@ def matchKeywords(request):
         if(platform == 'KA'):
             #get the selected badge using the URL sent
             ka_url = request.POST.get('ka_url');
-            entry = badgeSelected.objects.all().filter(userid_id=User.objects.get(username=username)).filter(platform=platform).\
-                                filter(title=ka_url).values('activity_id','badgeTypeSelected').last();
+
+            entry = badgeSelected.objects.filter(userid_id=User.objects.get(username=username)).filter(platform=platform).\
+                values('activity_id','badgeTypeSelected').last();
+            print('line 463 :: ', entry);
             activity_id = entry['activity_id'];
             selected_badge = entry['badgeTypeSelected'];
-            print('line 458 :: ', entry);
+
 
 
         selected_badge = selected_badge.lower();
@@ -493,6 +507,10 @@ def getGroupID(request, act_id):
     groupID = groupID.filter(users_id = request.user)
 
     return groupID[0].group;
+
+def getCurrentUserGroupID(request, act_id):
+
+    return JsonResponse({'groupID': getGroupID(request, act_id)});
 
 #input: activity ID
 #output: return the ID of the group members of the current user for the given activity

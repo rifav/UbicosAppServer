@@ -139,6 +139,9 @@ var movePage = function(moveToNext){
         function(){
             container.attr('class', noMoreClass);
         });
+
+    //scrolling to the top:
+    $('html, body').animate({scrollTop: '0px'}, 0);
 };
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
@@ -305,6 +308,11 @@ var bindActivityButtons = function(){
              //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
              $('img#default').attr('src', API_URL.picsBase + "/default.png");
              // end of the solution
+
+             //clear the success message (once displayed it stays on, so clear it for the next access to the card)
+             $('.upload-success-msg').hide();
+             //put the default image in its original frame after an image is uploaded
+             $("#gallery-upload-div img").width('450px').height('300px');
         }
 //        ---------------------display (only) individual discussion -----------------------
          if($('.card.self-gallery').hasClass('active')){
