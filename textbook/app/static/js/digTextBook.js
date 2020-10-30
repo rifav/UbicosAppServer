@@ -37,15 +37,7 @@ $(function(){
         reloadPage(pageToBeRefreshed);
     }
 
-//        //console.log("here");
-//        //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
-//        $('.page').off().on('click','#editPersonalityBtn', function(event){
-//             //console.log("button clicked");
-////             $("#matchedPersonality").css("display", "none");
-////             $("#editPersonality").css("display", "");
-//               $("#matchedPersonality").toggle();
-//               $("#editPersonality").toggle();
-//        });
+
 
 });
 
@@ -233,19 +225,31 @@ var bindActivityButtons = function(){
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
 
-//        --------------------------VIDEO/WHITEBOARD-----------------------
+//        --------------------------VIDEO-----------------------
         // if video tab is active get the video url and display in video.html
         //display the video url in a new tab instead of the card
-        if(type == 'video' || type == 'whiteboard'){
-            //lastOpenedTool = 'video';
+        if(type == 'video'){
             $('.card.active').removeClass('active');
             var video_url = activityButton.attr('data-video-url');
             window.open(video_url, '_blank'); //open any external video in a new window
         }
+//        --------------------------WHITEBOARD-----------------------
+        // if video tab is active get the video url and display in video.html
+        //display the video url in a new tab instead of the card
+        if(type == 'whiteboard'){
+            $('.card.active').removeClass('active');
+            //get the whiteboard id
+            console.log('whiteboard id :: ', id);
+
+            //using the whiteboard id and the logged in user
+
+            var whiteboard_url = getWhiteboardURl(id); //this will come from the database
+            console.log('whiteboard URl', whiteboard_url);
+            window.open(whiteboard_url, '_blank'); //open any external video in a new window
+        }
 //        ------------------------------TABLE-----------------------
         //if the table tab is active
         if($('.card.table').hasClass('active')){
-             //lastOpenedTool = 'table';
 
              $('input[name="table-id"]').attr('value', id)
              //$('.card.' + type + ' h1').text(activityButton.attr('data-heading'));

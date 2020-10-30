@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
     userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel,\
-    participationHistory
+    participationHistory, whiteboardInfoTable
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -587,6 +587,18 @@ def matchKeywords(request):
 
     return HttpResponse('');
 
+def getWhiteboardURl(request, board_id):
+
+    #print('line 592 :: ', board_id);
+    whiteboard = whiteboardInfoTable.objects.filter(whiteboard_acticityID = board_id, userid_id = request.user).values('whiteboard_link');
+    #print(whiteboard[0]['whiteboard_link']);
+
+    url = whiteboard[0]['whiteboard_link'];
+
+    return JsonResponse({'url':url});
+
+
+
 ###############################################
 ############ handler methods start ############
 def getUsername(request):
@@ -635,7 +647,24 @@ def insertBadgeInfo(request):
         #print(badgeElem['characteristic'])
         entry = badgeInfo(charac = badgeElem['characteristic'], value = badgeElem['value'], badgeName = badgeElem['badge_name'], index = badgeElem['index'],
                     platform = badgeElem['platform'], imgName = badgeElem['imgName'], definition = badgeElem['definition'],
-                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'], sentence_opener2 = badgeElem['badge_ss2']);
+                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'],
+                          sentence_opener2 = badgeElem['badge_ss2'], sentence_opener3 = badgeElem['badge_ss3']);
+        entry.save();
+
+    return HttpResponse('');
+
+def insertWhiteboardInfo(request):
+
+    #1. read the excel file (used a separate py file for this)
+    whiteboardInfoList = badgeInfoFileRead.whiteboardfileRead(None);
+    #print(type(bagdeInfoList));
+
+    # 2. insert into the table
+    for whiteboard in whiteboardInfoList:
+        #print(whiteboard['user'])
+
+        entry = whiteboardInfoTable(whiteboard_acticityID = int(whiteboard['whiteboard_id']),
+                                    userid_id = User.objects.get(username=whiteboard['user']).pk, whiteboard_link = whiteboard['url']);
         entry.save();
 
     return HttpResponse('');

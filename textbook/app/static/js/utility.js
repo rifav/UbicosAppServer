@@ -105,3 +105,22 @@ var formatTime = function(raw_time){
 
     return time;
 }
+
+var getWhiteboardURl = function(board_id){
+
+    //get the whiteboard URL
+    whiteboard_url = ''
+    $.ajax({
+        type:'GET',
+        url:'http://'+ host_url +'/getWhiteboardURl/'+board_id,
+        async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
+        success: function(e){
+             //console.log(e.url);
+             whiteboard_url = e.url;
+             //console.log('logged in username (inside) :: ', logged_in)
+        }
+    });
+
+    return whiteboard_url;
+
+}
