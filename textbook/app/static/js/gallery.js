@@ -47,12 +47,16 @@ var loadGalleryFeed = function(act_id){
                 msg_data = response.success;
                 var obj = jQuery.parseJSON(msg_data);
                 //console.log(obj)
+
                 //clear the image feed so it doesn't add to the previously loaded feed
                 $('#image-feed').empty();
                 //iterate through the response data to display the comments in the interface
                 $.each(obj, function(key, value){
                     //this method is defined in individual_gallery.js
-                    buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0]);
+                    //defined in utility.js
+                    time = formatTime(value.fields['posted_at'])
+                    //console.log(time);
+                    buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0], time);
                 });
 
                 //scrollbar
@@ -196,16 +200,15 @@ var postImageMessage = function () {
             return false;
         }
 
-        if(global_badgeList[global_char][0]['sentence_opener1'] === message) {
-            $("#gallery-notifier").text('');
-            $("#gallery-notifier").text('Your message exactly matches with suggestion. Try adding your thoughts.');
-            $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
-            return false;
-        }
-
         //todo: add the keyword matching algo here and display badge based on the algorithm
         //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
         if(global_badge_selected != 'None' && global_badge_selected != ''){
+               if(global_badgeList[global_char][0]['sentence_opener1'] === message) {
+                    $("#gallery-notifier").text('');
+                    $("#gallery-notifier").text('Your message exactly matches with suggestion. Try adding your thoughts.');
+                    $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+                    return false;
+                }
             //user selected any of the three badges
             //2. save the selected badge in the database
              //save selected badge info to the database
@@ -291,8 +294,8 @@ var realTimeMsgTransfer = function(){
         if(data.imageid == $("input[name='image-db-pk']").val()){
             //call to the method to post the message in the feed
             var currentdate = new Date();
-            var datetime = "" + currentdate.getDate() + "/"
-            + (currentdate.getMonth()+1)  + "/"
+            var datetime = "" + currentdate.getDate() + "-"
+            + (currentdate.getMonth()+1)  + "-"
             + currentdate.getFullYear() + " "
             + currentdate.getHours() + ":"
             + currentdate.getMinutes() + ":"

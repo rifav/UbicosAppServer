@@ -94,3 +94,14 @@ var buildFeedwithMsgs = function(message, container, username, time){
 }// end of buildFeedwithMsgs method
 
 
+var formatTime = function(raw_time){
+
+    //format of raw_time: 2020-10-30T03:44:56.323Z
+    var t1 = raw_time.split('.').pop()
+    time = raw_time.replace("."+t1, ""); //2020-10-30T03:44:56
+    time = time.replace("T", " ") //2020-10-30 03:44:56 //this is probably server time
+
+    //console.log(time)
+
+    return time;
+}

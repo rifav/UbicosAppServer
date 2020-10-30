@@ -44,7 +44,6 @@ urlpatterns = [
     url('computationalModel', views.computationalModel),
     url('matchKeywords', views.matchKeywords),
 
-
     #computational model urls
     url('getCurrentUserGroupID/(?P<act_id>\d+)', views.getCurrentUserGroupID),
 
@@ -53,7 +52,9 @@ urlpatterns = [
     #url('addUserToGroups',views.addUserToGroupsForm),
 
     #urls for different tool utility
-    url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
+    # url('activityTracker',views.platformActivityList),
+
+    #url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('gallery/del/(?P<img_id>\d+)', views.imageDelete),
     # url('getGalleryPerID/(?P<gid>\d+)', views.getGalleryPerID),

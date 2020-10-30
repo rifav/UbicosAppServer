@@ -9,34 +9,6 @@ $(function(){
             $("#mySidenav").css("width", "350px");
         });
 
-        //handle the tab menu button actions
-        $('#tab-week1, #tab-week2, #tab-week3').click(function (e){
-
-            handle_tab_menu_buttons($(this), $(this).attr('data-id'));
-
-        });
-
-        //highlight the tab menu buttons based on page id -- start
-        //adding this only here will work on reload but not with back/forward clicking
-        //make it a function and call it everytime as well
-        if(global_current_pagenumber >= 2 && global_current_pagenumber <= 11) {
-            console.log("current page number :: ", global_current_pagenumber);
-            $('#page-controls a').removeClass('menu-button-selected');
-            $("#tab-week1").addClass('menu-button-selected');
-        }else if(global_current_pagenumber >= 12 && global_current_pagenumber <= 24)
-        {
-            console.log("current page number :: ", global_current_pagenumber);
-            $('#page-controls a').removeClass('menu-button-selected');
-            $("#tab-week2").addClass('menu-button-selected');
-        }else if(global_current_pagenumber >= 25 && global_current_pagenumber <= 36){
-            console.log("current page number :: ", global_current_pagenumber);
-            $('#page-controls a').removeClass('menu-button-selected');
-            $("#tab-week3").addClass('menu-button-selected');
-        }
-
-        //highlight the tab menu buttons based on page id -- end
-
-
         //close the right-side-menu
         $('.right-menu-closebtn').click(function(e){
              $("#mySidenav").css("width", "0px");
@@ -102,15 +74,4 @@ $(function(){
 
 })
 
-var handle_tab_menu_buttons = function(container, pageID){
-
-    $("#mySidenav").css("width", "0px"); //if the right side menu is open, close it
-    //highlight the current selected tab menu button and non-highlight others
-    $('#page-controls a').removeClass('menu-button-selected');
-    $(container).addClass('menu-button-selected');
-    //load the respective page
-    reloadPage(pageID); //the following function is defined in digTextBook.js
-    localStorage.setItem("pageToBeRefreshed", pageID);//next reload will load this page
-
-}
 

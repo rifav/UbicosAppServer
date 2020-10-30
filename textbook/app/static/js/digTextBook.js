@@ -347,7 +347,6 @@ var bindActivityButtons = function(){
             $('#gallery-description').text(activityButton.attr('data-description') +
             ' Use the badge option on the top-right corner to get an idea about how to help others.');
 
-
             loadGalleryFeed(id);
 
         }

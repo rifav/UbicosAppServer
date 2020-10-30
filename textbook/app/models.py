@@ -16,12 +16,13 @@ class studentCharacteristicModel (models.Model):
 #saves students participation history
 class participationHistory (models.Model):
     platform = models.CharField(max_length=20)
-    activity_id = models.CharField(max_length=20)
+    activity_id = models.IntegerField()
     didParticipate = models.CharField(max_length=20)
     posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def natural_key(self):
         return (self.posted_by.username)
+
 
 # saves the image uploaded in the gallery
 class imageModel(models.Model):

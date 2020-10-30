@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel
+    userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel,\
+    participationHistory
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -15,10 +16,11 @@ from .parser import parser
 from .randomGroupGenerator import randomGroupGenerator
 from .badgeInfoFileRead import badgeInfoFileRead
 from .keywordMatch import keywordMatch
+from .binaryLogisticModel import binaryLogisticModel
 import json, random
 from datetime import datetime, timedelta
 from collections import Counter
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 
 
@@ -65,6 +67,14 @@ def broadcastImageComment(request):
     #solution: https://www.slideshare.net/BaabtraMentoringPartner/how-to-fix-must-be-an-instance-when-a-foreign-key-is-referred-django-python-mysql
     comment = imageComment(content=request.POST['message'], posted_by = request.user, imageId = img, activityID=request.POST['activityID'])
     comment.save()
+
+    #save into the history table once
+    if participationHistory.objects.filter(platform="MB", activity_id=request.POST['activityID'], posted_by=request.user).exists():
+        #do nothing
+        print();
+    else:
+        entry = participationHistory(platform="MB", activity_id=request.POST['activityID'],didParticipate='yes',posted_by=request.user);
+        entry.save()
 
     return JsonResponse({'success': '', 'errorMsg': True})
 
@@ -115,7 +125,7 @@ def login(request):
         # combination is valid - a User object is returned if it is.
         # user is created using the createsuperuser command
         user = authenticate(username=username, password=password)
-        print(user)
+        print('user :: ', user)
 
         if user:
             auth_login(request, user)
@@ -270,25 +280,19 @@ def getIndividualCommentMsgs(request,imageId):
 
 #used in gallery.js
 def getGalleryImage(request, act_id):
-    # first get the images from the group-members
 
+    print('Getting gallery image for activity id  ::', act_id);
+    # first get the images from the group-members
     # get the group members of the current users
     member_list = getGroupMembers(request, act_id);
 
-    #get all the user member list
-    # user_query = User.objects.all().values('id');
-    # all_user_id = [item['id'] for item in user_query]
-    # outside_member = list(set(all_user_id) - set(member_list))
-    # random_member_id = random.choice(outside_member);
-    # print('chosen random member :: ', random_member_id, User.objects.get(id=random_member_id).username);
 
-    #TODO:
     #get all the image id by the member list
-    member_image_id_query= imageModel.objects.filter(posted_by__in=member_list).values('id');
+    member_image_id_query= imageModel.objects.filter(posted_by__in=member_list, gallery_id=act_id).values('id');
     member_image_id_list = [item['id'] for item in member_image_id_query];
     print('line 289 :: ', member_image_id_list);
 
-    all_image_id_query = imageModel.objects.all().values('id');
+    all_image_id_query = imageModel.objects.filter(gallery_id=act_id).values('id');
     all_image_id_list = [item['id'] for item in all_image_id_query];
     print('line 293 :: ', all_image_id_list);
 
@@ -297,15 +301,13 @@ def getGalleryImage(request, act_id):
     print('line 297 :: ', outside_group_image_id);
 
     images = imageModel.objects.filter(id=outside_group_image_id).values('image');
-    dict = {}
-    dict['imagePk'] = outside_group_image_id;
-    dict['url'] = images[0]['image'];
-
-    #print(dict);
-    return JsonResponse({'imageData':dict});
-
-
-    return HttpResponse('');
+    if images:
+        dict = {}
+        dict['imagePk'] = outside_group_image_id;
+        dict['url'] = images[0]['image'];
+        return JsonResponse({'imageData': dict});
+    else:
+        return HttpResponse('');
 
 
 
@@ -388,7 +390,7 @@ def getBadgeNames(request):
 #https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
 def getBadgeOptions(request, username, platform, badgeKey):
 
-    print('line 306 /getBadgeOptions :: ', badgeKey);
+    print('line 393 /getBadgeOptions :: ', badgeKey);
 
     #get the students characteristic VALUES from the database
     charac = getCharacteristic(request, username);
@@ -398,7 +400,7 @@ def getBadgeOptions(request, username, platform, badgeKey):
     #separatae no participation badge vs constructive badge -- through badgeKey List
     dict = {};
     for elem in badgeKey:
-        original_elem = elem;
+        original_elem = elem; #msc, hsc, fam, con1, con2, social
 
         #little adjustment made to display all the three badges un the interface
         if(elem == 'con1' or elem == 'con2'):
@@ -411,20 +413,23 @@ def getBadgeOptions(request, username, platform, badgeKey):
                                                   value=charac[elem],index=random.choice(index_list)).values('badgeName','prompt','sentence_opener1'));
         dict[original_elem] = badge_item;
 
+    print('line 418 /getbadgeOptions', dict);
 
-    # print('line 327 /getbadgeOptions', dict);
     #todo handle topic_variable here
+
     return dict; #goes back to computationalModel method
 
 
-
+# this comes from the extension
 def saveKApost(request):
     # get the data
     if request.method == 'POST':
-        username = request.POST.get('username').lower();
+        username = request.POST.get('username').split(" ")[0];
         pagetitle = request.POST.get('pageURL');
         textareaId = request.POST.get('textareaId');
         content = request.POST.get('content');
+
+        print('line 430 :: ', username);
 
         # check if an answer is already present for this textarea, then update else enter
         if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
@@ -433,6 +438,9 @@ def saveKApost(request):
         else:
             ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
             ka_answer.save();
+
+            #insert an entry into the participation history for this activity id
+            #entry = participationHistory(platform='KA', activity_id='', didParticipate='yes', posted_by=request.user);
         return HttpResponse('successfully inserted');
 
     return HttpResponse('');
@@ -456,10 +464,6 @@ def saveBadgeSelection(request):
     return HttpResponse('');
 
 
-def getParticipationHistory(request, activity_id, platform):
-    #todo incomplete
-    return HttpResponse('');
-
 #modelbook: gallery ID
 #khanacademy: khan academy
 def computationalModel(request):
@@ -479,21 +483,34 @@ def computationalModel(request):
             willParticipate = bool(request.POST.get('willParticipate')); #this comes from TA
         else:
             #for the other two platforms, calculate will participate variable here
-            #todo finalize
-            if(int(activity_id)>=3):
-                #isNP = getParticipationHistory(request, activity_id, platform);
-                willParticipate = True;
-                #porblemid 1 and problem id 2 has utternace count >= step count -- wp = true/wp=false
-            else:
-                #todo: handle the first two cases
-                willParticipate = True;
+            if int(activity_id) == 1:
+                willParticipate = True; #why? or we can choose it randomly
+            elif int(activity_id) >= 2:
+                prev_acID = int(activity_id)-1;
 
+                #check if participated in the previous activity if a given platform
+                # the following table should have one entry [per activity id] at any moment of time
+                didParticipate = participationHistory.objects.filter(posted_by=request.user,
+                                                                     activity_id=prev_acID,
+                                                                     platform=platform).values('didParticipate');
+
+                print('line 496 did participate in the prev activity?', didParticipate);
+                #if there is a queryset, means current user participated in the previous activity
+                if didParticipate:
+                    willParticipate = True;
+                else: #because did not participate in the previous act
+                    willParticipate = False;
 
         #second, using the willParticipate variable, decide whether to call CPmodel or not
         badgeKey = [];
         if(willParticipate == True):
-            #call the CP model here to check the likelihood of participation
-            #calculate the equation here.
+            #call the CP model equation here to check the likelihood of participation and log it
+            #first, get students characteristic
+            charac = studentCharacteristicModel.objects.filter(user = request.user).values('has_msc', 'has_hsc', 'has_fam')
+            charac_dict = [dict(item) for item in charac]
+            #print('link 510 :: ', charac_dict);
+            likelihood = binaryLogisticModel.model(None, charac_dict, platform);
+            print('from the view class, likelihood score', likelihood);
             # todo log this (student id, activity id, platform, likelihood)
             # later from the data will verify whether students participated or not
             badgeKey = ['msc', 'hsc', 'fam']
@@ -532,7 +549,7 @@ def matchKeywords(request):
          }
 
     if request.method == 'POST':
-        username = request.POST.get('username').lower();
+        username = request.POST.get('username').split(" ")[0];
         print('line 448 from KA', username);
         activity_id = request.POST.get('activity_id');
         platform = request.POST.get('platform');
@@ -549,6 +566,7 @@ def matchKeywords(request):
             print('line 463 :: ', entry);
             activity_id = entry['activity_id'];
             selected_badge = entry['badgeTypeSelected'];
+
 
 
         selected_badge = selected_badge.lower();
@@ -625,16 +643,6 @@ def insertBadgeInfo(request):
 ############ handler methods end ############
 #############################################
 
-
-
-def getImageID(request,img_filename):
-    print('receiving parameter :: file name :: ' + img_filename);
-
-    img = imageModel.objects.filter(image='images/'+img_filename)
-    image_data = serializers.serialize('json', img, use_natural_foreign_keys=True);
-    #print(image_data[0].fields)
-    #print(img[0].pk)
-    return JsonResponse({'imageData': image_data})
 
 def getImagePerUser(request, act_id, username):
     print('receiving parameter :: activity id :: username ' + act_id + '  ' + username);
@@ -1356,88 +1364,57 @@ def userLogFromExtenstion(request):
 #if this method is called with users already existing in the database, will return a django error message
 def createBulkUser(request):
 
-    # 29 user for the study + 3 user
+    # 19 user for the study + 1 teacher user + 2 test user
 
-    #group 1
-    user = User.objects.create_user('panda', '', 'panda');
+    #whiteboard-group 1
+    user = User.objects.create_user('Squirtle', '', 'study6109');
     user.save();
-    user = User.objects.create_user('liger', '', 'liger');
+    user = User.objects.create_user('Bulbasaur', '', 'study2710');
     user.save();
-    user = User.objects.create_user('sheep', '', 'sheep');
-    user.save();
-
-    # group 2
-    user = User.objects.create_user('fox', '', 'fox');
-    user.save();
-    user = User.objects.create_user('leopard', '', 'leopard');
-    user.save();
-    user = User.objects.create_user('zebra', '', 'zebra');
+    user = User.objects.create_user('Dragonite', '', 'study2391');
     user.save();
 
-    # group 3
-    user = User.objects.create_user('bat', '', 'bat');
+    #whiteboard-group 2
+    user = User.objects.create_user('Gengar', '', 'study9273');
     user.save();
-    user = User.objects.create_user('dog', '', 'dog');
+    user = User.objects.create_user('Eevee', '', 'study3452');
     user.save();
-    user = User.objects.create_user('squirrel', '', 'squirrel');
-    user.save();
-
-    #group 4
-    user = User.objects.create_user('dolphin', '', 'dolphin');
-    user.save();
-    user = User.objects.create_user('elephant', '', 'elephant');
-    user.save();
-    user = User.objects.create_user('tiger', '', 'tiger');
+    user = User.objects.create_user('Charizard', '', 'study0013');
     user.save();
 
-    #group 5
-    user = User.objects.create_user('fish', '', 'fish');
+    # whiteboard-group 3
+    user = User.objects.create_user('Umbreon', '', 'study3920');
     user.save();
-    user = User.objects.create_user('frog', '', 'frog');
+    user = User.objects.create_user('Gyarados', '', 'study3525');
     user.save();
-    user = User.objects.create_user('monkey', '', 'monkey');
-    user.save();
-
-    #group 6
-    user = User.objects.create_user('ant', '', 'ant');
-    user.save();
-    user = User.objects.create_user('kangaroo', '', 'kangaroo');
-    user.save();
-    user = User.objects.create_user('rabbit', '', 'rabbit');
+    user = User.objects.create_user('Charmander', '', 'study0952');
     user.save();
 
-
-    #group-7
-    user = User.objects.create_user('bear', '', 'bear');
+    #whiteboard-group 4
+    user = User.objects.create_user('Ponyta', '', 'study1259');
     user.save();
-    user = User.objects.create_user('duck', '', 'duck');
+    user = User.objects.create_user('Lapras', '', 'study9251');
     user.save();
-    user = User.objects.create_user('hippo', '', 'hippo');
-    user.save();
-
-
-    #group 8
-    user = User.objects.create_user('giraffe', '', 'giraffe');
-    user.save();
-    user = User.objects.create_user('bee', '', 'bee');
-    user.save();
-    user = User.objects.create_user('eagle', '', 'eagle');
+    user = User.objects.create_user('Geodude', '', 'study8525');
     user.save();
 
-    # group 9
-    user = User.objects.create_user('deer', '', 'deer');
+    # whiteboard-group 5
+    user = User.objects.create_user('Chansey', '', 'study0193');
     user.save();
-    user = User.objects.create_user('penguin', '', 'penguin');
+    user = User.objects.create_user('Psyduck', '', 'study6123');
+    user.save();
+    user = User.objects.create_user('Horsea', '', 'study8723');
     user.save();
 
-
-    #group 10
-    user = User.objects.create_user('alligator', '', 'alligator');
+    #whiteboard-group 6
+    user = User.objects.create_user('Paras', '', 'study5283');
     user.save();
-    user = User.objects.create_user('raccoon', '', 'raccoon');
+    user = User.objects.create_user('Mew', '', 'study5105');
     user.save();
-    user = User.objects.create_user('lion', '', 'lion');
-    user.save()
+    user = User.objects.create_user('Tangela', '', 'study6209');
+    user.save();
+    user = User.objects.create_user('Seel', '', 'study6601');
+    user.save();
 
 
     #group 11 - teacher/developers
@@ -1451,17 +1428,54 @@ def createBulkUser(request):
 
     return render(request, 'app/login.html', {})
 
+# def platformActivityList(request):
+#     #Khan Academy activities
+#     entry = platformActivityList(platform='KA', title = 'https://www.khanacademy.org/math/pre-algebra/pre-algebra-ratios-rates/pre-algebra-ratios-intro/v/ratios-intro',
+#                             activity_id = 1, topic='Intro to Ratio');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/cc-seventh-grade-math/cc-7th-ratio-proportion/7th-constant-of-proportionality/v/introduction-proportional-relationships',
+#                             activity_id=2,topic='Proportional Relationship');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/algebra-basics/alg-basics-linear-equations-and-inequalities/alg-basics-write-and-solve-proportions/v/find-an-unknown-in-a-proportion',
+#                             activity_id=3, topic='Find Unknown in a proportion');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-linear-equations-functions/cc-8th-graphing-prop-rel/v/graphing-proportional-relationships-example',
+#                             activity_id=4, topic='Graphing proportional relationship');
+#     entry.save();
+#
+#     # gallery activities
+#
+#     entry = platformActivityList(platform='MB',
+#                             title='Perfect Purple Paint',
+#                             activity_id=1, topic='ratio');
+#     entry.save();
+#
+#     entry = platformActivityList(platform="MB",
+#                             title='Ratio Assignment Discussion',
+#                             activity_id=1, topic="ratio");
+#     entry.save();
+#
+#     return HttpResponse('');
+
+
+
+
 def groupAdd(request):
 
     users_list = [str(user) for user in User.objects.all()]
     print(len(users_list))
 
-    usernames_array = ["giraffe", "raccoon", "ant", "tiger", "sheep", "deer", "panda", "liger", "fox", "hippo", "alligator",
-                       "dog", "dolphin", "eagle", "zebra", "rabbit", "bear","monkey", "leopard", "frog", "squirrel", "elephant", "bee",
-                       "duck", "kangaroo", "penguin", "fish","bat", "lion", "AW", "user1", "user2"];
+    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Seel", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
+                       "Mew", "Dragonite", "Charizard", "Charmander", "Geodude", "Horsea","Tangela", "Gengar", "AW", "user1", "user2"];
 
-    username_groupID = ['1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4', '5', '5', '5', '6', '6', '6','7', '7',
-                        '7', '8', '8', '8', '9', '9', '9','10', '10', '10', '11', '11', '11']
+    username_groupID = ['1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '4', '4','4', '4','5','5','5']
+
 
     # for i in range(len(usernames_array)):
     #     print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
