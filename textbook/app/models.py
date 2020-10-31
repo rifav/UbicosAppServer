@@ -97,6 +97,7 @@ class badgeInfo(models.Model):
     prompt = models.CharField(max_length=1000)
     sentence_opener1 = models.CharField(max_length=1000);
     sentence_opener2 = models.CharField(max_length=1000);
+    sentence_opener3 = models.CharField(max_length=1000);
 
 # logs what badge user selected
 class badgeSelected(models.Model):

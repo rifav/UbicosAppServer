@@ -94,6 +94,24 @@ var buildFeedwithMsgs = function(message, container, username, time){
 }// end of buildFeedwithMsgs method
 
 
+//get the current time for real time message passing
+var getCurrentTime = function(){
+    //call to the method to post the message in the feed
+    var currentdate = new Date();
+    var datetime = "" + currentdate.getDate() + "-"
+    + (currentdate.getMonth()+1)  + "-"
+    + currentdate.getFullYear() + " "
+    + currentdate.getHours() + ":"
+    + currentdate.getMinutes() + ":"
+    + currentdate.getSeconds();
+
+    console.log(datetime);
+
+    return datetime;
+
+}
+
+//format time coming from django query
 var formatTime = function(raw_time){
 
     //format of raw_time: 2020-10-30T03:44:56.323Z
@@ -104,4 +122,23 @@ var formatTime = function(raw_time){
     //console.log(time)
 
     return time;
+}
+
+var getWhiteboardURl = function(board_id){
+
+    //get the whiteboard URL
+    whiteboard_url = ''
+    $.ajax({
+        type:'GET',
+        url:'http://'+ host_url +'/getWhiteboardURl/'+board_id,
+        async: false, //wait for ajax call to finish, else logged_in is null in the following if condition
+        success: function(e){
+             //console.log(e.url);
+             whiteboard_url = e.url;
+             //console.log('logged in username (inside) :: ', logged_in)
+        }
+    });
+
+    return whiteboard_url;
+
 }

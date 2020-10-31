@@ -22,7 +22,7 @@ urlpatterns = [
     #urls for gallery image tool
     url('getGalleryImage/(?P<act_id>\d+)', views.getGalleryImage),
     url('imageComment', views.broadcastImageComment),
-    url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
+    url('updateImageFeed/', views.updateImageFeed),
     #urls for self-gallery tool
     url('getSelfGalleryContent/(?P<act_id>\d+)', views.getSelfGalleryContent),
     #urls for student characteristic
@@ -52,7 +52,8 @@ urlpatterns = [
     #url('addUserToGroups',views.addUserToGroupsForm),
 
     #urls for different tool utility
-    # url('activityTracker',views.platformActivityList),
+    url('insertWhiteboardInfo',views.insertWhiteboardInfo),
+    url('getWhiteboardURl/(?P<board_id>\d+)',views.getWhiteboardURl),
 
     #url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1

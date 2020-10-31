@@ -21,12 +21,23 @@ var ka_badge_form_Btn = function(){
 
     $('#ka-copy-button').off().on('click', function(event){
 
+
         var $temp = $("<input>");
         $("body").append($temp);
         text = $('.badge-option-textarea textarea').val();
+        //todo not working, check later
+        if (text === 'Select an option to get the sentence starter'){
+            console.log('here');
+            message = 'Select a badge option first to copy a sentence starter.';
+            displayNotifier("#ka-notifier", message);
+            return false; //we don't copy
+        }
         $temp.val(text).select();
         document.execCommand("copy");
         $temp.remove();
+
+        message = 'Your selected sentence starter is copied to the clipboard. Paste it Khan Academy and modify as needed.';
+        displayNotifier("#ka-notifier", message);
 
         //get the selected badge
         console.log('kaform.js (line 32):: ', global_badge_selected);

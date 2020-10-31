@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
     userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel,\
-    participationHistory
+    participationHistory, whiteboardInfoTable
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -241,6 +241,7 @@ def uploadImage(request):
 
 # call from individual_gallery.js
 def getIndividualImages(request, act_id):
+    print('debug purpose, def getIndividualImages, gallery id, ', act_id);
     #get the group members of the current users
     member_list = getGroupMembers(request, act_id);
     print("getIndividualImages member id list :: ", member_list);
@@ -281,11 +282,10 @@ def getIndividualCommentMsgs(request,imageId):
 #used in gallery.js
 def getGalleryImage(request, act_id):
 
-    print('Getting gallery image for activity id  ::', act_id);
+    print('debug purpose, def updateImage, gallery id, ', act_id);
     # first get the images from the group-members
     # get the group members of the current users
     member_list = getGroupMembers(request, act_id);
-
 
     #get all the image id by the member list
     member_image_id_query= imageModel.objects.filter(posted_by__in=member_list, gallery_id=act_id).values('id');
@@ -297,31 +297,58 @@ def getGalleryImage(request, act_id):
     print('line 293 :: ', all_image_id_list);
 
     outside_group_image = list(set(all_image_id_list) - set(member_image_id_list))
-    outside_group_image_id = random.choice(outside_group_image);
-    print('line 297 :: ', outside_group_image_id);
-
-    images = imageModel.objects.filter(id=outside_group_image_id).values('image');
-    if images:
-        dict = {}
-        dict['imagePk'] = outside_group_image_id;
-        dict['url'] = images[0]['image'];
-        return JsonResponse({'imageData': dict});
-    else:
+    #outside_group_image can be empty if no image is uploaded in this gallery activity
+    print('line 301 :: ', outside_group_image);
+    if(len(outside_group_image) == 0):
+        print('debug purpose, def updateImage, image list is empty as no image is uploaded in this activity yet');
         return HttpResponse('');
+    else:
+        #the list is not empty
+        outside_group_image_id = random.choice(outside_group_image);
+        print('debug purpose, def getGalleryImage,  outside_group_image_id :: ', outside_group_image_id);
+
+        images = imageModel.objects.filter(id=outside_group_image_id).values('image');
+        if images:
+            dict = {}
+            dict['imagePk'] = outside_group_image_id;
+            dict['url'] = images[0]['image'];
+            return JsonResponse({'imageData': dict});
+        else:
+            return HttpResponse('');
 
 
 
 #used in gallery.js
-def updateImageFeed(request, img_id):
+def updateImageFeed(request):
 
-    print('updateImageFeed (image_id) :: ' + img_id);
-    img_msg = imageComment.objects.filter(imageId_id=img_id);
-    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
 
-    return JsonResponse({'success': img_msg, 'username': request.user.get_username()});
+    act_id = request.GET['act_id'] #gallery id
+    img_id = request.GET['img_id'] #img_id
+
+    print('debug purpose, def getGalupdateImageFeedleryImage, image id, :: ' + img_id + ' in activity id :: ', act_id);
+
+    # get the current users' group-member name
+    group_member_id = getGroupMembers(request, act_id);
+
+    # get all the comments in the given image id
+    # filter out the comments made my the users' group-member
+    #however, if there is no image uploaded yet for the gallery, then img_id will be null
+    img_msg = ''
+    if img_id:
+        img_msg = imageComment.objects.filter(imageId_id=img_id, posted_by__in = group_member_id);
+        img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
+
+    group_member_name = []
+    for i in group_member_id:
+        group_member_name.append(User.objects.get(id=i).username);
+
+    #print(group_member_name)
+
+    return JsonResponse({'success': img_msg, 'username': request.user.get_username(), 'group_member': group_member_name});
 
 def getSelfGalleryContent(request, act_id):
-    # get the users uploaded image for this gallery
+    # get the users' uploaded image for the given gallery
+    print('debug purpose, def getSelfGalleryContent, gallery id, ', act_id);
     #img_data = imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user); #returns a queryset
     img_data = list(imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user).values('id','image'));
     # print('line 251:', type(img_data)); #type -- list
@@ -329,16 +356,17 @@ def getSelfGalleryContent(request, act_id):
     #todo: what if the filter returns multiple image i.e., user uploaded more than one image
     #print('line 252 ::', img_data[0]['id']);
 
-    img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
-    #print('line 258 ::', img_msg);
-    #converting the time into a readable format
-    for i in img_msg:
-        i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
-        #print (i);
-
     dict = {};
-    dict['img_data'] = img_data;
-    dict['img_msg'] = img_msg;
+    if img_data: #there is at least an image uploaded by the user (could be more than one, but selecting the first here, TODO)
+        img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
+        # img_msg = [dict(item) for item in img_msg]
+        # print('line 258 ::', img_msg);
+        #converting the time into a readable format
+        for i in img_msg:
+            i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
+            #print (i);
+        dict['img_data'] = img_data;
+        dict['img_msg'] = img_msg;
 
     return JsonResponse({'success': dict});
 
@@ -557,6 +585,7 @@ def matchKeywords(request):
         selected_badge = request.POST.get('selected_badge');
 
 
+
         if(platform == 'KA'):
             #get the selected badge using the URL sent
             ka_url = request.POST.get('ka_url');
@@ -566,8 +595,6 @@ def matchKeywords(request):
             print('line 463 :: ', entry);
             activity_id = entry['activity_id'];
             selected_badge = entry['badgeTypeSelected'];
-
-
 
         selected_badge = selected_badge.lower();
         isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
@@ -586,6 +613,18 @@ def matchKeywords(request):
         return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText, 'selected_badge': selected_badge});
 
     return HttpResponse('');
+
+def getWhiteboardURl(request, board_id):
+
+    #print('line 592 :: ', board_id);
+    whiteboard = whiteboardInfoTable.objects.filter(whiteboard_acticityID = board_id, userid_id = request.user).values('whiteboard_link');
+    #print(whiteboard[0]['whiteboard_link']);
+
+    url = whiteboard[0]['whiteboard_link'];
+
+    return JsonResponse({'url':url});
+
+
 
 ###############################################
 ############ handler methods start ############
@@ -635,7 +674,24 @@ def insertBadgeInfo(request):
         #print(badgeElem['characteristic'])
         entry = badgeInfo(charac = badgeElem['characteristic'], value = badgeElem['value'], badgeName = badgeElem['badge_name'], index = badgeElem['index'],
                     platform = badgeElem['platform'], imgName = badgeElem['imgName'], definition = badgeElem['definition'],
-                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'], sentence_opener2 = badgeElem['badge_ss2']);
+                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'],
+                          sentence_opener2 = badgeElem['badge_ss2'], sentence_opener3 = badgeElem['badge_ss3']);
+        entry.save();
+
+    return HttpResponse('');
+
+def insertWhiteboardInfo(request):
+
+    #1. read the excel file (used a separate py file for this)
+    whiteboardInfoList = badgeInfoFileRead.whiteboardfileRead(None);
+    #print(type(bagdeInfoList));
+
+    # 2. insert into the table
+    for whiteboard in whiteboardInfoList:
+        #print(whiteboard['user'])
+
+        entry = whiteboardInfoTable(whiteboard_acticityID = int(whiteboard['whiteboard_id']),
+                                    userid_id = User.objects.get(username=whiteboard['user']).pk, whiteboard_link = whiteboard['url']);
         entry.save();
 
     return HttpResponse('');

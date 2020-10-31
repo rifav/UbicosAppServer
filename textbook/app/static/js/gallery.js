@@ -1,6 +1,7 @@
 var gallery_act_id;
 var global_badge_selected = '';
 var global_char = ''; //to be used in postImageMessage
+var gallery_group_list
 
 $(function(){
 
@@ -22,14 +23,19 @@ var loadGalleryFeed = function(act_id){
         url:'http://'+ host_url +'/getGalleryImage/'+act_id, //this should return image outside this group randomly
         async: false, //wait for ajax call to finish
         success: function(data){
+            //console.log(data);
+            //if no image is uploaded for this activity, data will be empty then we don't have
+            //any id or src to attach to the image
+            if(data){
+                //display a random image which outside the group
+                imageInfo = data.imageData;
+                //console.log('line 27 :: ', imageInfo);
+                //set the src
+                $('.section img').attr('src','/media/'+imageInfo['url']);
+                //set the primary key
+                $('input[name="image-db-pk"]').val(imageInfo['imagePk']);
+            }
 
-            //display an image randomly outside the group
-            imageInfo = data.imageData;
-            //console.log('line 27 :: ', imageInfo);
-            //set the src
-            $('.section img').attr('src','/media/'+imageInfo['url']);
-            //set the primary key
-            $('input[name="image-db-pk"]').val(imageInfo['imagePk']);
         }
      });
 
@@ -37,31 +43,52 @@ var loadGalleryFeed = function(act_id){
     var imagePk = $('input[name="image-db-pk"]').val();
 
     //todo if imagePk is null i.e., no image is uploaded for this activity id, then it generates an error, handle it
-    //3. make an ajax call to get the comments and update discussion feed with each image [TODO: get the group member info as well]
+    //3. make an ajax call to get the comments and update discussion feed with each image
      $.ajax({
          type: 'GET',
-         url: '/updateImageFeed/'+imagePk, //get image comment using primary id
+         url: '/updateImageFeed/',
+         data: {'act_id': gallery_act_id, 'img_id': imagePk}, //get image comment using primary id for this activity
          success: function(response){
-                //console.log(response)
+                //console.log(response) //this returns the image comment img_msg as well as the group-member names
 
-                msg_data = response.success;
-                var obj = jQuery.parseJSON(msg_data);
-                //console.log(obj)
 
-                //clear the image feed so it doesn't add to the previously loaded feed
-                $('#image-feed').empty();
-                //iterate through the response data to display the comments in the interface
-                $.each(obj, function(key, value){
-                    //this method is defined in individual_gallery.js
-                    //defined in utility.js
-                    time = formatTime(value.fields['posted_at'])
-                    //console.log(time);
-                    buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0], time);
-                });
+                //if there is no image, then there is no comment
+                if(response.success) {
+                    msg_data = response.success;
+                    var obj = jQuery.parseJSON(msg_data);
+                    //console.log(obj)
 
-                //scrollbar
-                var element = document.getElementById("image-feed");
-                element.scrollTop = element.scrollHeight;
+                    //clear the image feed so it doesn't add to the previously loaded feed
+                    //$('#image-feed').empty();
+
+                    //iterate through the response data to display the comments in the interface
+                    $.each(obj, function(key, value){
+                        //this method is defined in individual_gallery.js
+                        //defined in utility.js
+                        time = formatTime(value.fields['posted_at'])
+                        //console.log(time);
+                        buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0], time);
+                    });
+
+                    //scrollbar
+                    var element = document.getElementById("image-feed");
+                    element.scrollTop = element.scrollHeight;
+                }
+
+                //update group member ingo
+                group_member_list = response.group_member;
+                //also update the global variable which will check real time messaging
+                gallery_group_list = response.group_member;
+                //console.log(group_member_list)
+                total_member = group_member_list.length
+                //update number span
+                $('.gallery-group-user span').text(total_member);
+                //update the user names
+                $.each( group_member_list, function(key, value ){
+                            //console.log(value);
+                            i=key+1;
+                            $('li#gallery-member-'+i).text(value);
+                        });
 
              }
      });
@@ -71,6 +98,8 @@ var loadGalleryFeed = function(act_id){
     //defined in utility.js
     computationalModelMethod(logged_in, 'MB', gallery_act_id);
 
+    // make the badge-option-div draggable
+    $('#badge-option').draggable(draggableConfig);
 
 
 } //end of loadGalleryFeed method
@@ -102,11 +131,12 @@ var galleryMsgBtnAction = function(){
              var className = $(this).attr('class');
              var remove = className.split('-').pop(); //will return closebtn
              var itemToClose = className.replace("-"+remove, "");
-             console.log(itemToClose);
+             //console.log(itemToClose);
              $("#"+itemToClose).css("display", "none");
       });
 
       $('.badgeRequest img').on('click', function(e){
+            //Todo: update badge div option
             //if the badge-option div is visible do nothing, else toggle
             if($('#badge-option').is(":visible")){
                 //alert("visible");
@@ -127,7 +157,7 @@ var galleryMsgBtnAction = function(){
         global_char = char;
         //console.log(char);
         //get the badgeName
-        global_badge_selected = $(this).children('span').text(); //todo: this needs to go in the database
+        global_badge_selected = $(this).children('span').text(); //gets saved into badge selected database
         console.log('gallery.js global_badge_selected :: ', global_badge_selected);
         var prompt;
         var sentence_opener;
@@ -152,16 +182,26 @@ var galleryMsgBtnAction = function(){
 
         //copy button
       $('#gallery-copy-button').off().on('click', function(e){
+            //if not badge is selected, and still clicks the <copy to the textbox> button
+            if(global_badge_selected == '') {
+                //no badge is selected
+                message = 'Select a badge option first to copy a sentence starter.';
+                displayNotifier("#gallery-notifier", message);
+                return false;
+            }
+
+            //get the sentence starter from the text area
             var badge_textarea_value = $('.badge-option-textarea textarea').val();
             console.log(badge_textarea_value);
             //set it to the message textbox
             $('#image-msg-text').val(badge_textarea_value);
 
+            //notify the user that the sentence starter is copied
+            message = 'Your selected sentence starter is copied to the input box. Modify as needed.';
+            displayNotifier("#gallery-notifier", message);
+
             //$("div#badge-option").css("display", "none");
             $(this).closest('div#badge-option').fadeOut();
-
-//            setTimeout($("#gallery-reward-div").css("display", "none");,
-//            2000);
 
       });
 
@@ -181,37 +221,37 @@ var postImageMessage = function () {
         var message = inputEl.val();
 
         if(!message){
-            //entry into user log -- TODO fix the language
-            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, global_current_pagenumber)
-            return;
+            message = 'Your answer is too brief. Try writing a more specific answer.';
+            displayNotifier("#gallery-notifier", message);
+            enterLogIntoDatabase('Gallery Input Button Click', 'Gallery feed empty message input' , '', global_current_pagenumber);
+            return false;
+
         }
 
-
+        //if we come until here, there is a message
         //console.log('user message :: '+message)
-        //check for the message length
-        //get the length of the message
+        //check for the message length and get the length of the message
         var msg = message.split(" ");
         var lengthOfMsg = msg.length;
-        //check the length condition first
-        if(lengthOfMsg == 0){
-            $("#gallery-notifier").text('');
-            $("#gallery-notifier").text('Your answer is too brief. Try writing a more specific answer.');
-            $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+        //cif it is less than 7 words
+        if(lengthOfMsg < 7){
+            message = 'Your answer is too brief. Try writing a more specific answer.';
+            displayNotifier("#gallery-notifier", message);
+            enterLogIntoDatabase('Gallery Input Button Click', 'Gallery feed less than seven words message input' , '', global_current_pagenumber);
             return false;
         }
 
-        //todo: add the keyword matching algo here and display badge based on the algorithm
+
         //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
         if(global_badge_selected != 'None' && global_badge_selected != ''){
                if(global_badgeList[global_char][0]['sentence_opener1'] === message) {
-                    $("#gallery-notifier").text('');
-                    $("#gallery-notifier").text('Your message exactly matches with suggestion. Try adding your thoughts.');
-                    $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+                    message = 'Your message exactly matches with suggestion. Try adding your thoughts.';
+                    displayNotifier("#gallery-notifier", message);
                     return false;
                 }
-            //user selected any of the three badges
-            //2. save the selected badge in the database
-             //save selected badge info to the database
+                //user selected any of the three badges
+                //2. save the selected badge in the database
+                //save selected badge info to the database
                 $.ajax({
                  type: 'POST',
                  url: '/saveBadgeSelection/',
@@ -221,36 +261,37 @@ var postImageMessage = function () {
                         console.log(response);
                      }
                 });
-            //3. make the api call and send the user message and selected badge in the server
-            //to do make this a function in utility.js
-            console.log('selected badge for gallery.js ::', global_badge_selected);
-            $.ajax({
-             type: 'POST',
-             url: '/matchKeywords/',
-             data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
-                'platform': 'MB', 'activity_id': gallery_act_id},
-             success: function(response){
-                    console.log(response);
-                    console.log(response.isMatch); //returns true if match found, else false
-                    if(response.isMatch){
-                        console.log('inside the if else loop');
-                        $("#gallery-reward").css("display", "block");
-                        //set up the values
-                        var imgName = global_badge_selected.toLowerCase();
-                        $('#gallery-reward img').attr('src', '/static/pics/'+imgName+'.png');
-                        $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
-                        $('#reward-div-prompt').text(response.praiseText);
+                //3. make the keyword matching API call and send the user message and selected badge in the server
+                //to do make this a function in utility.js
+                console.log('selected badge for gallery.js ::', global_badge_selected);
+                $.ajax({
+                    type: 'POST',
+                    url: '/matchKeywords/',
+                    data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
+                    'platform': 'MB', 'activity_id': gallery_act_id},
+                    success: function(response){
+                        console.log(response);
+                        console.log(response.isMatch); //returns true if match found, else false
+                        if(response.isMatch){
+                            console.log('inside the if else loop');
+                            $("#gallery-reward").css("display", "block");
+                            //set up the values
+                            var imgName = global_badge_selected.toLowerCase();
+                            $('#gallery-reward img').attr('src', '/static/pics/'+imgName+'.png');
+                            $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
+                            $('#reward-div-prompt').text(response.praiseText);
 
-                    }
+                        }
                  }
             });
         }
+
         //get the user name who posted
         var user_name = $("input[name='username']").val()
-        console.log(user_name);
+        console.log('logged in user when posting in the gallery from client side', user_name);
 
         var imagePk = $("input[name='image-db-pk']").val();
-        console.log('image pk :: ',imagePk)
+        console.log('image pk gallery image comment is making :: ',imagePk)
 
         //posts student comment in database - can be extracted using image primary key.
         $.post({
@@ -286,28 +327,39 @@ var realTimeMsgTransfer = function(){
 
      my_channel.bind("bn_event", function (data) {
 
-        //console.log(data);
-        //console.log('(server)', data.imageid)
-        //console.log('(local)', $("input[name='image-db-pk']").val())
+        console.log('during real time conversation through the channel in the gallery.js', data.name);
 
-        //if student commenting on one image is the same as the other user is viewing show the comment else don't show
-        if(data.imageid == $("input[name='image-db-pk']").val()){
-            //call to the method to post the message in the feed
-            var currentdate = new Date();
-            var datetime = "" + currentdate.getDate() + "-"
-            + (currentdate.getMonth()+1)  + "-"
-            + currentdate.getFullYear() + " "
-            + currentdate.getHours() + ":"
-            + currentdate.getMinutes() + ":"
-            + currentdate.getSeconds();
-            //defined in utility.js
-            buildFeedwithMsgs(data.message, "#image-feed", data.name, datetime);
+        //if the element is not found in the list, returns -1
+        //if found will return the index
+        //so, if the data.name (user who is posting) is in the gallery_group_list continue else do nothing
+        if(jQuery.inArray(data.name, gallery_group_list) !== -1){
+            //console.log('(server)', data.imageid)
+            //console.log('(local)', $("input[name='image-db-pk']").val())
+            //if student commenting on one image is the same as the other user is viewing show the comment else don't show
+            if(data.imageid == $("input[name='image-db-pk']").val()){
 
+                //defined in utility.js
+                time = getCurrentTime();
+                console.log('from gallery.js', time);
+
+                //defined in utility.js
+                buildFeedwithMsgs(data.message, "#image-feed", data.name, time);
+
+            }
         }
+
+
+
 
     });
 
 }// end of realTimeMsgTransfer method
 
 
+var displayNotifier = function(container, message){
 
+    $(container).text('');
+    $(container).text(message);
+    $(container).hide().slideDown().delay(5000).fadeOut();
+
+}

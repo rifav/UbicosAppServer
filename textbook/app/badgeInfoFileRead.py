@@ -35,6 +35,34 @@ class badgeInfoFileRead():
 
         return bagdeInfoList;
 
+    def whiteboardfileRead(self):
+        filename = '/Users/isa14/Downloads/whiteboard.csv';
+
+        with open(filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',');
+            line_count = 0;
+            whiteboardInfoList = []; #will store the rows and will return this list of dictionaries to the server
+            for row in csv_reader:
+                dict = {};
+                if line_count == 0:
+                    #print(f'Column names are {", ".join(row)}');
+                    line_count += 1;
+                else:
+                    dict['platform'] = row[0];
+                    dict['title'] = row[1];
+                    dict['whiteboard_id'] = row[2];
+                    dict['user'] = row[3];
+                    dict['url'] = row[4];
+                    #print(dict);
+
+                    whiteboardInfoList.append(dict);
+                    line_count += 1;
+
+        #print(whiteboardInfoList)
+        #print(len(whiteboardInfoList));
+
+        return whiteboardInfoList;
+
 
 if __name__ == "__main__":
     badgeInfoFileRead.fileRead(None)

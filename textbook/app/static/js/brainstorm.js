@@ -15,7 +15,6 @@ $( function() {
 
     my_channel_brainstorm.bind("cn_event", function (data) {
 
-
       if(data.update === "true"){
             console.log("@@inside here")
             loadIdeaToWorkspace();

@@ -37,15 +37,7 @@ $(function(){
         reloadPage(pageToBeRefreshed);
     }
 
-//        //console.log("here");
-//        //personality edit -- TODO move it later -- capture the changes, and reflect on the p-tag
-//        $('.page').off().on('click','#editPersonalityBtn', function(event){
-//             //console.log("button clicked");
-////             $("#matchedPersonality").css("display", "none");
-////             $("#editPersonality").css("display", "");
-//               $("#matchedPersonality").toggle();
-//               $("#editPersonality").toggle();
-//        });
+
 
 });
 
@@ -86,6 +78,8 @@ var reloadPage = function(pageToLoad){
 
 //this method is used for page navigation i.e., previous/next buttons
 var movePage = function(moveToNext){
+    //close the sidenavigation bar if any of the previous/next button is clicked.
+    $("#mySidenav").css("width", "0px");
 
     var container = $('#textbook-content'),
         pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
@@ -140,8 +134,7 @@ var movePage = function(moveToNext){
             container.attr('class', noMoreClass);
         });
 
-    //scrolling to the top:
-    $('html, body').animate({scrollTop: '0px'}, 0);
+
 };
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
@@ -233,19 +226,31 @@ var bindActivityButtons = function(){
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
 
-//        --------------------------VIDEO/WHITEBOARD-----------------------
+//        --------------------------VIDEO-----------------------
         // if video tab is active get the video url and display in video.html
         //display the video url in a new tab instead of the card
-        if(type == 'video' || type == 'whiteboard'){
-            //lastOpenedTool = 'video';
+        if(type == 'video'){
             $('.card.active').removeClass('active');
             var video_url = activityButton.attr('data-video-url');
             window.open(video_url, '_blank'); //open any external video in a new window
         }
+//        --------------------------WHITEBOARD-----------------------
+        // if video tab is active get the video url and display in video.html
+        //display the video url in a new tab instead of the card
+        if(type == 'whiteboard'){
+            $('.card.active').removeClass('active');
+            //get the whiteboard id
+            console.log('whiteboard id :: ', id);
+
+            //using the whiteboard id and the logged in user
+
+            var whiteboard_url = getWhiteboardURl(id); //this will come from the database
+            console.log('whiteboard URl', whiteboard_url);
+            window.open(whiteboard_url, '_blank'); //open any external video in a new window
+        }
 //        ------------------------------TABLE-----------------------
         //if the table tab is active
         if($('.card.table').hasClass('active')){
-             //lastOpenedTool = 'table';
 
              $('input[name="table-id"]').attr('value', id)
              //$('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
@@ -320,8 +325,10 @@ var bindActivityButtons = function(){
              //if the card is already extended, put it back to normal
              card_extension_close();
 
-             //when a user opens this card, load the image this user uploaded and
+
+             //and, 2) load the image this user uploaded and
              //display all the comments made by other students
+             //defined in individual_gallery.js
              loadSelfImageFeed(id);
 
 
@@ -421,6 +428,47 @@ var bindActivityButtons = function(){
 
     });
     //right hand side card button actions -- end
+
+
+        //personality page 0.html, personality option button
+        $('#editPersonalityOptionBtn').off().on('click', function(event){
+                $("#matchedPersonality").toggle();
+                $("#editPersonality").toggle();
+
+        });
+
+        //personality page 0.html, personality edit button
+        $('#changePersonalityBtn').off().on('click', function(event){
+
+                //get the value for the checkboxes
+                personality_msc = $('#dropdown-msc :selected').text();
+                personality_hsc = $('#dropdown-hsc :selected').text();
+                personality_con = $('#dropdown-con :selected').text();
+                personality_fam = $('#dropdown-fam :selected').text();
+
+                //todo: insert into logs
+
+                console.log(personality_msc);
+                console.log(personality_hsc);
+                console.log(personality_con);
+                console.log(personality_fam);
+
+                //update the p-tag (id=matchedPersonality) based on the responses
+                $('span.personality-msc').text(personality_msc);
+                $('span.personality-hsc').text(personality_hsc);
+                $('span.personality-con').text(personality_con);
+                $('span.personality-fam').text(personality_fam);
+
+                //todo the matched personality thing
+
+                //show the p-tag(id=matchedPersonality) toggle
+                $("#matchedPersonality").toggle();
+                $("#editPersonality").toggle();
+
+
+
+
+           });
 
 };
 

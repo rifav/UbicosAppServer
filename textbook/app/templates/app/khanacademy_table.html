@@ -1,8 +1,6 @@
 {% load static %}
-<h1> Khan Academy </h1>
+<h1> Khan Academy Discussion </h1>
 <p>
-    display badges and prompts here.
-    auto display them when any khan academy page loads.
 </p>
 
         <div id="badge-option" class="badge-option-class badge-ka">
@@ -30,14 +28,19 @@
 
             </div>
             <div class="badge-prompt-text" id="ka-badge-prompt">
-                <p>Select an option to get the prompt</p>
+                <p>Select an option to get the prompt.</p>
             </div>
             <div class="badge-option-textarea">
-                <textarea>Select an option to get the sentence starter </textarea>
+                <textarea>Select an option to get the sentence starter.</textarea>
             </div>
             <div class="badge-option-footer" id="ka-copy-button">
                 <button> Copy to Clipboard </button>
             </div>
 
         </div>
+
+    <div>
+        <span id="ka-notifier" class="notifier"> Your selected sentence starter is copied to the clipboard.
+            Paste it Khan Academy and modify as needed. </span>
+    </div>
 
