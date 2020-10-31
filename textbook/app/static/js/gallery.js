@@ -1,6 +1,7 @@
 var gallery_act_id;
 var global_badge_selected = '';
 var global_char = ''; //to be used in postImageMessage
+var gallery_group_list
 
 $(function(){
 
@@ -37,13 +38,14 @@ var loadGalleryFeed = function(act_id){
     var imagePk = $('input[name="image-db-pk"]').val();
 
     //todo if imagePk is null i.e., no image is uploaded for this activity id, then it generates an error, handle it
-    //3. make an ajax call to get the comments and update discussion feed with each image [TODO: get the group member info as well]
+    //3. make an ajax call to get the comments and update discussion feed with each image
      $.ajax({
          type: 'GET',
          url: '/updateImageFeed/'+imagePk, //get image comment using primary id
+         data: {'act_id': gallery_act_id},
          success: function(response){
                 //console.log(response)
-
+                //response returns img_msg and group-member info
                 msg_data = response.success;
                 var obj = jQuery.parseJSON(msg_data);
                 //console.log(obj)
@@ -62,6 +64,21 @@ var loadGalleryFeed = function(act_id){
                 //scrollbar
                 var element = document.getElementById("image-feed");
                 element.scrollTop = element.scrollHeight;
+
+                //update group member ingo
+                group_member_list = response.group_member;
+                //also update the global variable which will check real time messaging
+                gallery_group_list = response.group_member;
+                //console.log(group_member_list)
+                total_member = group_member_list.length
+                //update number span
+                $('.gallery-group-user span').text(total_member);
+                //update the user names
+                $.each( group_member_list, function(key, value ){
+                            //console.log(value);
+                            i=key+1;
+                            $('li#gallery-member-'+i).text(value);
+                        });
 
              }
      });
@@ -102,11 +119,12 @@ var galleryMsgBtnAction = function(){
              var className = $(this).attr('class');
              var remove = className.split('-').pop(); //will return closebtn
              var itemToClose = className.replace("-"+remove, "");
-             console.log(itemToClose);
+             //console.log(itemToClose);
              $("#"+itemToClose).css("display", "none");
       });
 
       $('.badgeRequest img').on('click', function(e){
+            //Todo: update badge div option
             //if the badge-option div is visible do nothing, else toggle
             if($('#badge-option').is(":visible")){
                 //alert("visible");
@@ -127,7 +145,7 @@ var galleryMsgBtnAction = function(){
         global_char = char;
         //console.log(char);
         //get the badgeName
-        global_badge_selected = $(this).children('span').text(); //todo: this needs to go in the database
+        global_badge_selected = $(this).children('span').text(); //gets saved into badge selected database
         console.log('gallery.js global_badge_selected :: ', global_badge_selected);
         var prompt;
         var sentence_opener;
@@ -286,20 +304,28 @@ var realTimeMsgTransfer = function(){
 
      my_channel.bind("bn_event", function (data) {
 
-        //console.log(data);
-        //console.log('(server)', data.imageid)
-        //console.log('(local)', $("input[name='image-db-pk']").val())
+        console.log(data.name);
 
-        //if student commenting on one image is the same as the other user is viewing show the comment else don't show
-        if(data.imageid == $("input[name='image-db-pk']").val()){
+        //if the element is not found in the list, returns -1
+        //if found will return the index
+        //so, if the data.name (user who is posting) is in the gallery_group_list continue else do nothing
+        if(jQuery.inArray(data.name, gallery_group_list) !== -1){
+            //console.log('(server)', data.imageid)
+            //console.log('(local)', $("input[name='image-db-pk']").val())
+            //if student commenting on one image is the same as the other user is viewing show the comment else don't show
+            if(data.imageid == $("input[name='image-db-pk']").val()){
 
-            //defined in utility.js
-            time = getCurrentTime();
+                //defined in utility.js
+                time = getCurrentTime();
 
-            //defined in utility.js
-            buildFeedwithMsgs(data.message, "#image-feed", data.name, time);
+                //defined in utility.js
+                buildFeedwithMsgs(data.message, "#image-feed", data.name, time);
 
+            }
         }
+
+
+
 
     });
 

@@ -314,11 +314,27 @@ def getGalleryImage(request, act_id):
 #used in gallery.js
 def updateImageFeed(request, img_id):
 
-    print('updateImageFeed (image_id) :: ' + img_id);
-    img_msg = imageComment.objects.filter(imageId_id=img_id);
+    act_id = request.GET['act_id']
+    #print('updateImageFeed (image_id) :: ' + img_id + ' in activity id :: ', act_id);
+
+    # get the current users' group-member name
+    group_member_id = getGroupMembers(request, act_id);
+
+    #get all the comments in the given image id
+    # filter out the comments made my the users' group-member
+    img_msg = imageComment.objects.filter(imageId_id=img_id, posted_by__in = group_member_id);
+
+    #serialize
     img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
 
-    return JsonResponse({'success': img_msg, 'username': request.user.get_username()});
+
+    group_member_name = []
+    for i in group_member_id:
+        group_member_name.append(User.objects.get(id=i).username);
+
+    #print(group_member_name)
+
+    return JsonResponse({'success': img_msg, 'username': request.user.get_username(), 'group_member': group_member_name});
 
 def getSelfGalleryContent(request, act_id):
     # get the users' uploaded image for the given gallery
