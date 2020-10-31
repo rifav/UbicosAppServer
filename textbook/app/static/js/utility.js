@@ -94,6 +94,20 @@ var buildFeedwithMsgs = function(message, container, username, time){
 }// end of buildFeedwithMsgs method
 
 
+//get the current time for real time message passing
+var getCurrentTime = function(){
+    //call to the method to post the message in the feed
+    var currentdate = new Date();
+    var datetime = "" + currentdate.getDate() + "-"
+    + (currentdate.getMonth()+1)  + "-"
+    + currentdate.getFullYear() + " "
+    + currentdate.getHours() + ":"
+    + currentdate.getMinutes() + ":"
+    + currentdate.getSeconds();
+
+}
+
+//format time coming from django query
 var formatTime = function(raw_time){
 
     //format of raw_time: 2020-10-30T03:44:56.323Z

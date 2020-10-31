@@ -78,6 +78,8 @@ var reloadPage = function(pageToLoad){
 
 //this method is used for page navigation i.e., previous/next buttons
 var movePage = function(moveToNext){
+    //close the sidenavigation bar if any of the previous/next button is clicked.
+    $("#mySidenav").css("width", "0px");
 
     var container = $('#textbook-content'),
         pageToHide = $('.page:not(.previous):not(.next)', container), // This the current page, which will be hidden
@@ -132,8 +134,7 @@ var movePage = function(moveToNext){
             container.attr('class', noMoreClass);
         });
 
-    //scrolling to the top:
-    $('html, body').animate({scrollTop: '0px'}, 0);
+
 };
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
@@ -326,6 +327,7 @@ var bindActivityButtons = function(){
 
              //when a user opens this card, load the image this user uploaded and
              //display all the comments made by other students
+             //defined in individual_gallery.js
              loadSelfImageFeed(id);
 
 
@@ -425,6 +427,47 @@ var bindActivityButtons = function(){
 
     });
     //right hand side card button actions -- end
+
+
+        //personality page 0.html, personality option button
+        $('#editPersonalityOptionBtn').off().on('click', function(event){
+                $("#matchedPersonality").toggle();
+                $("#editPersonality").toggle();
+
+        });
+
+        //personality page 0.html, personality edit button
+        $('#changePersonalityBtn').off().on('click', function(event){
+
+                //get the value for the checkboxes
+                personality_msc = $('#dropdown-msc :selected').text();
+                personality_hsc = $('#dropdown-hsc :selected').text();
+                personality_con = $('#dropdown-con :selected').text();
+                personality_fam = $('#dropdown-fam :selected').text();
+
+                //todo: insert into logs
+
+                console.log(personality_msc);
+                console.log(personality_hsc);
+                console.log(personality_con);
+                console.log(personality_fam);
+
+                //update the p-tag (id=matchedPersonality) based on the responses
+                $('span.personality-msc').text(personality_msc);
+                $('span.personality-hsc').text(personality_hsc);
+                $('span.personality-con').text(personality_con);
+                $('span.personality-fam').text(personality_fam);
+
+                //todo the matched personality thing
+
+                //show the p-tag(id=matchedPersonality) toggle
+                $("#matchedPersonality").toggle();
+                $("#editPersonality").toggle();
+
+
+
+
+           });
 
 };
 

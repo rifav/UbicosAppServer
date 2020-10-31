@@ -321,7 +321,7 @@ def updateImageFeed(request, img_id):
     return JsonResponse({'success': img_msg, 'username': request.user.get_username()});
 
 def getSelfGalleryContent(request, act_id):
-    # get the users uploaded image for this gallery
+    # get the users' uploaded image for the given gallery
     #img_data = imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user); #returns a queryset
     img_data = list(imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user).values('id','image'));
     # print('line 251:', type(img_data)); #type -- list
@@ -330,7 +330,8 @@ def getSelfGalleryContent(request, act_id):
     #print('line 252 ::', img_data[0]['id']);
 
     img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
-    #print('line 258 ::', img_msg);
+    # img_msg = [dict(item) for item in img_msg]
+    # print('line 258 ::', img_msg);
     #converting the time into a readable format
     for i in img_msg:
         i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
@@ -557,6 +558,7 @@ def matchKeywords(request):
         selected_badge = request.POST.get('selected_badge');
 
 
+
         if(platform == 'KA'):
             #get the selected badge using the URL sent
             ka_url = request.POST.get('ka_url');
@@ -566,8 +568,6 @@ def matchKeywords(request):
             print('line 463 :: ', entry);
             activity_id = entry['activity_id'];
             selected_badge = entry['badgeTypeSelected'];
-
-
 
         selected_badge = selected_badge.lower();
         isMatch = keywordMatch.matchingMethod(None, message, selected_badge);

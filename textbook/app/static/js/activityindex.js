@@ -22,7 +22,7 @@ $(function(){
                 var navBars = ['showLinkgeneral', 'showLinkweek1', 'showLinkweek2', 'showLinkweek3']
                 var selected = $(this).attr('class');
 
-                navBars.splice( $.inArray(selected,navBars), 1);
+                navBars.splice($.inArray(selected,navBars), 1);
                 $.each(navBars, function(id, element){
                     $("a."+element+" img.uparrow").css("display","none");
                     $("a."+element+" img.downarrow").css("display","");

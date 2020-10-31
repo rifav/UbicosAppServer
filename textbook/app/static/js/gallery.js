@@ -292,16 +292,12 @@ var realTimeMsgTransfer = function(){
 
         //if student commenting on one image is the same as the other user is viewing show the comment else don't show
         if(data.imageid == $("input[name='image-db-pk']").val()){
-            //call to the method to post the message in the feed
-            var currentdate = new Date();
-            var datetime = "" + currentdate.getDate() + "-"
-            + (currentdate.getMonth()+1)  + "-"
-            + currentdate.getFullYear() + " "
-            + currentdate.getHours() + ":"
-            + currentdate.getMinutes() + ":"
-            + currentdate.getSeconds();
+
             //defined in utility.js
-            buildFeedwithMsgs(data.message, "#image-feed", data.name, datetime);
+            time = getCurrentTime();
+
+            //defined in utility.js
+            buildFeedwithMsgs(data.message, "#image-feed", data.name, time);
 
         }
 

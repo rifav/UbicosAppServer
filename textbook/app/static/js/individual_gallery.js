@@ -196,7 +196,7 @@ var retrieveComments = function(imagePk){
         success: function(data){
               //display this data
               loaded_comments = JSON.parse(data.imageCommments); // converts from string type to array format
-              //console.log("when the page is loading :: ", loaded_comments);
+              console.log("when the page is loading :: ", loaded_comments);
               //console.log(jQuery.type(data));
               if(loaded_comments==0){//if no comment this data will be empty
                 console.log("no comment in this photo", imagePk);
@@ -208,7 +208,8 @@ var retrieveComments = function(imagePk){
 
                     $.each(loaded_comments, function(key, value){
                         //console.log(value['fields']['content']);
-                        buildFeedwithMsgs(value['fields']['content'], "#ind-feed",logged_in);
+                        time = formatTime(value.fields['posted_at'])
+                        buildFeedwithMsgs(value['fields']['content'], "#ind-feed",logged_in, time);
                     });
 
               }
@@ -218,6 +219,7 @@ var retrieveComments = function(imagePk){
 
 } //end of retrieveComments (imagePk) method
 
+//called for self-gallery
 var loadSelfImageFeed = function(act_id) {
 
         //this ajax completes the 1-4 steps
@@ -227,8 +229,10 @@ var loadSelfImageFeed = function(act_id) {
             async: false, //wait for ajax call to finish
             success: function(data){
 
+                console.log(data);
                 var img_data = data.success['img_data'];
                 var img_msg = data.success['img_msg'];
+                //console.log(img_msg);
 
                 var imgID = img_data[0]['id'];
                 var imgSrc =img_data[0]['image'];
@@ -245,7 +249,7 @@ var loadSelfImageFeed = function(act_id) {
                 $.each(img_msg, function(key, value){
                     //console.log(value);
                     //defined in utility.j
-                    buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username']);
+                    buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username'],value['posted_at']);
                 });//end of the each loop
             }//end of the success for the post ajax
 

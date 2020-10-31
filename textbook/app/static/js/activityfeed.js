@@ -21,9 +21,13 @@ function updateActivityFeedRealtime(){
     //wait for an event to be triggered in that channel - when
     my_channel.bind("an_event", function (data) {
 
-        //  add in the thread itself
         //defined in utility.js
-        buildFeedwithMsgs(data.message, "#activity-feed", data.name);
+            time = getCurrentTime();
+
+
+        //add in the thread itself
+        //defined in utility.js
+        buildFeedwithMsgs(data.message, "#activity-feed", data.name, time);
 
     });
 
@@ -100,13 +104,14 @@ function loadFeed(id){
                 msg_data = response.success
                 var obj = jQuery.parseJSON(msg_data);
 
-                //console.log(obj)
+                console.log(obj)
 
                 $.each(obj, function(key, value){
                     //method defined in individual_gallery.js
                     var message = value.fields['content'];
                     var posted_by = value.fields['posted_by'][0];
-                    buildFeedwithMsgs(message, "#activity-feed", posted_by);
+                    time = formatTime(value.fields['posted_at']);
+                    buildFeedwithMsgs(message, "#activity-feed", posted_by, time);
 
                 });
 //

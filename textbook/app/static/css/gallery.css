@@ -318,12 +318,31 @@ input[type="file"] {
 }
 
 
+/* personality page 0.html css - start */
+.initPersonality {
+
+}
+
+.initPersonality p{
+    width: 80%;
+
+}
+
+.initPersonality img{
+    width: 130px;
+    position: absolute;
+    top: 0%;
+    left: -6%;
+    margin-left: 25rem;
+
+}
+
+.personalityProfiles{
+
+    width: 100%;
+    margin-top: 10%;
+}
 
 
-
-
-
-
-
-
+/* personality page 0.html css - end */
 
