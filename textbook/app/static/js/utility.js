@@ -105,6 +105,10 @@ var getCurrentTime = function(){
     + currentdate.getMinutes() + ":"
     + currentdate.getSeconds();
 
+    console.log(datetime);
+
+    return datetime;
+
 }
 
 //format time coming from django query

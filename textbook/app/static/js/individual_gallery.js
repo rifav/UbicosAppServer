@@ -177,7 +177,7 @@ var postIndMessage = function (){
         error: function(){
             //inputEl.prop('disabled', false);
             $("input[name='ind-msg-text']").val('');
-            alert("Select a number that has image associated with it.");
+            alert("No image is associated with the selected number. Try a number that has an image with it.");
 
             return false;
         }
@@ -229,28 +229,34 @@ var loadSelfImageFeed = function(act_id) {
             async: false, //wait for ajax call to finish
             success: function(data){
 
-                console.log(data);
-                var img_data = data.success['img_data'];
-                var img_msg = data.success['img_msg'];
-                //console.log(img_msg);
+                //console.log(data.success);
+                if(jQuery.isEmptyObject(data.success)) {
+                    //no image uploaded by the user for this activity id
+                    //todo a message to the user
+                }else{
+                    var img_data = data.success['img_data'];
+                    var img_msg = data.success['img_msg'];
+                    //console.log(img_msg);
 
-                var imgID = img_data[0]['id'];
-                var imgSrc =img_data[0]['image'];
+                    var imgID = img_data[0]['id'];
+                    var imgSrc =img_data[0]['image'];
 
-                //update the image src
-                $('div#self-gallery-div img').attr('src','/media/'+imgSrc);
-                //update the img primary key
-                $('div#self-gallery-div img').attr('data-imgID', imgID);
-                //console.log($('div#self-gallery-div img').attr('data-imgID'));
+                    //update the image src
+                    $('div#self-gallery-div img').attr('src','/media/'+imgSrc);
+                    //update the img primary key
+                    $('div#self-gallery-div img').attr('data-imgID', imgID);
+                    //console.log($('div#self-gallery-div img').attr('data-imgID'));
 
-                //clear out previously loaded comments
-                $('#ind-comment-feed').empty();
-                //loop through the img msg data to access each commment and display under the images
-                $.each(img_msg, function(key, value){
-                    //console.log(value);
-                    //defined in utility.j
-                    buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username'],value['posted_at']);
-                });//end of the each loop
+                    //clear out previously loaded comments
+                    $('#ind-comment-feed').empty();
+                    //loop through the img msg data to access each commment and display under the images
+                    $.each(img_msg, function(key, value){
+                        //console.log(value);
+                        //defined in utility.j
+                        buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username'],value['posted_at']);
+                    });//end of the each loop
+                }//end of the else
+
             }//end of the success for the post ajax
 
         });//end of the ajax call

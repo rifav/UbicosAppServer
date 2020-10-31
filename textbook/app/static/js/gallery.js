@@ -23,14 +23,19 @@ var loadGalleryFeed = function(act_id){
         url:'http://'+ host_url +'/getGalleryImage/'+act_id, //this should return image outside this group randomly
         async: false, //wait for ajax call to finish
         success: function(data){
+            //console.log(data);
+            //if no image is uploaded for this activity, data will be empty then we don't have
+            //any id or src to attach to the image
+            if(data){
+                //display a random image which outside the group
+                imageInfo = data.imageData;
+                //console.log('line 27 :: ', imageInfo);
+                //set the src
+                $('.section img').attr('src','/media/'+imageInfo['url']);
+                //set the primary key
+                $('input[name="image-db-pk"]').val(imageInfo['imagePk']);
+            }
 
-            //display an image randomly outside the group
-            imageInfo = data.imageData;
-            //console.log('line 27 :: ', imageInfo);
-            //set the src
-            $('.section img').attr('src','/media/'+imageInfo['url']);
-            //set the primary key
-            $('input[name="image-db-pk"]').val(imageInfo['imagePk']);
         }
      });
 
@@ -41,29 +46,34 @@ var loadGalleryFeed = function(act_id){
     //3. make an ajax call to get the comments and update discussion feed with each image
      $.ajax({
          type: 'GET',
-         url: '/updateImageFeed/'+imagePk, //get image comment using primary id
-         data: {'act_id': gallery_act_id},
+         url: '/updateImageFeed/',
+         data: {'act_id': gallery_act_id, 'img_id': imagePk}, //get image comment using primary id for this activity
          success: function(response){
-                //console.log(response)
-                //response returns img_msg and group-member info
-                msg_data = response.success;
-                var obj = jQuery.parseJSON(msg_data);
-                //console.log(obj)
+                //console.log(response) //this returns the image comment img_msg as well as the group-member names
 
-                //clear the image feed so it doesn't add to the previously loaded feed
-                $('#image-feed').empty();
-                //iterate through the response data to display the comments in the interface
-                $.each(obj, function(key, value){
-                    //this method is defined in individual_gallery.js
-                    //defined in utility.js
-                    time = formatTime(value.fields['posted_at'])
-                    //console.log(time);
-                    buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0], time);
-                });
 
-                //scrollbar
-                var element = document.getElementById("image-feed");
-                element.scrollTop = element.scrollHeight;
+                //if there is no image, then there is no comment
+                if(response.success) {
+                    msg_data = response.success;
+                    var obj = jQuery.parseJSON(msg_data);
+                    //console.log(obj)
+
+                    //clear the image feed so it doesn't add to the previously loaded feed
+                    //$('#image-feed').empty();
+
+                    //iterate through the response data to display the comments in the interface
+                    $.each(obj, function(key, value){
+                        //this method is defined in individual_gallery.js
+                        //defined in utility.js
+                        time = formatTime(value.fields['posted_at'])
+                        //console.log(time);
+                        buildFeedwithMsgs(value.fields['content'], "#image-feed",value.fields['posted_by'][0], time);
+                    });
+
+                    //scrollbar
+                    var element = document.getElementById("image-feed");
+                    element.scrollTop = element.scrollHeight;
+                }
 
                 //update group member ingo
                 group_member_list = response.group_member;
@@ -265,7 +275,7 @@ var postImageMessage = function () {
         }
         //get the user name who posted
         var user_name = $("input[name='username']").val()
-        console.log(user_name);
+        console.log('logged in user when posting in the gallery from client side', user_name);
 
         var imagePk = $("input[name='image-db-pk']").val();
         console.log('image pk :: ',imagePk)
@@ -304,7 +314,7 @@ var realTimeMsgTransfer = function(){
 
      my_channel.bind("bn_event", function (data) {
 
-        console.log(data.name);
+        console.log('during real time conversation through the channel in the gallery.js', data.name);
 
         //if the element is not found in the list, returns -1
         //if found will return the index
@@ -317,6 +327,7 @@ var realTimeMsgTransfer = function(){
 
                 //defined in utility.js
                 time = getCurrentTime();
+                console.log('from gallery.js', time);
 
                 //defined in utility.js
                 buildFeedwithMsgs(data.message, "#image-feed", data.name, time);

@@ -241,6 +241,7 @@ def uploadImage(request):
 
 # call from individual_gallery.js
 def getIndividualImages(request, act_id):
+    print('debug purpose, def getIndividualImages, gallery id, ', act_id);
     #get the group members of the current users
     member_list = getGroupMembers(request, act_id);
     print("getIndividualImages member id list :: ", member_list);
@@ -281,11 +282,10 @@ def getIndividualCommentMsgs(request,imageId):
 #used in gallery.js
 def getGalleryImage(request, act_id):
 
-    print('Getting gallery image for activity id  ::', act_id);
+    print('debug purpose, def updateImage, gallery id, ', act_id);
     # first get the images from the group-members
     # get the group members of the current users
     member_list = getGroupMembers(request, act_id);
-
 
     #get all the image id by the member list
     member_image_id_query= imageModel.objects.filter(posted_by__in=member_list, gallery_id=act_id).values('id');
@@ -297,36 +297,46 @@ def getGalleryImage(request, act_id):
     print('line 293 :: ', all_image_id_list);
 
     outside_group_image = list(set(all_image_id_list) - set(member_image_id_list))
-    outside_group_image_id = random.choice(outside_group_image);
-    print('line 297 :: ', outside_group_image_id);
-
-    images = imageModel.objects.filter(id=outside_group_image_id).values('image');
-    if images:
-        dict = {}
-        dict['imagePk'] = outside_group_image_id;
-        dict['url'] = images[0]['image'];
-        return JsonResponse({'imageData': dict});
-    else:
+    #outside_group_image can be empty if no image is uploaded in this gallery activity
+    print('line 301 :: ', outside_group_image);
+    if(len(outside_group_image) == 0):
+        print('debug purpose, def updateImage, image list is empty as no image is uploaded in this activity yet');
         return HttpResponse('');
+    else:
+        #the list is not empty
+        outside_group_image_id = random.choice(outside_group_image);
+        print('debug purpose, def getGalleryImage,  outside_group_image_id :: ', outside_group_image_id);
+
+        images = imageModel.objects.filter(id=outside_group_image_id).values('image');
+        if images:
+            dict = {}
+            dict['imagePk'] = outside_group_image_id;
+            dict['url'] = images[0]['image'];
+            return JsonResponse({'imageData': dict});
+        else:
+            return HttpResponse('');
 
 
 
 #used in gallery.js
-def updateImageFeed(request, img_id):
+def updateImageFeed(request):
 
-    act_id = request.GET['act_id']
-    #print('updateImageFeed (image_id) :: ' + img_id + ' in activity id :: ', act_id);
+
+    act_id = request.GET['act_id'] #gallery id
+    img_id = request.GET['img_id'] #img_id
+
+    print('debug purpose, def getGalupdateImageFeedleryImage, image id, :: ' + img_id + ' in activity id :: ', act_id);
 
     # get the current users' group-member name
     group_member_id = getGroupMembers(request, act_id);
 
-    #get all the comments in the given image id
+    # get all the comments in the given image id
     # filter out the comments made my the users' group-member
-    img_msg = imageComment.objects.filter(imageId_id=img_id, posted_by__in = group_member_id);
-
-    #serialize
-    img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
-
+    #however, if there is no image uploaded yet for the gallery, then img_id will be null
+    img_msg = ''
+    if img_id:
+        img_msg = imageComment.objects.filter(imageId_id=img_id, posted_by__in = group_member_id);
+        img_msg = serializers.serialize('json', img_msg, use_natural_foreign_keys=True, use_natural_primary_keys=True);
 
     group_member_name = []
     for i in group_member_id:
@@ -338,6 +348,7 @@ def updateImageFeed(request, img_id):
 
 def getSelfGalleryContent(request, act_id):
     # get the users' uploaded image for the given gallery
+    print('debug purpose, def getSelfGalleryContent, gallery id, ', act_id);
     #img_data = imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user); #returns a queryset
     img_data = list(imageModel.objects.filter(gallery_id=act_id, posted_by_id=request.user).values('id','image'));
     # print('line 251:', type(img_data)); #type -- list
@@ -345,17 +356,17 @@ def getSelfGalleryContent(request, act_id):
     #todo: what if the filter returns multiple image i.e., user uploaded more than one image
     #print('line 252 ::', img_data[0]['id']);
 
-    img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
-    # img_msg = [dict(item) for item in img_msg]
-    # print('line 258 ::', img_msg);
-    #converting the time into a readable format
-    for i in img_msg:
-        i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
-        #print (i);
-
     dict = {};
-    dict['img_data'] = img_data;
-    dict['img_msg'] = img_msg;
+    if img_data: #there is at least an image uploaded by the user (could be more than one, but selecting the first here, TODO)
+        img_msg = list(individualMsgComment.objects.filter(imageId_id=img_data[0]['id']).values('content', 'posted_by__username', 'posted_at'));
+        # img_msg = [dict(item) for item in img_msg]
+        # print('line 258 ::', img_msg);
+        #converting the time into a readable format
+        for i in img_msg:
+            i['posted_at'] = i['posted_at'].strftime("%Y-%m-%d %H:%M:%S");
+            #print (i);
+        dict['img_data'] = img_data;
+        dict['img_msg'] = img_msg;
 
     return JsonResponse({'success': dict});
 

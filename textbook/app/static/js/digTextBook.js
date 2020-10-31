@@ -325,7 +325,8 @@ var bindActivityButtons = function(){
              //if the card is already extended, put it back to normal
              card_extension_close();
 
-             //when a user opens this card, load the image this user uploaded and
+
+             //and, 2) load the image this user uploaded and
              //display all the comments made by other students
              //defined in individual_gallery.js
              loadSelfImageFeed(id);
