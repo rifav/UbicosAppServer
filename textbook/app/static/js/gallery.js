@@ -98,6 +98,8 @@ var loadGalleryFeed = function(act_id){
     //defined in utility.js
     computationalModelMethod(logged_in, 'MB', gallery_act_id);
 
+    // make the badge-option-div draggable
+    $('#badge-option').draggable(draggableConfig);
 
 
 } //end of loadGalleryFeed method
@@ -180,16 +182,26 @@ var galleryMsgBtnAction = function(){
 
         //copy button
       $('#gallery-copy-button').off().on('click', function(e){
+            //if not badge is selected, and still clicks the <copy to the textbox> button
+            if(global_badge_selected == '') {
+                //no badge is selected
+                message = 'Select a badge option first to copy a sentence starter.';
+                displayNotifier("#gallery-notifier", message);
+                return false;
+            }
+
+            //get the sentence starter from the text area
             var badge_textarea_value = $('.badge-option-textarea textarea').val();
             console.log(badge_textarea_value);
             //set it to the message textbox
             $('#image-msg-text').val(badge_textarea_value);
 
+            //notify the user that the sentence starter is copied
+            message = 'Your selected sentence starter is copied to the input box. Modify as needed.';
+            displayNotifier("#gallery-notifier", message);
+
             //$("div#badge-option").css("display", "none");
             $(this).closest('div#badge-option').fadeOut();
-
-//            setTimeout($("#gallery-reward-div").css("display", "none");,
-//            2000);
 
       });
 
@@ -209,37 +221,37 @@ var postImageMessage = function () {
         var message = inputEl.val();
 
         if(!message){
-            //entry into user log -- TODO fix the language
-            enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, global_current_pagenumber)
-            return;
+            message = 'Your answer is too brief. Try writing a more specific answer.';
+            displayNotifier("#gallery-notifier", message);
+            enterLogIntoDatabase('Gallery Input Button Click', 'Gallery feed empty message input' , '', global_current_pagenumber);
+            return false;
+
         }
 
-
+        //if we come until here, there is a message
         //console.log('user message :: '+message)
-        //check for the message length
-        //get the length of the message
+        //check for the message length and get the length of the message
         var msg = message.split(" ");
         var lengthOfMsg = msg.length;
-        //check the length condition first
-        if(lengthOfMsg == 0){
-            $("#gallery-notifier").text('');
-            $("#gallery-notifier").text('Your answer is too brief. Try writing a more specific answer.');
-            $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+        //cif it is less than 7 words
+        if(lengthOfMsg < 7){
+            message = 'Your answer is too brief. Try writing a more specific answer.';
+            displayNotifier("#gallery-notifier", message);
+            enterLogIntoDatabase('Gallery Input Button Click', 'Gallery feed less than seven words message input' , '', global_current_pagenumber);
             return false;
         }
 
-        //todo: add the keyword matching algo here and display badge based on the algorithm
+
         //1. if the user has selected any of the three badge, we want to pass it to the server; else we want to skip checking
         if(global_badge_selected != 'None' && global_badge_selected != ''){
                if(global_badgeList[global_char][0]['sentence_opener1'] === message) {
-                    $("#gallery-notifier").text('');
-                    $("#gallery-notifier").text('Your message exactly matches with suggestion. Try adding your thoughts.');
-                    $("#gallery-notifier").hide().slideDown().delay(5000).fadeOut();
+                    message = 'Your message exactly matches with suggestion. Try adding your thoughts.';
+                    displayNotifier("#gallery-notifier", message);
                     return false;
                 }
-            //user selected any of the three badges
-            //2. save the selected badge in the database
-             //save selected badge info to the database
+                //user selected any of the three badges
+                //2. save the selected badge in the database
+                //save selected badge info to the database
                 $.ajax({
                  type: 'POST',
                  url: '/saveBadgeSelection/',
@@ -249,36 +261,37 @@ var postImageMessage = function () {
                         console.log(response);
                      }
                 });
-            //3. make the api call and send the user message and selected badge in the server
-            //to do make this a function in utility.js
-            console.log('selected badge for gallery.js ::', global_badge_selected);
-            $.ajax({
-             type: 'POST',
-             url: '/matchKeywords/',
-             data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
-                'platform': 'MB', 'activity_id': gallery_act_id},
-             success: function(response){
-                    console.log(response);
-                    console.log(response.isMatch); //returns true if match found, else false
-                    if(response.isMatch){
-                        console.log('inside the if else loop');
-                        $("#gallery-reward").css("display", "block");
-                        //set up the values
-                        var imgName = global_badge_selected.toLowerCase();
-                        $('#gallery-reward img').attr('src', '/static/pics/'+imgName+'.png');
-                        $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
-                        $('#reward-div-prompt').text(response.praiseText);
+                //3. make the keyword matching API call and send the user message and selected badge in the server
+                //to do make this a function in utility.js
+                console.log('selected badge for gallery.js ::', global_badge_selected);
+                $.ajax({
+                    type: 'POST',
+                    url: '/matchKeywords/',
+                    data: {'username': logged_in, 'message': message, 'selected_badge' : global_badge_selected,
+                    'platform': 'MB', 'activity_id': gallery_act_id},
+                    success: function(response){
+                        console.log(response);
+                        console.log(response.isMatch); //returns true if match found, else false
+                        if(response.isMatch){
+                            console.log('inside the if else loop');
+                            $("#gallery-reward").css("display", "block");
+                            //set up the values
+                            var imgName = global_badge_selected.toLowerCase();
+                            $('#gallery-reward img').attr('src', '/static/pics/'+imgName+'.png');
+                            $('#reward-div-selection').text('You earned the '+global_badge_selected+' badge!');
+                            $('#reward-div-prompt').text(response.praiseText);
 
-                    }
+                        }
                  }
             });
         }
+
         //get the user name who posted
         var user_name = $("input[name='username']").val()
         console.log('logged in user when posting in the gallery from client side', user_name);
 
         var imagePk = $("input[name='image-db-pk']").val();
-        console.log('image pk :: ',imagePk)
+        console.log('image pk gallery image comment is making :: ',imagePk)
 
         //posts student comment in database - can be extracted using image primary key.
         $.post({
@@ -343,4 +356,10 @@ var realTimeMsgTransfer = function(){
 }// end of realTimeMsgTransfer method
 
 
+var displayNotifier = function(container, message){
 
+    $(container).text('');
+    $(container).text(message);
+    $(container).hide().slideDown().delay(5000).fadeOut();
+
+}
