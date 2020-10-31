@@ -1,26 +1,19 @@
+var global_ka_url;
+var ka_act_id;
+
 $(function(){
 
     ka_badge_form_Btn();
 
  });
 
-var load_ka_card = function() {
+var load_ka_card = function(act_id, video_url) {
 
-    //make an ajax call to get the badges
-    $.ajax({
-        url: '/getBadges',
-        type: 'POST',
-        async: false,
-        data: {"username": logged_in, 'platform' : 'KA'}, //passing username so TA code can use the same API
-        success: function (data) {
-            //here data is a dict, where each key element is a list
-            console.log('kaform.js', data.badgeList);
-            //assigning it to a global variable, so we can access it outside this call and update promp/sentence opener as needed
-            global_badgeList = data.badgeList;
-            //call the method and update the badge-option-view
-            badge_option_div_update(data.badgeList, "ka"); //defined in gallery.js
-        }
-    });
+    global_ka_url = video_url;
+    ka_act_id = act_id;
+
+    //this method is defined in utility.js
+    computationalModelMethod(logged_in, 'KA', act_id);
 
 }
 
@@ -34,6 +27,20 @@ var ka_badge_form_Btn = function(){
         $temp.val(text).select();
         document.execCommand("copy");
         $temp.remove();
+
+        //get the selected badge
+        console.log('kaform.js (line 32):: ', global_badge_selected);
+
+        //save selected badge info to the database
+        $.ajax({
+         type: 'POST',
+         url: '/saveBadgeSelection/',
+         data: {'username': logged_in, 'platform': 'KA', 'activity_id': ka_act_id, 'title': global_ka_url,
+            'selected_badge' : global_badge_selected},
+         success: function(response){
+                console.log(response);
+             }
+        });
 
     });
  }

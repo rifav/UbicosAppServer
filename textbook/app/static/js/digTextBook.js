@@ -15,10 +15,12 @@ window.onerror = function(message, file, line) {
     It is also used in: activityindex.js
 */
 
-var NUM_PAGES = 33;
+var NUM_PAGES = 36;
 
 //load all init function required for the digital textbook to load here
 $(function(){
+
+
 
     // Load first pages
     // TODO the URL should indicate which page to be loaded instead of always loading pages 1 and 2
@@ -30,7 +32,6 @@ $(function(){
 
     //check for the last accessed page in the local storage
     if(localStorage.getItem("pageToBeRefreshed")){
-
         var pageToBeRefreshed = localStorage.getItem("pageToBeRefreshed");
         console.log("last accessed page (digTextBook.js)::", pageToBeRefreshed);
         reloadPage(pageToBeRefreshed);
@@ -53,6 +54,7 @@ $(function(){
 //1) in digtextbook.js - load the last accessed page
 //2) in activityindex.js - when a page is selected from the side navigation bar
 var reloadPage = function(pageToLoad){
+    global_current_pagenumber = pageToLoad;
     var gotoPage = pageToLoad;
     var container = $('#textbook-content');
 
@@ -75,7 +77,7 @@ var reloadPage = function(pageToLoad){
 
     //TODO: update the side navigation bar current status
     //idenfity the a tag with the page id
-    console.log($($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]));
+    //console.log($($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]));
     //then add active class in the current selected <a> tag -- not working
     //$($('#mySidenav a[data-pageId="'+gotoPage+'"]')[0]).toggleClass('active');
 
@@ -137,6 +139,9 @@ var movePage = function(moveToNext){
         function(){
             container.attr('class', noMoreClass);
         });
+
+    //scrolling to the top:
+    $('html, body').animate({scrollTop: '0px'}, 0);
 };
 
 var loadPage = function(pageNum, pageContainer, successFn, notFoundFn){
@@ -228,14 +233,14 @@ var bindActivityButtons = function(){
 //        ------------------------------based on different tools-----------------------
         // TODO: make the following if dynamic
 
-//        ------------------------------VIDEO-----------------------
+//        --------------------------VIDEO/WHITEBOARD-----------------------
         // if video tab is active get the video url and display in video.html
         //display the video url in a new tab instead of the card
-        if(type == 'video'){
+        if(type == 'video' || type == 'whiteboard'){
             //lastOpenedTool = 'video';
             $('.card.active').removeClass('active');
             var video_url = activityButton.attr('data-video-url');
-            window.open(video_url, '_blank'); //open paint splash game in a new window
+            window.open(video_url, '_blank'); //open any external video in a new window
         }
 //        ------------------------------TABLE-----------------------
         //if the table tab is active
@@ -287,7 +292,8 @@ var bindActivityButtons = function(){
 
              //if the card is already extended, put it back to normal
              card_extension_close();
-             load_ka_card();
+             var video_url = activityButton.attr('data-video-url');
+             load_ka_card(id, video_url); //defined in kaform.js
              console.log('card opened');
         }
 //        ---------------------image upload card-----------------------
@@ -302,8 +308,13 @@ var bindActivityButtons = function(){
              //https://stackoverflow.com/questions/52430558/dynamic-html-image-loading-using-javascript-and-django-templates
              $('img#default').attr('src', API_URL.picsBase + "/default.png");
              // end of the solution
+
+             //clear the success message (once displayed it stays on, so clear it for the next access to the card)
+             $('.upload-success-msg').hide();
+             //put the default image in its original frame after an image is uploaded
+             $("#gallery-upload-div img").width('450px').height('300px');
         }
-//        ---------------------individual discussion-----------------------
+//        ---------------------display (only) individual discussion -----------------------
          if($('.card.self-gallery').hasClass('active')){
 
              //if the card is already extended, put it back to normal
@@ -333,7 +344,8 @@ var bindActivityButtons = function(){
             card_extension();
 
             //update the heading in the card
-           // $('.card.' + type + ' h1').text(activityButton.attr('data-heading'));
+            $('#gallery-description').text(activityButton.attr('data-description') +
+            ' Use the badge option on the top-right corner to get an idea about how to help others.');
 
             loadGalleryFeed(id);
 

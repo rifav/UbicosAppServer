@@ -1,13 +1,12 @@
 {% load static %}
+<h1>Gallery Name</h1>
+<p id="gallery-description" class="cardDescription"> Discuss about the images as a group. </p>
 <div id="gallery-view">
 
     <div id="single-image-view" class="gallery-panel">
         <div class="verticalDivider">
             <div id="row-left">
-                <h1>Gallery Name</h1>
-                <p id="gallery-description">
-                        Discuss about the images as a group.
-                </p>
+
 
                 <div class="gallery-userlist">
                     <div class="gallery-group-user">
@@ -40,7 +39,7 @@
                     <!--<div class = "posted_by_image"></div>-->
                 </div>
                 <div class="badgeRequest">
-                    <img  src="{% static 'pics/ques.png' %}" alt="">
+                    <img  src="{% static 'pics/ques_icon.png' %}" alt="">
                 </div>
                 <!--div displaying the badge selection-->
                 <div id="badge-option" class="badge-option-class badge-gallery">
@@ -49,31 +48,31 @@
                         <a href="javascript:void(0)" class="badge-option-closebtn">&times;</a>
                     </div>
                     <div class="badge-option-display">
-                        <div href="#" id="mb-badge1" data-char="msc" tabindex="1">
-                           <img  src="{% static 'pics/blank.png' %}" alt="">
-                           <span>Brainstorm</span>
+                        <div href="#" id="mb-badge1" data-char="" tabindex="1">
+                            <img  src="{% static 'pics/blank.png' %}" alt="">
+                            <span>Badge 1</span>
                         </div>
-                        <div href="#" id="mb-badge2" data-char="hsc" tabindex="2">
-                           <img  src="{% static 'pics/blank.png' %}" alt="">
-                           <span>Elaboration</span>
+                        <div href="#" id="mb-badge2" data-char="" tabindex="2">
+                            <img  src="{% static 'pics/blank.png' %}" alt="">
+                            <span>Badge 2</span>
                        </div>
-                        <div href="#" id="mb-badge3" data-char="fam" tabindex="3">
-                           <img  src="{% static 'pics/blank.png' %}" alt="">
-                           <span>Feedback</span>
+                        <div href="#" id="mb-badge3" data-char="" tabindex="3">
+                            <img  src="{% static 'pics/blank.png' %}" alt="">
+                            <span>Badge 3</span>
                        </div>
-                        <div href="#" id="mb-badge4" data-char="none" tabindex="4">
-                           <img  src="{% static 'pics/blank.png' %}" alt="">
+                        <div href="#" id="mb-badge4" data-char="other" tabindex="4">
+                            <img  src="{% static 'pics/blank.png' %}" alt="">
                             <span>None</span>
                        </div>
 
                     </div>
-                    <div class="badge-prompt-text ">
+                    <div class="badge-prompt-text">
                         <p>Select an option to get the prompt</p>
                     </div>
                     <div class="badge-option-textarea">
                         <textarea>Select an option to get the sentence starter </textarea>
                     </div>
-                    <div class="badge-option-footer">
+                    <div class="badge-option-footer" id="gallery-copy-button">
                         <button> Copy to the textbox </button>
                     </div>
 
@@ -82,16 +81,25 @@
             </div>
 
             <div id="row-right">
-                <ul id="image-feed" class="feed" style="margin-top: 100px;margin-bottom:100px">
+                <ul id="image-feed" class="feed" style="margin-top: 25px;margin-bottom:100px">
                 </ul>
 
-
+                <span id="gallery-notifier"> Your answer is too brief. Try writing a more specific answer. </span>
                 <div class="message-input">
                     <input type="text" id="image-msg-text" name="image-msg-text" placeholder="Comment on this picture">
                     <input type="hidden" name="username" value={{ user.get_username }}>
                     <a href="" id="image-msg-send-btn"></a>
                 </div>
             </div>
+
+            <div id="gallery-reward" class="reward-div" style="display:none">
+                <a href="javascript:void(0)" class="gallery-reward-closebtn">&times;</a>
+                <p id="reward-div-selection"> You earned the [badge_name] badge! </p>
+                <img src="{% static 'pics/blank.png' %}" alt="" >
+                <p id="reward-div-prompt"> sample praise message example, send from server </p>
+                <p id="reward-div-ins"> To try another badge, click on the badge icon on the top! </p>
+             </div>
+
     </div>
     </div>
 

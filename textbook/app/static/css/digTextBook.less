@@ -8,14 +8,14 @@
 @brainstorm3: #ff9933; /* brainstorm model so far */
 @brainstorm4: #e67300; /* brainstorm model so far */
 @gallery_link: #2DB872;
-@gallery1: #cdeba0;
-@gallery2: #c2e68b;
+/*@gallery1: #cdeba0;
+@gallery2: #c2e68b;*/
+@gallery1: #d9f2d9;
+@gallery2: #c6ecc6;
 @moreInfo1: rgb(105, 119, 128);
 @moreInfo2: rgb(109, 156, 194);
 @table1: #B182D9;
 @table2: #5151C8;
-@convert1: magenta;
-@convert2: yellow;
 @multQues1: #33cccc; /* #0099FF; */
 @multQues2: #0099ff; /* #0066cc; */
 @khanacademy_link:  #6699ff;
@@ -40,7 +40,7 @@ html, body {
     margin: 0;
     font-family: 'Open Sans', sans-serif;
     font-size: 12pt;
-    overflow: hidden;
+    overflow: hidden; //stops scrolling the entire page
 }
 
 h1 {
@@ -74,10 +74,10 @@ a {
     overflow: hidden;
 }
 
+
 .center {
     position: absolute;
     width: 500px; /*size of the div */
-    height: 200px;
     height: 200px;
     left: 570px; /*location of the div */
     top: 110px;
@@ -150,7 +150,7 @@ a {
 .page {
     position: absolute;
     padding-right: 80px;
-    margin-top: 8%;
+    margin-top: 5%;
     margin-left: 5%;
     width: 95%;
     box-sizing: border-box;
@@ -169,6 +169,7 @@ a {
     text-align: justify;
     margin: 1rem;
     position: relative;
+    line-height: 1.6;
 }
 
 
@@ -186,6 +187,13 @@ a {
     position: relative;
 }
 
+.page-section-border{
+    border: 1px solid #C9DDE4;
+    padding: 10px;
+    margin: 10px;
+}
+
+// css related to page navigation bar and other tab menus -- start
 #page-controls {
     position: fixed;
     bottom: 0;
@@ -198,15 +206,29 @@ a {
     display: inline-block;
     position: absolute;
     bottom: 15px;
-    height: 52px;
-    width: 52px;
-    border-radius: 50%;
+    height: 40px;
+    width: 40px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     background-repeat: no-repeat;
     text-indent: -999999px;
     background-position: center;
     background-size: 30px;
     background-color: #C9DDE4;
+    border: 1px solid #669eb2;
+    /* put the a tag text in the middle */
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+    text-decoration: none;
+    border-radius: 50%;
+}
+
+#page-controls > a:hover{
+    background-color: #99becc;
+}
+
+#page-controls a.menu-button-selected{
+    background-color: #99becc;
 }
 
 #page-controls #page-control-number {
@@ -217,22 +239,34 @@ a {
 }
 
 #page-controls #page-control-previous {
-    left: 10px;
+    left: 525px;
+
     background-image: url(../pics/back-blue.png);
 }
+
 
 .first #page-controls #page-control-previous {
     display: none;
 }
 
+#page-controls #study-menu{
+    left: 10px;
+    background-image: url(../pics/index.png);
+}
+
+
+
 #page-controls #page-control-next {
-    right: 15px;
+    left: 575px;
+    border-radius: 50%;
     background-image: url(../pics/next-blue.png);
 }
 
 .last #page-controls #page-control-next {
     display: none;
 }
+
+// css related to page navigation bar and other tab menus -- end
 
 #textbook-content h1 {
     border-bottom: dotted 2px #7AAFB5;
@@ -261,7 +295,9 @@ a {
     border-radius: 40px;
 }
 
-
+a.assignment {
+    color: black;
+}
 //different card styling -- start
 
 /* chat card class color + activity button color */
@@ -286,7 +322,7 @@ a {
     color: @brainstorm_link;
 }
 .activity-button.brainstorm {
-    background-image: url('/static/pics/brainstorm.png');
+    background-image: url('/static/pics/brainstormT.png');
 }
 .activity-button.brainstorm:after {
     background: linear-gradient(@brainstorm_link, @brainstorm2);
@@ -329,6 +365,21 @@ a {
     transition: all 0.4s;
 }
 
+/* digital whiteboard class color + activity button color */
+.whiteboard {
+    color: @multQues2;
+}
+.activity-button.whiteboard {
+    background-image: url('/static/pics/whiteboard.png');
+}
+.activity-button.whiteboard:after {
+    background: linear-gradient(@multQues1, @multQues2);
+}
+.activity-button.whiteboard:hover {
+    box-shadow: 0 0 30px @multQues2;
+    transition: all 0.4s;
+}
+
 /* upload class color + activity button color */
 
 .upload {
@@ -363,7 +414,7 @@ a {
 /* individual commenting class color + activity button color */
 
 .individual {
-    color: gallery_link;
+    color: @gallery_link;
 }
 .activity-button.individual {
     background-image: url('/static/pics/individual.png');
@@ -459,6 +510,9 @@ a {
 
 //different card styling -- end
 
+#activity-feed-view h1{
+    padding-top: 2rem;
+}
 
 .verticalDivider {
     display: grid;
@@ -502,8 +556,8 @@ a {
 */
 
 .card {
-    overflow-y: auto;
-    overflow-x: hidden;
+    /* overflow-y: auto;
+    overflow-x: hidden;*/ /* removing these two stopped overall card scrolling */
     -webkit-overflow-scrolling: touch;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
     position: fixed;
@@ -522,6 +576,20 @@ a {
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     z-index: 2;
+}
+
+.card h1{
+    padding-top: 1.5rem;
+}
+
+p.cardDescription{
+    position: absolute;
+    top: 5rem;
+    z-index: 1;
+    font-size: 12pt;
+    padding-top: 10px;
+    width: 560px;
+    line-height: 1.6;
 }
 
 .card.active {
@@ -598,6 +666,14 @@ a {
 }
 /* gallery message-input */
 
+#gallery-notifier {
+    display: none;
+    position: absolute;
+    top: 68%;
+    left: 1%;
+    color: black;
+}
+
 .message-input {
     background: rgba(201, 221, 228, 1);
     /* -webkit-backdrop-filter: blur(10px);
@@ -621,7 +697,7 @@ a {
         padding-left: 10px;
         outline: none;
         font-family: Tahoma, sans-serif;
-        font-size: 110%;
+        font-size: 100%;
     }
 
     .message-input a {
@@ -637,18 +713,17 @@ a {
     }
 
 #activity-feed {
-
         height: 80%;
         width: 98%;
         padding: 15px 15px 15px 15px;
         overflow-y: auto;
-        border-style: dotted;
-        position: fixed;
-        top: 0%;
+        //border-style: dotted;
+        position: absolute;
+        top: 3rem;
 }
 
 #ind-feed {
-    height: 30%;
+    height: 20%;
     padding: 15px 15px 15px 15px;
     //border-style: dotted;
     overflow-y: auto;
@@ -660,7 +735,7 @@ a {
     //border-style: dotted;
     overflow-y: auto;
     position: relative;
-    top: 40%;
+    top: 45%;
 }
 
 .award-holder{
@@ -714,7 +789,8 @@ a {
 }
   .msg-timestamp span{
     position: absolute;
-    left: 85%;
+    left: 78%;
+    width: 40%;
     display: block;
     color: darkcyan;
   }
@@ -858,13 +934,6 @@ a {
     padding: 1.5rem;
 }
 
-.chat_prompt_p {
-    position: fixed;
-    top: 4.5%;
-    z-index: 1;
-    font-size: smaller;
-    padding-top: 10px;
-}
 
 #activity-index {
     margin-top: 90px !important;
@@ -909,7 +978,7 @@ a {
 
             &.video span { .bg-color-image(@video1, url(../pics/video.png)); }
             &.gallery span { .bg-color-image(@gallery1, url(../pics/gallery.png)); }
-            &.brainstorm span { .bg-color-image(@brainstorm1, url(../pics/brainstorm.png)); }
+            &.brainstorm span { .bg-color-image(@brainstorm1, url(../pics/brainstormT.png)); }
             &.table span { .bg-color-image(@table1, url(../pics/graph.png)); }
             &.moreinfo span { .bg-color-image(@moreInfo1, url(../pics/more.png)); }
             &.multQues span { .bg-color-image(@multQues1, url(../pics/answer.png)); }
@@ -992,36 +1061,41 @@ a {
     align-items: center;
     margin: 0;
     position: absolute;
-    top: 25%;
+    top: 30%;
     width: 100%;
 }
 
-//TODO: requires updated
 .upload-success-msg{
 
      padding: 5px 20px 0px;
-     background-color: #909497; //background color of the success message
-     color: white;
+     text-align: center;
+     color: black;
+     border: 1px solid #ddd;
+     border-radius: 20px;
+     background-color: #ffffcc; //background color of the success message
      opacity: 1;
      transition: opacity 0.6s;
-     margin-bottom: 15px;
-     width: 90%
+    // margin-bottom: 15px;
+     width: 400px;
+     position: absolute;
+     top: 25rem;
+     left: 18%;
 
 }
 
 .upload-success-msg-closebtn {
-  margin-left: 15px;
-  color: white;
-  font-weight: bold;
-  float: right;
-  font-size: 22px;
-  line-height: 20px;
-  cursor: pointer;
-  transition: 0.3s;
+      margin-left: 15px;
+      color: black;
+      font-weight: bold;
+      float: right;
+      font-size: 22px;
+      line-height: 20px;
+      cursor: pointer;
+      transition: 0.3s;
 }
 
 .upload-success-msg-closebtn:hover {
-  color: black;
+  color: white;
 }
 
 .self-gallery img{
@@ -1029,7 +1103,7 @@ a {
     width: 400px;
     position: fixed;
     left: 50%;
-    top: 35%;
+    top: 40%;
     transform: translate(-50%, -50%);
 }
 
@@ -1046,8 +1120,6 @@ a {
 }
 
 .gallery img {
-//     max-width: 100%;
-//     max-height: 100%;
     width: 75%;
     height: 60%;
     cursor: pointer;
@@ -1114,9 +1186,9 @@ a {
         img {
                 max-height: 400px;
                 width: 450px;
-                height: 360px;
+                height: 370px;
                 position: absolute;
-                left: 70px;
+                left: 50px;
                 top: 15%;
 
 
@@ -1727,19 +1799,19 @@ a {
     //border:1px solid black;
     img{
         position: absolute;
-        left: 9px;
-        width: 30px;
-        height: 45px;
+        left: 2px;
+        width: 45px;
+        height: 40px;
         border-radius: 50%;
         margin: 0px;
+        padding-top: 5px;
     }
 
 }
 
 .badge-option-class{
     position: fixed;
-    top: 180px;
-
+    top: 120px;
     height: 440px;
     width: 520px;
     z-index:2;
@@ -1764,7 +1836,7 @@ a {
     margin-left: 20px;
 }
 
-.badge-option-closebtn {
+.badge-option-closebtn, .gallery-reward-closebtn {
   position: absolute;
   top: 0;
   right: 10px;
@@ -1798,6 +1870,7 @@ a {
             width: 120px;
             color: black;
             padding: 15px;
+            padding-left: 33px;
         }
     }
 }
@@ -1835,6 +1908,7 @@ a {
     background-position: bottom right;
 	background-repeat: no-repeat;
 	font-size: 110%;
+	esize: none;
 }
 
 
@@ -1861,14 +1935,6 @@ a {
 }
 
 /* css related to badge prompt shown in gallery.html -- end*/
-
-
-#mySidenav a img{
-    position: relative;
-    top: 4px;
-    width:20px;
-    height:20px;
-}
 
 .gallery-submission {
     background-color: #2DB872;
@@ -1932,92 +1998,49 @@ a {
     background-color: #2DB872;
 }
 
-.prompt-card {
-    display: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: 0 0 5px rgba(30, 192, 145,1);
+.reward-div {
     position: absolute;
-    top: 20%;
-    left: 28%;
-    height: 42%;
-    width: 41%;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    color:  white;
-    margin: 5px 5px 5px 5px !important;
-    transform: translateX(100%);
-    transition: all 0.4s;
-    transition-timing-function: ease-out;
-    border-top-left-radius: 50%;
-    border-bottom-left-radius: 50%;
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
-    z-index: 2;
-}
-
-
-.prompt-card.prompt.active {
-    display : block;
-    transform: translateX(0);
-    transition: all 0.4s;
-    transition-timing-function: ease-out;
-    position:fixed;
-    left: 60%;
-    width: 22%;
-    top:30%;
-    border-radius:10%;
-    z-index:3;
-
-}
-
-.prompt-card.prompt-ka.active, .prompt-card.prompt-gm.active {
-    display : block;
-    transform: translateX(0);
-    transition: all 0.4s;
-    transition-timing-function: ease-out;
-    position: fixed;
-    left: 60%;
-    width: 22%;
-    top:30%;
-    border-radius:10%;
-    z-index:3;
-
-}
-
-#prompt-p, #prompt-p-ka, #prompt-p-gm{
-
-    margin:0px;
-    height:32px;
-    max-width:100%;
-    position:relative;
-    margin-left: 55px;
-    margin-top: 10px;
-
-}
-
-.prompt-close-card {
-    display: inline-block;
-    position: absolute;
-    top: 45px;
-    right: 45px;
-    height: 10px;
-    width: 10px;
-    background: url('/static/pics/clear.png') no-repeat;
-    background-size: 100%;
-    z-index: 2;
-}
-
-#prompt-badge-img, #prompt-badge-img-ka, #prompt-badge-img-gm{
-    display : block;
-    width:70px;
-    height:100px;
+    top: 30%;
     left: 30%;
-    margin: 50px 10px 0px 20px;
-    position:relative;
+    height: 15em;
+    width: 25em;
+    /*transform: translateX(100%);
+    transition: all 0.4s;
+    transition-timing-function: ease-out;*/
+    border-radius: 30px;
+    z-index: 2;
+    border: 1px solid #ddd;
+    background-color: #f4f4f4;
+    font-size: 12pt;
+
+    img{
+
+        width: 20%;
+        height: 45%;
+        margin-left: 5%;
+        margin-right: 5%;
+        padding-bottom: 10px;
+        float: left;
+    }
 
 }
+
+#reward-div-selection{
+    margin-left: 20%;
+
+}
+
+#reward-div-prompt{
+    width: fit-content;
+    margin-top: 10%;
+    margin-right: 10%;
+}
+
+#reward-div-ins {
+    margin-top: 10%;
+    margin-left: 20%;
+}
+
 
 /* user prompt related css finish*/
 
@@ -2039,18 +2062,18 @@ a {
 
 }
 
-.badge-description{
-    position: absolute;
-    width: 40%;
-    margin-left:80px;
-    height: 100px;
-    z-index: -1;
-    top: 100%;
-    opacity: 0;
-    background-color: #C9DDE4;
-    border:2px solid #B0E0E6;
-
-}
+// .badge-description{
+//     position: absolute;
+//     width: 40%;
+//     margin-left:80px;
+//     height: 100px;
+//     z-index: -1;
+//     top: 100%;
+//     opacity: 0;
+//     background-color: #C9DDE4;
+//     border:2px solid #B0E0E6;
+//
+// }
 
 /* teacher dashboard user button */
 #teacher-user-list{
@@ -2071,48 +2094,6 @@ a {
   margin-bottom: 10px;
 }
 
-/* khan academy dashboard number display*/
-/* https://stackoverflow.com/questions/4861224/how-to-use-css-to-surround-a-number-with-a-circle */
-.ka-projection{
-   width: 600px;
-   height: 600px;
-   position: absolute;
-   margin-left: 100px;
-   margin-right: auto;
-   text-align: center;
-}
-
-.ka-projection-number-display-1, .ka-projection-number-display-2,
-.gallery-project-group-circle
-
- {
-
-    width: 120px;
-    margin-left:100px;
-    line-height: 120px;
-    border-radius: 50%;
-    text-align: center;
-    font-size: 32px;
-    color: #666;
-    border: 2px solid #666;
-    background: #fff;
-
-}
-
-.ka_item_display_button{
-  background:#008ed7;
-  color:#fff;
-  -webkit-border-radius: 1px;
-  -moz-border-radius: 1px;
-  border-radius: 20px;
-  text-decoration:none;
-  font-weight:700;
-  font-size:16px;
-  padding:15px 35px;
-  float:left;
-  margin-left: 10px;
-  margin-bottom: 10px;
- }
 
 
 .badge_name{
@@ -2190,22 +2171,30 @@ a {
 
 //first page left side menu bar related CSS -- start
 
-#right-side-menu{
-    font-size: 30px;
-    cursor: pointer;
-    position: fixed;
-    top: 25px;
+// #right-side-menu{
+//     font-size: 30px;
+//     cursor: pointer;
+//     position: fixed;
+//     top: 25px;
+// }
+#mySidenav a img{
+    position: relative;
+    top: 4px;
+    width:20px;
+    height:20px;
+    font-size: 12pt;
 }
 
 .sidenav {
 
-  height: 95%;
+  height: 85%;
   width: 0;
   position: fixed;
   z-index: 1;
-  top: 20px;
+  top: 5%;
   left: 0;
-  background-color: #A1D9CD;
+  background-color: #ccdfe5;
+  border: 1px solid #88b3c3;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
@@ -2223,7 +2212,7 @@ a {
 }
 
 .sidenav a:hover {
-  color: #f1f1f1;
+  color: #88b3c3;
 }
 
 .sidenav .right-menu-closebtn {
@@ -2239,61 +2228,14 @@ a {
 }
 
 .active {
-    background-color: #4CB7B7;
+    background-color: #669eb2;
 }
 //first page left side menu bar related CSS -- end
 
 
 //badgeCard css -- start
 
-.child {
-    display: inline-block;
 
-    span {
-        display: block;
-     }
-
-}
-
-.child.platform{
-    position: relative;
-    top: -28px;
-}
-
-.badgeContainter {
-    border: 1px solid black;
-    padding: 25px 10px 25px 10px;
-    text-align: center;
-    display: block;
-
-    img {
-        width: 70px;
-        height: 70px;
-    }
-
-}
-
-.badgeContainter > div {
-    display: inline-block;
-    padding: 0px 25px 0px 25px;
-}
-
-.badgeContent {
-    margin:auto;
-    margin-top: -50px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    text-align: center;
-    padding: 10px 22px 10px 25px;
-    text-transform:uppercase;
-    line-height: 1em;
-    background-color: #ccc;
-    width: 20%;
-    min-width: 170px;
-}
-
-.badgeTitle {color: black;}
-.badgeSub {color: green;}
 
 //badgeCard css -- end
 

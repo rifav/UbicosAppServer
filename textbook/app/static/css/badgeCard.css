@@ -1,0 +1,130 @@
+
+.badgeCardHeader1 {
+    text-align: center;
+}
+
+.badgeCardName, .badgeCardBody {
+  display: flex;
+  cursor: pointer;
+}
+.badgeCardName > div {
+    flex: 1; /*grow*/
+    width: 85px;
+    height: 135px;
+   /*  background: #1ea0e9;
+    border-radius: 45%; */
+    margin: 15px;
+    font-size: smaller;
+}
+
+.badgeDesc{
+    text-align: center;
+}
+
+.badgeDesc img{
+    height: 80px;
+    width: 80px;
+    border-radius: 45%;
+    text-align: center;
+    margin-left: 5px;
+    margin-top: 10px;
+}
+
+.badgeDesc:hover{
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.badgeDesc:hover .badge-description-hover{
+    display: inline;
+}
+
+.badgeDesc.badgeDesc-selected{
+    border-radius: 15px;
+    background-color: #bdd1db;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.badgeDesc span{
+    font-style: italic;
+    text-align: center;
+}
+
+.badge-description-name{
+    position: relative;
+    top: 0%;
+    margin-top: 5%;
+    width: 85px;
+    height: 70px;
+    padding: 2px;
+}
+
+
+.badge-description-hover{
+    display: none;
+    width: 150px;
+    height: auto; /* 65px; adjust height based on the description*/
+    padding: 5px;
+    background-color: black;
+    border-radius: 10px;
+    color: #fff;
+    position: relative;
+    right: 30px;
+    float: left;
+}
+
+.badge-description-2-hover{
+    display: none;
+    width: 150px;
+    height: auto; /* 65px; adjust height based on the description*/
+    padding: 5px;
+    background-color: black;
+    border-radius: 10px;
+    color: #fff;
+    position: absolute;
+    right: 30px;
+    float: left;
+}
+
+
+.badgeCardHeader2{
+    padding-top: 1rem;
+    text-align: center;
+}
+
+
+.badgeCardBody > div {
+    flex: 1; /*grow*/
+    width: 100px;
+    height: 250px;
+    border: 1px solid #b3b3b3;
+    margin: 15px;
+    font-style: italic;
+    font-size: smaller;
+    text-align: center; /* puts the element/text in the middle of this div */
+}
+
+.badgeBody > div {
+
+    margin: 15px;
+    position: relative;
+}
+
+.badgeBodyC1:hover .badge-description-2-hover{
+    display: inline;
+}
+
+.badgeBody img{
+    height: 80px;
+    width: 70px;
+}
+
+span.sub-badges-name{
+    display:block;
+
+}
+
+.badgeBodyC2 span{
+    display: block;
+}
+
+

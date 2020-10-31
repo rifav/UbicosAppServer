@@ -1,16 +1,15 @@
 {% load static %}
+<h1>sample header</h1>
+<p class="cardDescription">Use the Upload button to select the image you want to upload in the gallery. You will see a confirmation message once your image is uploaded. </p>
+
 <div id="upload-view">
 
     <div  class="gallery-panel">
-         <h1>sample header</h1>
-
-         <p>Use the Upload button to select the image you want to upload in the gallery. You will see a success message once your image is uploaded. </p>
-
-
+<!--         <h1>sample header</h1>-->
 
         <div id="gallery-upload-div" class="gallery-upload-section">
             <div>
-                <img id="default" src="{% static 'pics/default.png' %}" alt="" style="height:300px;">
+                <img id="default" src="{% static 'pics/default.png' %}" alt="" style="height:300px;width:450px">
                 <!--<span class="badge"></span>-->
             </div>
 
@@ -27,7 +26,10 @@
 
         <div class="upload-success-msg" style="display:none">
           <span class="upload-success-msg-closebtn">&times;</span>
-          <p id="upload-success-msg-p"><strong>Your selected image was successfully uploaded.</strong></p>
+          <p id="upload-success-msg-p">
+              <strong>Your selected image was successfully uploaded. In the next section you will be looking at
+                  other peoples solution and brainstorm your thoughts. </strong>
+          </p>
         </div>
 
 

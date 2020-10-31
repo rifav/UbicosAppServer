@@ -20,6 +20,7 @@ urlpatterns = [
     url('saveIndividualCommentMsgs', views.saveIndividualCommentMsgs),
     url('getIndividualCommentMsgs/(?P<imageId>\d+)', views.getIndividualCommentMsgs),
     #urls for gallery image tool
+    url('getGalleryImage/(?P<act_id>\d+)', views.getGalleryImage),
     url('imageComment', views.broadcastImageComment),
     url('updateImageFeed/(?P<img_id>\d+)', views.updateImageFeed),
     #urls for self-gallery tool
@@ -32,15 +33,28 @@ urlpatterns = [
     url('updateFeed/(?P<id>\d+)', views.updateFeed),
     #url for khan academy tool
     url('saveKApost',views.saveKApost),
-    #utility urls
-    url('getBadges',views.getBadges), #used by gallery.js, kaform.js
 
+    #badge related urls
+    url('insertBadgeInfo',views.insertBadgeInfo), #used by gallery.js, kaform.js
+    url('getBadgeOptions',views.getBadgeOptions), #used by gallery.js, kaform.js
+    url('getBadgeNames',views.getBadgeNames), #used by gallery.js, kaform.js
+    url('saveBadgeSelection', views.saveBadgeSelection), #used by gallery.js, kaform.js
+
+    #computational model urls
+    url('computationalModel', views.computationalModel),
+    url('matchKeywords', views.matchKeywords),
+
+    #computational model urls
+    url('getCurrentUserGroupID/(?P<act_id>\d+)', views.getCurrentUserGroupID),
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),
     #url('addUserToGroups',views.addUserToGroupsForm),
+
     #urls for different tool utility
-    url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
+    # url('activityTracker',views.platformActivityList),
+
+    #url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('gallery/del/(?P<img_id>\d+)', views.imageDelete),
     # url('getGalleryPerID/(?P<gid>\d+)', views.getGalleryPerID),
@@ -52,14 +66,14 @@ urlpatterns = [
     url('brainstorm/del/(?P<note_id>\d+)', views.brainstormDelete),
     url('tableData/save/',views.tableEntriesSave),
     # url('submitAnswer',views.submitAnswer),
-    #url('uploadKAImage', views.uploadKAImage),
+
 
     #url('getKAPerKAID/(?P<ka_id>[0-9]+)',views.getKAPerKAID),
     #url('checkKAAnswer/(?P<ka_id>\d+)',views.checkKAAnswer),
     #url('dashboardKAInfo/(?P<ka_id>\d+)',views.dashboardKAInfo),
     #badges
     url('insertBadges',views.insertBadges),
-    url('getBadges',views.getBadges),
+
     # url('parser',views.pageParser),
     url('camera',views.camera),
     #url('randomDiscussionGroupCreate',views.random_discussion_group_generator),

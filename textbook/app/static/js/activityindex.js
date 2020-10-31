@@ -4,7 +4,8 @@ $(function(){
         //side navigation bar click events -- start
 
         //open the right-side-menu
-        $('#right-side-menu').click(function(e){
+        //$('#right-side-menu').click(function(e){
+        $('#study-menu').click(function(e){
             $("#mySidenav").css("width", "350px");
         });
 
@@ -56,7 +57,7 @@ $(function(){
 
             //highlight one module one at a time within respective <ul> tag
             $("#mySidenav a.nav").removeClass('active'); //remove all the active class so far
-            console.log($(this));
+            console.log('activityindex.js line 62', $(this));
             $(this).toggleClass('active'); //then add active class in the current selected <a> tag
 
             //get the page id, load that page, save the page id as the last accessed page
@@ -72,4 +73,5 @@ $(function(){
         //side navigation bar click events -- end
 
 })
+
 

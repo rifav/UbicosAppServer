@@ -3,14 +3,8 @@ var ind_act_id; //digTextbook.js --> loadIndividualFeed --> postIndMessages --> 
 var loaded_comments;
 
 $(function(){
-
-    //button color change with real time image navigation
-    imageNavigation();
-
     //adding user input button event action
     individiualMsgBtnAction();
-
-
 
 });
 
@@ -23,107 +17,63 @@ var loadIndividualFeed = function(act_id) {
 //      steps to be implemented:
 //      1. get all the images using the the current users group-mate info -- done in the server side
 //      2. make a query to retrieve the images and send back to the client side -- done in the server side with the following ajax
-//      3. display the images -- done with the following ajax
-//      4. setup commenting and display [only visible to the current user] -- done
+//      3. display the first images along with any comments made -- done with the following ajax
 
-        //this ajax completes the 1-4 steps
+        //this ajax completes the 1-2 steps
         $.ajax({
             type:'GET',
             url:'http://'+ host_url +'/getIndividualImages/'+act_id,
             async: false, //wait for ajax call to finish
             success: function(data){
+
                 data = JSON.parse(data.imageData);
-                //console.log(data)
+                //console.log('individual_gallery :: ', data)
                 //console.log(data[0].fields['gallery_id']);
 
                 //loop through the data to access each image and display the images
                 $.each(data, function(key, value){
-                    image_src = value.fields['image'];
-                    image_posted_by = value.fields['posted_by'];
+                    image_src = value['url'];
+                    image_pk = value['image_id'];
+                    image_posted_by = value['posted_by'];
                     var id=key+1;
-                    //update the image src
-                    $('#slide-'+id+' img').attr('src','/media/'+image_src);
-                    //update the img primary key
-                    $('#slide-'+id+' img').attr('data-imgID', value.pk);
-                    //console.log($('#slide-'+id+' img').attr('data-imgID'));
-                    //TODO: display who posted the image
-
-                    //hovering the image
-                    $('#slide-'+id+' img').hover(function(){
-                        $(this).css({ "-webkit-transform": "scale(1.2)",
-                               "transform":"scale(1.2) " ,
-                               "transition":"transform 0.25s ease"
-                               });
-                        }, function(){ //remove hovering effect
-                            $(this).css({ "-webkit-transform": "scale(1)",
-                                   "transform":"scale(1)" ,
-                                   "transition":"transform 0.25s ease"});
-                        });
+                    //we are only updating the a tags with the appropriate values;
+                    //update the image src in the a tag
+                    $("a[href='#slide-"+id).attr('data-imgSrc', image_src);
+                    //console.log($("a[href='#slide-"+id).attr('data-imgSrc'));
+                    //update the img primary key in the a tag
+                    $("a[href='#slide-"+id).attr('data-imgID', image_pk);
+                    //console.log($("a[href='#slide-"+id).attr('data-imgID'));
 
                 });//end of the each loop
             }//end of the success for the post ajax
 
         });//end of the ajax call
 
-        //display the comments of the first image, clear the feed first for previous additions
+        //step #3 is done below
+        //display the comments of the first image, clear the feed first to remove any previous additions
         $('#ind-feed').empty();
-
-        //initial display fix -- start
-        //initially no button is grey, so the variable is true
-        var noGrey=true;
-        $('.slider a').each(function(id,element){
-              //if there is any a tag element that is grey upon loading, means previously selected, so load the comments for that image
-              if($(element).css('background-color') == 'rgb(165, 168, 166)') {
-                var div = $(element).attr('href');
-                imagePk = $(div+" img").attr("data-imgID");
-                console.log('line 75 :: ',imagePk);
-                retrieveComments(imagePk);
-                noGrey=false;
-                return false;
-              }
-        });
-
-        //since no button is grey, means the first time loading, color the first button grey and load the comments for that image
-        if(noGrey==true) {
-            $('a[href="#slide-1"]').css('background-color',"#a5a8a6");
-            var imagePk = $('#slide-1 img').attr("data-imgID");
+//
+        //get the primary key of the first image from the a tag
+        var imagePk = $("a[href='#slide-1").attr("data-imgID");
+        //console.log('line 62 :: ', typeof(imagePk));
+        if(imagePk !== "") {
+            //console.log(imagePk);
+            //get the src from the first a tag, set the img src, and display the image
+            $('.slider img').attr("src", $("a[href='#slide-1").attr("data-imgSrc"));
+            //add the img imgID to be used when saving comments in the database
+            $('.slider img').attr("data-imgID", imagePk);
+            //console.log($('.slider img').attr("data-imgID"))
+            //get the comments
             retrieveComments(imagePk);
-        }
-        //initial display fix -- end
+         }else{
+            //if no image has been uploaded in this activity id, then imagePk can be null
+            console.log('no image currently added');
+         }
+
+
 
 
 } //end of loadIndividualFeed method
-
-
-var imageNavigation = function(){
-
-    $('.slider a').off().on('click', function(e){
-
-         //with each button click, change the color of the selected button
-         var href = $(this).attr('href');
-
-         //change the background of the currently selected number
-         $(this).css('background-color',"#a5a8a6");
-
-         //change the background of the other numbers to original white color
-         $('.slider a').not('[href="'+href+'"]').each(function(id,element){
-              //console.log($(element));
-              $(element).css('background-color',"white");
-         });
-
-         //with each click of the button empty the ind-feed first
-         $('#ind-feed').empty();
-
-         //comments are already retrieved when the page is loaded, so display based on the primary key of the image
-         //if data exists, display it in the ind-feed
-         var div = $(this).attr('href');
-         var imagePk = $(div+" img").attr("data-imgID");
-         //console.log("currently clicked image primary key :: " + imagePk);
-
-        retrieveComments(imagePk);
-
-    });
-} //end of buttonColorChange method
 
 
 var individiualMsgBtnAction = function(){
@@ -133,6 +83,7 @@ var individiualMsgBtnAction = function(){
         postIndMessage();
         //alert($("input[name='ind-msg-text']").val());
     });
+
     //adding event lister for 'enter' button
     $('#ind-msg-text').off().on('keypress', function (e) {
         if (e.which == 13) {
@@ -141,6 +92,39 @@ var individiualMsgBtnAction = function(){
          return false;
         }
       });
+
+    //todo add hovering effect
+
+    //navigation button clicks and respective updates in the img src and imgID
+    //image numbers navigation detection
+     $('.slider a').off().on('click', function(event){
+        //change the background color for currently selected number
+        $('.slider a').removeClass('slider-image-selected');
+        $(this).addClass('slider-image-selected');
+
+        //update the feed with the image selection
+        //1. with each click of the button empty the ind-feed first
+        $('#ind-feed').empty();
+
+         //2. get the selected images src from the a tag
+         var imgSrC = $(this).attr('data-imgSrc');
+         //console.log(imgSrC);
+         //set the image src
+         $('.slider img').attr("src", imgSrC);
+
+        var imagePk = $(this).attr('data-imgID');
+
+         if(imagePk !== "") {
+            //console.log(imagePk);
+            //3. set the imgID which can be used to save comment respective to this image
+            $('.slider img').attr("data-imgID", imagePk);
+            //4.update the feed
+            retrieveComments(imagePk);
+         }else{
+            console.log('no image currently added');
+         }
+
+     });
 
 } //end of individiualMsgBtnAction method
 
@@ -152,7 +136,7 @@ var postIndMessage = function (){
     if(!message){
         //message is empty;
         //entry into user log -- TODO fix the language
-        enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, current_pagenumber);
+        enterLogIntoDatabase('input button click', 'image-feed empty message input' , message, global_current_pagenumber);
         return;
     }
 
@@ -161,15 +145,17 @@ var postIndMessage = function (){
     enterLogIntoDatabase('click', 'activity-feed message input' , message, global_current_pagenumber);
 
     //check which image is open, extract that image data attribute (image PK) and pass that with the data to the server
-    var imagePk;
-    $('.slider a').each(function(id,element){
-              //console.log($(element));
-              if($(element).css('background-color') == 'rgb(165, 168, 166)') {
-                var div = $(element).attr('href');
-                imagePk = $(div+" img").attr("data-imgID");
-                console.log('post message in the server ', imagePk);
-              }
-    });
+    var imagePk = $('.slider a.slider-image-selected').attr('data-imgID');
+
+    if(imagePk == $('.slider img').attr('data-imgID')) {
+        //just an additional verification that the selected image and displayed image are the same
+        console.log(imagePk);
+    }else{
+        console.log(imagePk);
+        console.log($('.slider img').attr('data-imgID'))
+        console.log('not the same image, check');
+    }
+
 
 //    //triggers the event in views.py
     $.post({
@@ -185,13 +171,13 @@ var postIndMessage = function (){
             $("input[name='ind-msg-text']").val('');
 
             //display the message in the feed when posted
-            buildFeedwithMsgs(message);
+            buildFeedwithMsgs(message, "#ind-feed", logged_in);
 
         },
         error: function(){
             //inputEl.prop('disabled', false);
             $("input[name='ind-msg-text']").val('');
-            alert("select an image first using the numbered circular buttons.");
+            alert("Select a number that has image associated with it.");
 
             return false;
         }
@@ -199,30 +185,7 @@ var postIndMessage = function (){
 
 } // end of postIndMessage method
 
-//this method is used in three places: TODO
-//1)
-//3) gallery.js
-var buildFeedwithMsgs = function(message, container, username){
-    var li = $("<li/>").appendTo(container);
-    if(logged_in == username){
-       li.addClass('message self');
-    }else{
-       li.addClass('message');
-    }
-    var div = $("<div/>").appendTo(li);
-    div.addClass('user-image');
-    var span = $('<span/>', {text: username}).appendTo(div); //logged_in from utility.js
-    var p = $('<p/>', {text: message}).appendTo(li);
-    var div_msg = $("<div/>").appendTo(li);
-    div_msg.addClass('msg-timestamp');
-    var span_timestap = $('<span/>', {
-              text: "add_timestamp"}).appendTo(div_msg);
 
-    //TODO change this into a dynamic if else
-    $(container).animate({ scrollTop: $(container).height() }, 400);
-    //$(container).scrollTop($(container)[0].scrollHeight);
-
-}// end of buildFeedwithMsgs method
 
 var retrieveComments = function(imagePk){
 
@@ -236,12 +199,18 @@ var retrieveComments = function(imagePk){
               //console.log("when the page is loading :: ", loaded_comments);
               //console.log(jQuery.type(data));
               if(loaded_comments==0){//if no comment this data will be empty
-                console.log("no comment data");
+                console.log("no comment in this photo", imagePk);
               }else{
                 //show the first image comments with the loading of the images
                 //console.log(loaded_comments[0].fields['content']);
                 //TODO loop through loaded_comments to display all the messages; [0] only displays the first comment
-                buildFeedwithMsgs(loaded_comments[0].fields['content'], "#ind-feed",logged_in);
+                //defined in utility.js
+
+                    $.each(loaded_comments, function(key, value){
+                        //console.log(value['fields']['content']);
+                        buildFeedwithMsgs(value['fields']['content'], "#ind-feed",logged_in);
+                    });
+
               }
 
         },
@@ -275,6 +244,7 @@ var loadSelfImageFeed = function(act_id) {
                 //loop through the img msg data to access each commment and display under the images
                 $.each(img_msg, function(key, value){
                     //console.log(value);
+                    //defined in utility.j
                     buildFeedwithMsgs(value['content'], "#ind-comment-feed",value['posted_by__username']);
                 });//end of the each loop
             }//end of the success for the post ajax

@@ -1,11 +1,11 @@
-
 var host_url = window.location.host
 
 $(function(){
 
         $("#file-upload").change(function(event){
 
-                enterLogIntoDatabase('upload image', 'gallery image upload attempted' , '', global_current_pagenumber)
+
+                enterLogIntoDatabase('upload image', 'Attemped gallery image upload' , '', global_current_pagenumber)
 
                 console.log("file changed");
 
@@ -26,13 +26,17 @@ $(function(){
                       data : form_data,
                       success: function(response){
 
+                         //adjust the height and width of the image
+                        $("#gallery-upload-div img").width('100%').height('auto');
+
                         //success message upon uploading an image
                         $('.upload-success-msg').show();
 
 
+
+
                     }, error: function(response){
-                           //TODO: log this
-                           alert(data);
+                           enterLogIntoDatabase('upload image', 'Something went wrong while gallery image upload' , '', global_current_pagenumber);
                            $( ".upload-success-msg-p" ).text( "Something went wrong, try again" );
                     }
 

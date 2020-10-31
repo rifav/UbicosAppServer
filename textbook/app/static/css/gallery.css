@@ -3,7 +3,8 @@
 /* .center used to format login-form*/
 .center {
   position: absolute;
-	width: 340px; /*size of the div */
+  border-radius: 20px;
+	width: 470px; /*size of the div */
 	height: 250px;
     left: 550px; /*location of the div */
     top: 110px;
@@ -167,9 +168,10 @@ input[type="file"] {
     padding: 12px 12px;
     background: #edf1f2;
     border-radius: 20px;
-    width: 90%;
+    width: 95%;
     height: 20px;
     margin:0;
+    margin-left: 10px;
     font-family:verdana;
     font-size: 20px;
  }

@@ -5,10 +5,98 @@ var dict = {'suggestion': false, 'social' : false, 'relevance' : false, 'reflect
 
 $(function(){
 
+    //load the first set of badge and highlight it
+    updateBadgeCardBody('Understand Better!', 'msc');
+    //todo highlight
+
+    badgeCardActionItems();
+
+
    // displayAllBadges();
 
-
 })
+
+   //study2020v1 starts here
+var badgeCardActionItems = function(){
+
+    $(".badgeDesc").on('click', function(event){
+    /* If you call click on a class with jQuery it can bubble to other elements and register multiple clicks.
+    Stopping the propagation of that click event to other elements is how to solve this */
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        $('.badgeDesc').removeClass('badgeDesc-selected');
+        $(this).addClass('badgeDesc-selected');
+
+        //access the span element
+        var span_text = $(this).find('span.badge-description-name').text();
+        //get the data attribute
+        var badgeType = $(this).attr('data-id');
+        //console.log('line 28 :: ', badgeType)
+        updateBadgeCardBody(span_text, badgeType);
+
+    });
+}
+
+var updateBadgeCardBody = function(span_text, badgeType){
+    //update badgeCardHeader2 of badge.html
+    $('.badgeCardHeader2 h5').text("");
+    $('.badgeCardHeader2 h5').text(span_text);
+
+    //send badgeType to db and get the badge names
+    //TODO update the counts for each platform
+
+     $.ajax({
+
+            type:'POST',
+            async: false,
+            url:'http://'+ host_url +'/getBadgeNames/',
+            data: {'badgeType': badgeType},
+            success: function(response){
+                badgeNames = response.badgeNames; //array of names
+                //console.log('awardbanner.js line 49 :: ', badgeNames[0]['badgeName']);
+                //loop the variable badgeNames and update the html
+                i = 1;
+                $.each(badgeNames, function(key,elem){
+                    //console.log(badgeNames[key]['badgeName']);
+                    //set the badge name
+                    $('#badgeCard-badgeName'+i).text(badgeNames[key]['badgeName']);
+                    //set the description which is displayed upon hover
+                    $('#badgeCard-desc'+i).text(badgeNames[key]['definition']);
+                    //set the image source
+                    $('#badgeCard-img'+i).attr('src', '/static/pics/'+badgeNames[key]['imgName']+'.png');
+
+                    i = i + 1;
+                });
+
+                //update the count now
+                badgeCount = response.badgeCount;
+                //console.log(badgeCount);
+                //outer loop maintaining the three badges
+                i=1;
+                $.each(badgeCount, function(key,elem){
+                    //console.log(elem['badgeName']);
+                    //console.log(elem['count_List']); //badge count list for each of the three badges
+                    //inner loop for maintaining the count for three platforms
+                    j=1;
+                    platform = ['Modelbook', 'Khan Academy', 'Cobi'];
+                    $.each(elem['count_List'], function(key1, elem1){
+                        //updates the span
+                        //console.log(elem1);
+                        $('#badgePlatformC'+i+' .badge-count-platform-'+j).text(platform[key1]+': '+elem1['badgeCount']);
+                        j = j + 1;
+                    });
+                    i = i + 1;
+
+                });
+
+            }
+        });
+}
+   //study2020v1 ends here
+
+
+/* march/april 2019 version starts here
 
 //$( document ).ready(function() {
 //    setInterval(function(){
@@ -17,8 +105,6 @@ $(function(){
 //    console.log("check check");
 //    }, 5000);
 //});
-
-
 var getBadgesFromDB = function(){
 
     $.ajax({
@@ -169,4 +255,4 @@ var badge_dict_prompt_copy = {'suggestion': 'Next time try ...',
   }
 
 
-
+// march/april 2019 version starts here */

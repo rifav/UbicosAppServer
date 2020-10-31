@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
-    userQuesAnswerTable, groupInfo, userLogTable, badgeModel, studentCharacteristicModel, badgeInfo, KAPostModel
+    userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel,\
+    participationHistory
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -13,10 +14,13 @@ from django.db.models import Count
 from django.core import serializers
 from .parser import parser
 from .randomGroupGenerator import randomGroupGenerator
+from .badgeInfoFileRead import badgeInfoFileRead
+from .keywordMatch import keywordMatch
+from .binaryLogisticModel import binaryLogisticModel
 import json, random
 from datetime import datetime, timedelta
 from collections import Counter
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 
 
@@ -63,6 +67,14 @@ def broadcastImageComment(request):
     #solution: https://www.slideshare.net/BaabtraMentoringPartner/how-to-fix-must-be-an-instance-when-a-foreign-key-is-referred-django-python-mysql
     comment = imageComment(content=request.POST['message'], posted_by = request.user, imageId = img, activityID=request.POST['activityID'])
     comment.save()
+
+    #save into the history table once
+    if participationHistory.objects.filter(platform="MB", activity_id=request.POST['activityID'], posted_by=request.user).exists():
+        #do nothing
+        print();
+    else:
+        entry = participationHistory(platform="MB", activity_id=request.POST['activityID'],didParticipate='yes',posted_by=request.user);
+        entry.save()
 
     return JsonResponse({'success': '', 'errorMsg': True})
 
@@ -113,7 +125,7 @@ def login(request):
         # combination is valid - a User object is returned if it is.
         # user is created using the createsuperuser command
         user = authenticate(username=username, password=password)
-        print(user)
+        print('user :: ', user)
 
         if user:
             auth_login(request, user)
@@ -133,11 +145,13 @@ def login(request):
         return render(request, 'app/login.html', {})
 
 def saveCharacteristic(request):
-    #TODO update from the front-end
-    #loop through all the user and set some values
+    # TODO update from the front-end
+    # loop through all the user and set some values
+    # note: added has_social true for badge update consistency (more into computional model method). while
+    # the other four variables value will come from the survey, has_social will always be true.
     for o in User.objects.all():
         student_char = studentCharacteristicModel(user=o, has_msc=True,
-                                                  has_hsc=True, has_fam=True, has_con=True);
+                                                  has_hsc=True, has_fam=True, has_con=True, has_social=True);
         student_char.save();
 
 
@@ -155,6 +169,7 @@ def getCharacteristic(request, username):
     dict['hsc'] = info['has_hsc'];
     dict['fam'] = info['has_fam'];
     dict['con'] = info['has_con'];
+    dict['social'] = info['has_social'];
 
     return dict;
     #return JsonResponse({'info': dict});
@@ -167,11 +182,11 @@ def uploadImage(request):
 
         #get the gallery ID
         gallery_id = request.POST.get('act-id')
-        print('gallery_id :: ', gallery_id)
+        print('gallery_id :: ', gallery_id);
 
-        #get the student group ID
-        group_id = request.POST.get('group-id')
-        print('group_id :: ', group_id)
+        #made a query here to get the student group ID
+        group_id = getGroupID(request, gallery_id);
+        print('group_id :: ', group_id);
 
         # print(type(request.FILES['gallery_img'].name))
         # django.core.files.uploadedfile.InMemoryUploadedFile
@@ -179,7 +194,7 @@ def uploadImage(request):
         #get the logged in username
         username = ''
         if request.user.is_authenticated:
-            print('username :: ', request.user.get_username())
+            print('username :: ', request.user.get_username());
             username = request.user.get_username();
         else:
             print('user not signed in') #add in log
@@ -187,7 +202,7 @@ def uploadImage(request):
 
         #insert values in the database
         #TODO: restrict insertion if user is not signed in
-        img = imageModel(gallery_id=gallery_id, group_id = group_id , posted_by = request.user, image=request.FILES['gallery_img'])
+        img = imageModel(gallery_id=gallery_id, group_id = group_id , posted_by = request.user, image=request.FILES['gallery_img']);
         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
         img.save()
 
@@ -229,12 +244,23 @@ def getIndividualImages(request, act_id):
     #get the group members of the current users
     member_list = getGroupMembers(request, act_id);
     print("getIndividualImages member id list :: ", member_list);
-    #retrieve images from Image Model for each user in member_list
-    images = imageModel.objects.filter(posted_by_id__in=member_list);
-    image_data = serializers.serialize('json', images, use_natural_foreign_keys=True);
-    #print('debug, get individual images method :: ', image_data)
+    #retrieve the LAST image uploaded from Image Model for each user in member_list
 
-    return JsonResponse({'imageData': image_data});
+    image_list = [];
+    for user_id in member_list:
+        #get the LAST image uploaded by the user_id
+        images = imageModel.objects.filter(posted_by_id = user_id).last();
+        dict = {};
+        if images:
+            dict['posted_by'] = images.posted_by.get_username();
+            dict['image_id'] = images.pk;
+            dict['url'] = images.image.url;
+            image_list.append(dict);
+
+    #print('get individual images :: ', image_list);
+
+    return JsonResponse({'imageData': json.dumps(image_list)});
+    #return HttpResponse('');
 
 def saveIndividualCommentMsgs(request):
     #insert into the model
@@ -251,6 +277,39 @@ def getIndividualCommentMsgs(request,imageId):
     imageCommments = individualMsgComment.objects.filter(imageId=imageId, posted_by=request.user);
     imageCommments = serializers.serialize('json', imageCommments, use_natural_foreign_keys=True);
     return JsonResponse({'imageCommments': imageCommments});
+
+#used in gallery.js
+def getGalleryImage(request, act_id):
+
+    print('Getting gallery image for activity id  ::', act_id);
+    # first get the images from the group-members
+    # get the group members of the current users
+    member_list = getGroupMembers(request, act_id);
+
+
+    #get all the image id by the member list
+    member_image_id_query= imageModel.objects.filter(posted_by__in=member_list, gallery_id=act_id).values('id');
+    member_image_id_list = [item['id'] for item in member_image_id_query];
+    print('line 289 :: ', member_image_id_list);
+
+    all_image_id_query = imageModel.objects.filter(gallery_id=act_id).values('id');
+    all_image_id_list = [item['id'] for item in all_image_id_query];
+    print('line 293 :: ', all_image_id_list);
+
+    outside_group_image = list(set(all_image_id_list) - set(member_image_id_list))
+    outside_group_image_id = random.choice(outside_group_image);
+    print('line 297 :: ', outside_group_image_id);
+
+    images = imageModel.objects.filter(id=outside_group_image_id).values('image');
+    if images:
+        dict = {}
+        dict['imagePk'] = outside_group_image_id;
+        dict['url'] = images[0]['image'];
+        return JsonResponse({'imageData': dict});
+    else:
+        return HttpResponse('');
+
+
 
 #used in gallery.js
 def updateImageFeed(request, img_id):
@@ -283,90 +342,249 @@ def getSelfGalleryContent(request, act_id):
 
     return JsonResponse({'success': dict});
 
-
-def getBadges(request):
-    # msc = badgeInfo(charac='msc', value='True', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='msc', value='False', index=1, badgeName='Brainstorm',
-    #                 platform='TA',
-    #                 prompt='Coming up with the solution is difficult! Share your thoughts about the [topic_variable] so together you can come up with different ideas to solve the problem',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='hsc', value='True', index=1, badgeName='Elaboration',
-    #                 platform='TA', prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
-    #                 sentence_opener='We can combine our opinion into...');
-    # msc.save();
-    # msc = badgeInfo(charac='hsc', value='False', index=1, badgeName='Elaboration',
-    #                 platform='TA',
-    #                 prompt='Giving explanation is hard. Imagine an example that best illustrate the problem and help you explain what you are thinking.',
-    #                 sentence_opener='We can combine our opinion into...');
-    # msc.save();
-    # msc = badgeInfo(charac='fam', value='True', index=1, badgeName='Feedback',
-    #                 platform='TA', prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
-    #                 sentence_opener='I would like to suggest...');
-    # msc.save();
-    # msc = badgeInfo(charac='fam', value='False', index=1, badgeName='Feedback',
-    #                 platform='TA',
-    #                 prompt='Summarize what the other person is saying. Make sure you understand the idea they are trying to get across. ',
-    #                 sentence_opener='I would like to suggest...');
-    # msc.save();
-    # msc = badgeInfo(charac='con',value='True',index=1,badgeName='Reflection',
-    #                 platform='TA',prompt='Look at others solution and reflect whether you agree with them or not.',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-    # msc = badgeInfo(charac='con', value='False', index=1, badgeName='Reflection',
-    #                 platform='TA', prompt='Look at others solution and reflect whether you agree with them or not.',
-    #                 sentence_opener='This is similar to what I was thinking because…');
-    # msc.save();
-
-    #get platform from the front end
+#very poor coding, fix when time
+def getBadgeNames(request):
     if request.method == 'POST':
-        platform = request.POST.get('platform');
-        username = request.POST.get('username');
+        badgeType = request.POST.get('badgeType');
+        #print('346 :: ', badgeType)
 
-    #get the students characteristic from the database
-    charac = getCharacteristic(request,username);
-    #print('accessing charac', charac['msc']);
+        #used value = "True" to get the three badgenames; true/false either way we have three badges
+        badges = list(badgeInfo.objects.filter(charac=badgeType, value="True").values('badgeName', 'imgName', 'definition').distinct());
 
+        #print('line 296', badges);
+
+        badgeCountList = [];
+        for badge in badges:
+            dict = {}
+            dict['badgeName'] = badge['badgeName'];
+            #print(dict['badgeName']);
+            platform = ['MB', 'KA', 'TA'];
+            count_list = [];
+            for i in platform:
+                count = {}
+                #print(i);
+                #get the badgecount for each platform
+                count['platform'] = i;
+                badge_count = badgeReceived.objects.filter(userid_id=request.user, badgeTypeReceived = dict['badgeName'].lower(), platform=i).values('platform')\
+                    .annotate(Count('platform'));
+                #print(badge_count);
+                if badge_count:
+                    count['badgeCount'] = badge_count[0]['platform__count'];
+                else:
+                    count['badgeCount'] = 0;
+
+                count_list.append(count);
+
+            #print('line 376 (debug purpose):: ', count_list);
+            dict['count_List'] = count_list;
+            #append this to the main list
+            badgeCountList.append(dict);
+
+        #print('line 382 badge count list (debug) :: ', badgeCountList);
+
+        return JsonResponse({'badgeNames': badges, 'badgeCount': badgeCountList});
+    return HttpResponse('');
+
+
+#this method is called from gallery.js/khan academy content.js, and teachable agent <fileName>
+#https://stackoverflow.com/questions/18045867/post-jquery-array-to-django
+def getBadgeOptions(request, username, platform, badgeKey):
+
+    print('line 393 /getBadgeOptions :: ', badgeKey);
+
+    #get the students characteristic VALUES from the database
+    charac = getCharacteristic(request, username);
+    #print('line 309 accessing charac list :: ', charac);
+    #print('line 310 accessing charac value :: ', charac['social']);
+
+    #separatae no participation badge vs constructive badge -- through badgeKey List
     dict = {};
-    #make 3 separate queries
-    #TODO: how to make it into one query
-    #TODO: handle index for randomization
-    #TODO: separatae no participation badge vs constructive badge
-    msc_badge = list(badgeInfo.objects.filter(charac='msc',platform=platform,
-                                              value=charac['msc'],index=1).values('badgeName','prompt','sentence_opener'));
-    dict['msc'] = msc_badge;
-    hsc_badge = list(badgeInfo.objects.filter(charac='hsc',platform=platform,
-                                  value=charac['hsc'], index=1).values('badgeName', 'prompt', 'sentence_opener'));
-    dict['hsc'] = hsc_badge;
-    fam_badge = list(badgeInfo.objects.filter(charac='fam',platform=platform,
-                                              value=charac['fam'], index=1).values('badgeName', 'prompt',
-                                                                                   'sentence_opener'));
-    dict['fam'] = fam_badge;
+    for elem in badgeKey:
+        original_elem = elem; #msc, hsc, fam, con1, con2, social
 
-    #print('872 :: ', type(msc_badge[0]));
+        #little adjustment made to display all the three badges un the interface
+        if(elem == 'con1' or elem == 'con2'):
+            elem = elem.replace(elem,"con");
 
-    return JsonResponse({'badgeList': dict})
-    #return HttpResponse('');
+        #handle randomization using index key
+        index_list = [1,2,3];
+        so = [1,2];
+        badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
+                                                  value=charac[elem],index=random.choice(index_list)).values('badgeName','prompt','sentence_opener1'));
+        dict[original_elem] = badge_item;
 
+    print('line 418 /getbadgeOptions', dict);
+
+    #todo handle topic_variable here
+
+    return dict; #goes back to computationalModel method
+
+
+# this comes from the extension
 def saveKApost(request):
     # get the data
     if request.method == 'POST':
-        username = request.POST.get('username');
-        pagetitle = request.POST.get('pagetitle');
+        username = request.POST.get('username').split(" ")[0];
+        pagetitle = request.POST.get('pageURL');
         textareaId = request.POST.get('textareaId');
         content = request.POST.get('content');
 
-    # check if an answer is already present for this textarea, then update else enter
-    if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
-        KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)). \
-            update(content=content);
-    else:
-        ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
-        ka_answer.save();
+        print('line 430 :: ', username);
+
+        # check if an answer is already present for this textarea, then update else enter
+        if KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)).exists():
+            KAPostModel.objects.filter(title = pagetitle).filter(textareaID = textareaId).filter(posted_by=User.objects.get(username=username)). \
+                update(content=content);
+        else:
+            ka_answer = KAPostModel(title = pagetitle, textareaID = textareaId, content=content, posted_by=User.objects.get(username=username));
+            ka_answer.save();
+
+            #insert an entry into the participation history for this activity id
+            #entry = participationHistory(platform='KA', activity_id='', didParticipate='yes', posted_by=request.user);
+        return HttpResponse('successfully inserted');
+
+    return HttpResponse('');
+
+def saveBadgeSelection(request):
+    # get the data
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        platform = request.POST.get('platform');
+        activity_id = request.POST.get('activity_id');
+        title = request.POST.get('title');
+        selected_badge = request.POST.get('selected_badge');
+
+        #save users' selected badge
+        badge_Selected = badgeSelected(userid=User.objects.get(username=username), platform=platform, activity_id=activity_id, title=title,
+                                badgeTypeSelected=selected_badge);
+        badge_Selected.save();
+
+        return HttpResponse('');
+
+    return HttpResponse('');
+
+
+#modelbook: gallery ID
+#khanacademy: khan academy
+def computationalModel(request):
+    if request.method == 'POST':
+        username = request.POST.get('username');
+        platform = request.POST.get('platform');
+        activity_id = request.POST.get('activity_id');
+
+        # first check if this student will participate or not based on their history
+        # willParticipate = false --> when the student did not participate in the last two activities -- badgeKey = NP related key
+        # willParticipate = true --> when the student participated in the last two activities -- badgeKey = CP related key
+
+        willParticipate = False;
+        if (platform == 'TA'):
+            #for TA, willParticipate will come from the csharp server; based on utterance count
+            #True means participate; null means no participate (false)
+            willParticipate = bool(request.POST.get('willParticipate')); #this comes from TA
+        else:
+            #for the other two platforms, calculate will participate variable here
+            if int(activity_id) == 1:
+                willParticipate = True; #why? or we can choose it randomly
+            elif int(activity_id) >= 2:
+                prev_acID = int(activity_id)-1;
+
+                #check if participated in the previous activity if a given platform
+                # the following table should have one entry [per activity id] at any moment of time
+                didParticipate = participationHistory.objects.filter(posted_by=request.user,
+                                                                     activity_id=prev_acID,
+                                                                     platform=platform).values('didParticipate');
+
+                print('line 496 did participate in the prev activity?', didParticipate);
+                #if there is a queryset, means current user participated in the previous activity
+                if didParticipate:
+                    willParticipate = True;
+                else: #because did not participate in the previous act
+                    willParticipate = False;
+
+        #second, using the willParticipate variable, decide whether to call CPmodel or not
+        badgeKey = [];
+        if(willParticipate == True):
+            #call the CP model equation here to check the likelihood of participation and log it
+            #first, get students characteristic
+            charac = studentCharacteristicModel.objects.filter(user = request.user).values('has_msc', 'has_hsc', 'has_fam')
+            charac_dict = [dict(item) for item in charac]
+            #print('link 510 :: ', charac_dict);
+            likelihood = binaryLogisticModel.model(None, charac_dict, platform);
+            print('from the view class, likelihood score', likelihood);
+            # todo log this (student id, activity id, platform, likelihood)
+            # later from the data will verify whether students participated or not
+            badgeKey = ['msc', 'hsc', 'fam']
+        else:
+            #based on student history, will not participate so display conscien and social badges
+            badgeKey = ['con1', 'con2', 'social']
+
+
+        badgeList = getBadgeOptions(request, username, platform, badgeKey);
+
+        return JsonResponse({'badgeList': badgeList}); #goes back to utility.js
+
+    return HttpResponse('');
+
+def matchKeywords(request):
+    praise_messages_part1_list = ['Very Good!', 'Well Done!', 'Way to go!', 'Wonderful!', 'Great Effort!', 'Nice One!'];
+    praise_messages_part1 = random.choice(praise_messages_part1_list);
+
+    # the keywords are the badgenames (so check with the excel sheet and be consistent, else error)
+    praise_message_part2_dict = \
+        {'brainstorm': 'This will help you to understand better.',
+         'question': 'Asking questions helps you to understand better.',
+         'critique': 'This will help you to understand better.',
+         'elaborate': 'This will benefit your help-giving skills.',
+         'share': 'Sharing thoughts helps you to put them into words.',
+         'challenge': 'This will benefit your help-giving skills.',
+         'feedback': 'Your feedback to others is highly appreciated!',
+         'addon': 'Adding to an existing conversation is useful.',
+         'summarize': 'Summarizing is a great skill.',
+         'answer': 'Responding to others is a great way of learning.',
+         'reflect': 'Reflecting on others work is good.',
+         'assess': 'Evaluating others work is a skill!',
+         'participate': 'Participation is a great collaborative technique!',
+         'appreciate': 'Appreciating others encourages collaboration.',
+         'encourage': 'Encouraging others helps in a collaboration.'
+         }
+
+    if request.method == 'POST':
+        username = request.POST.get('username').split(" ")[0];
+        print('line 448 from KA', username);
+        activity_id = request.POST.get('activity_id');
+        platform = request.POST.get('platform');
+        message = request.POST.get('message');
+        selected_badge = request.POST.get('selected_badge');
+
+
+        if(platform == 'KA'):
+            #get the selected badge using the URL sent
+            ka_url = request.POST.get('ka_url');
+
+            entry = badgeSelected.objects.filter(userid_id=User.objects.get(username=username)).filter(platform=platform).\
+                values('activity_id','badgeTypeSelected').last();
+            print('line 463 :: ', entry);
+            activity_id = entry['activity_id'];
+            selected_badge = entry['badgeTypeSelected'];
+
+
+
+        selected_badge = selected_badge.lower();
+        isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
+        if(isMatch):
+            entry = badgeReceived(userid_id=User.objects.get(username=username).pk, platform=platform,
+                                  activity_id = activity_id, message = message, badgeTypeReceived = selected_badge);
+            entry.save();
+        #isMatch = true; update badgecount #todo maintain another table for this, this will be used to update the badgeCard
+        #isMatch = false;
+
+        #todo think about a table with specific activity name
+        #praised text generated randomly
+        praiseText = praise_messages_part1 +' '+praise_message_part2_dict[selected_badge];
+
+
+        return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText, 'selected_badge': selected_badge});
+
     return HttpResponse('');
 
 ###############################################
@@ -385,6 +603,10 @@ def getGroupID(request, act_id):
 
     return groupID[0].group;
 
+def getCurrentUserGroupID(request, act_id):
+
+    return JsonResponse({'groupID': getGroupID(request, act_id)});
+
 #input: activity ID
 #output: return the ID of the group members of the current user for the given activity
 def getGroupMembers(request, act_id):
@@ -400,19 +622,27 @@ def getGroupMembers(request, act_id):
 
     return group_member_list;
 
+#this method reads badge info from an excel and saves into the database
+#file location is hardcoded i.e., downloads folder of IA computer
+def insertBadgeInfo(request):
+
+    #1. read the excel file (used a separate py file for this)
+    bagdeInfoList = badgeInfoFileRead.fileRead(None);
+    #print(type(bagdeInfoList));
+
+    # 2. insert into the table
+    for badgeElem in bagdeInfoList:
+        #print(badgeElem['characteristic'])
+        entry = badgeInfo(charac = badgeElem['characteristic'], value = badgeElem['value'], badgeName = badgeElem['badge_name'], index = badgeElem['index'],
+                    platform = badgeElem['platform'], imgName = badgeElem['imgName'], definition = badgeElem['definition'],
+                          prompt = badgeElem['badge_prompt'], sentence_opener1 = badgeElem['badge_ss1'], sentence_opener2 = badgeElem['badge_ss2']);
+        entry.save();
+
+    return HttpResponse('');
+
 ############ handler methods end ############
 #############################################
 
-
-
-def getImageID(request,img_filename):
-    print('receiving parameter :: file name :: ' + img_filename);
-
-    img = imageModel.objects.filter(image='images/'+img_filename)
-    image_data = serializers.serialize('json', img, use_natural_foreign_keys=True)
-    #print(image_data[0].fields)
-    #print(img[0].pk)
-    return JsonResponse({'imageData': image_data})
 
 def getImagePerUser(request, act_id, username):
     print('receiving parameter :: activity id :: username ' + act_id + '  ' + username);
@@ -498,9 +728,6 @@ def tableEntriesSave(request):
     entries.save();
 
     return HttpResponse('');
-
-
-
 
 # delete the following method
 # def uploadKAImage(request):
@@ -947,7 +1174,7 @@ def getDashboard(request):
     return render(request, 'app/dashboard.html');
 
 def insertBadges(request):
-    badge = badgeModel(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
+    badge = badgeReceived(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
                        platform = request.POST.get('platform'), userid = request.user)
     badge.save()
 
@@ -1137,88 +1364,57 @@ def userLogFromExtenstion(request):
 #if this method is called with users already existing in the database, will return a django error message
 def createBulkUser(request):
 
-    # 29 user for the study + 3 user
+    # 19 user for the study + 1 teacher user + 2 test user
 
-    #group 1
-    user = User.objects.create_user('panda', '', 'panda');
+    #whiteboard-group 1
+    user = User.objects.create_user('Squirtle', '', 'study6109');
     user.save();
-    user = User.objects.create_user('liger', '', 'liger');
+    user = User.objects.create_user('Bulbasaur', '', 'study2710');
     user.save();
-    user = User.objects.create_user('sheep', '', 'sheep');
-    user.save();
-
-    # group 2
-    user = User.objects.create_user('fox', '', 'fox');
-    user.save();
-    user = User.objects.create_user('leopard', '', 'leopard');
-    user.save();
-    user = User.objects.create_user('zebra', '', 'zebra');
+    user = User.objects.create_user('Dragonite', '', 'study2391');
     user.save();
 
-    # group 3
-    user = User.objects.create_user('bat', '', 'bat');
+    #whiteboard-group 2
+    user = User.objects.create_user('Gengar', '', 'study9273');
     user.save();
-    user = User.objects.create_user('dog', '', 'dog');
+    user = User.objects.create_user('Eevee', '', 'study3452');
     user.save();
-    user = User.objects.create_user('squirrel', '', 'squirrel');
-    user.save();
-
-    #group 4
-    user = User.objects.create_user('dolphin', '', 'dolphin');
-    user.save();
-    user = User.objects.create_user('elephant', '', 'elephant');
-    user.save();
-    user = User.objects.create_user('tiger', '', 'tiger');
+    user = User.objects.create_user('Charizard', '', 'study0013');
     user.save();
 
-    #group 5
-    user = User.objects.create_user('fish', '', 'fish');
+    # whiteboard-group 3
+    user = User.objects.create_user('Umbreon', '', 'study3920');
     user.save();
-    user = User.objects.create_user('frog', '', 'frog');
+    user = User.objects.create_user('Gyarados', '', 'study3525');
     user.save();
-    user = User.objects.create_user('monkey', '', 'monkey');
-    user.save();
-
-    #group 6
-    user = User.objects.create_user('ant', '', 'ant');
-    user.save();
-    user = User.objects.create_user('kangaroo', '', 'kangaroo');
-    user.save();
-    user = User.objects.create_user('rabbit', '', 'rabbit');
+    user = User.objects.create_user('Charmander', '', 'study0952');
     user.save();
 
-
-    #group-7
-    user = User.objects.create_user('bear', '', 'bear');
+    #whiteboard-group 4
+    user = User.objects.create_user('Ponyta', '', 'study1259');
     user.save();
-    user = User.objects.create_user('duck', '', 'duck');
+    user = User.objects.create_user('Lapras', '', 'study9251');
     user.save();
-    user = User.objects.create_user('hippo', '', 'hippo');
-    user.save();
-
-
-    #group 8
-    user = User.objects.create_user('giraffe', '', 'giraffe');
-    user.save();
-    user = User.objects.create_user('bee', '', 'bee');
-    user.save();
-    user = User.objects.create_user('eagle', '', 'eagle');
+    user = User.objects.create_user('Geodude', '', 'study8525');
     user.save();
 
-    # group 9
-    user = User.objects.create_user('deer', '', 'deer');
+    # whiteboard-group 5
+    user = User.objects.create_user('Chansey', '', 'study0193');
     user.save();
-    user = User.objects.create_user('penguin', '', 'penguin');
+    user = User.objects.create_user('Psyduck', '', 'study6123');
+    user.save();
+    user = User.objects.create_user('Horsea', '', 'study8723');
     user.save();
 
-
-    #group 10
-    user = User.objects.create_user('alligator', '', 'alligator');
+    #whiteboard-group 6
+    user = User.objects.create_user('Paras', '', 'study5283');
     user.save();
-    user = User.objects.create_user('raccoon', '', 'raccoon');
+    user = User.objects.create_user('Mew', '', 'study5105');
     user.save();
-    user = User.objects.create_user('lion', '', 'lion');
-    user.save()
+    user = User.objects.create_user('Tangela', '', 'study6209');
+    user.save();
+    user = User.objects.create_user('Seel', '', 'study6601');
+    user.save();
 
 
     #group 11 - teacher/developers
@@ -1232,17 +1428,54 @@ def createBulkUser(request):
 
     return render(request, 'app/login.html', {})
 
+# def platformActivityList(request):
+#     #Khan Academy activities
+#     entry = platformActivityList(platform='KA', title = 'https://www.khanacademy.org/math/pre-algebra/pre-algebra-ratios-rates/pre-algebra-ratios-intro/v/ratios-intro',
+#                             activity_id = 1, topic='Intro to Ratio');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/cc-seventh-grade-math/cc-7th-ratio-proportion/7th-constant-of-proportionality/v/introduction-proportional-relationships',
+#                             activity_id=2,topic='Proportional Relationship');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/algebra-basics/alg-basics-linear-equations-and-inequalities/alg-basics-write-and-solve-proportions/v/find-an-unknown-in-a-proportion',
+#                             activity_id=3, topic='Find Unknown in a proportion');
+#     entry.save();
+#
+#     entry = platformActivityList(platform='KA',
+#                             title='https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-linear-equations-functions/cc-8th-graphing-prop-rel/v/graphing-proportional-relationships-example',
+#                             activity_id=4, topic='Graphing proportional relationship');
+#     entry.save();
+#
+#     # gallery activities
+#
+#     entry = platformActivityList(platform='MB',
+#                             title='Perfect Purple Paint',
+#                             activity_id=1, topic='ratio');
+#     entry.save();
+#
+#     entry = platformActivityList(platform="MB",
+#                             title='Ratio Assignment Discussion',
+#                             activity_id=1, topic="ratio");
+#     entry.save();
+#
+#     return HttpResponse('');
+
+
+
+
 def groupAdd(request):
 
     users_list = [str(user) for user in User.objects.all()]
     print(len(users_list))
 
-    usernames_array = ["giraffe", "raccoon", "ant", "tiger", "sheep", "deer", "panda", "liger", "fox", "hippo", "alligator",
-                       "dog", "dolphin", "eagle", "zebra", "rabbit", "bear","monkey", "leopard", "frog", "squirrel", "elephant", "bee",
-                       "duck", "kangaroo", "penguin", "fish","bat", "lion", "AW", "user1", "user2"];
+    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Seel", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
+                       "Mew", "Dragonite", "Charizard", "Charmander", "Geodude", "Horsea","Tangela", "Gengar", "AW", "user1", "user2"];
 
-    username_groupID = ['1', '1', '2', '2', '2', '3', '3', '3', '4', '4', '4', '5', '5', '5', '6', '6', '6','7', '7',
-                        '7', '8', '8', '8', '9', '9', '9','10', '10', '10', '11', '11', '11']
+    username_groupID = ['1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '4', '4','4', '4','5','5','5']
+
 
     # for i in range(len(usernames_array)):
     #     print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
