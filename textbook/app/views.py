@@ -146,6 +146,7 @@ def login(request):
 
 def saveCharacteristic(request):
     # TODO update from the front-end
+    # todo; write a code for the file read
     # loop through all the user and set some values
     # note: added has_social true for badge update consistency (more into computional model method). while
     # the other four variables value will come from the survey, has_social will always be true.
@@ -316,8 +317,6 @@ def getGalleryImage(request, act_id):
         else:
             return HttpResponse('');
 
-
-
 #used in gallery.js
 def updateImageFeed(request):
 
@@ -370,7 +369,7 @@ def getSelfGalleryContent(request, act_id):
 
     return JsonResponse({'success': dict});
 
-#very poor coding, fix when time
+# used in the badgeCard, get the badge names and count
 def getBadgeNames(request):
     if request.method == 'POST':
         badgeType = request.POST.get('badgeType');
@@ -423,7 +422,7 @@ def getBadgeOptions(request, username, platform, badgeKey):
     #get the students characteristic VALUES from the database
     charac = getCharacteristic(request, username); #this is a dict
     #print('line 309 accessing charac list :: ', charac);
-    #print('line 310 accessing charac value :: ', charac['social']);
+    print('line 310 accessing charac value :: ', type(charac['social']));
 
     #separatae no participation badge vs constructive badge -- through badgeKey List
     dict = {};
@@ -664,6 +663,19 @@ def getWhiteboardURl(request, board_id):
 
     return JsonResponse({'url':url});
 
+#updates the chat feed
+def updateFeed(request, id):
+
+    # message of all times
+    msg = Message.objects.filter(activity_id = id);
+    msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
+    return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
+
+    # #separate message today vs other days -- keeping for any future use
+    # msg = Message.objects.filter(posted_at__gte = datetime.now() - timedelta(days=1)); #returns all the comment from today
+    # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True);
+    # print('msg :: ', msg_data);
+    # return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True});
 
 
 ###############################################
@@ -754,38 +766,14 @@ def insertKhanAcademyInfo(request):
 
 ############ handler methods end ############
 #############################################
+#
 
 
-def getImagePerUser(request, act_id, username):
-    print('receiving parameter :: activity id :: username ' + act_id + '  ' + username);
 
-    image_list = imageModel.objects.filter(gallery_id=act_id).filter(posted_by=User.objects.get(username=username))
-    image_data = serializers.serialize('json', image_list, use_natural_foreign_keys=True)
 
-    print(image_data)
-
-    return JsonResponse({'success': image_data})
-
-def imageDelete(request, img_id):
-    img = imageModel.objects.get(pk=img_id)
-    # This will delete the image and all of its Entry objects.
-    print(img)
-    img.delete()
-
-    return HttpResponse('deleted?')
-
-def updateFeed(request, id):
-
-    # message of all times
-    msg = Message.objects.filter(activity_id = id);
-    msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True)
-    return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True})
-
-    # #separate message today vs other days -- keeping for any future use
-    # msg = Message.objects.filter(posted_at__gte = datetime.now() - timedelta(days=1)); #returns all the comment from today
-    # msg_data = serializers.serialize('json', msg, use_natural_foreign_keys=True);
-    # print('msg :: ', msg_data);
-    # return JsonResponse({'success': msg_data, 'username': request.user.get_username(), 'errorMsg': True});
+##############################################
+##Codes used from the previous version-start##
+##############################################
 
 
 def brainstormSave(request):
@@ -841,6 +829,131 @@ def tableEntriesSave(request):
 
     return HttpResponse('');
 
+def registerUser(request):
+    return render(request, 'app/register.html', {})
+
+def groupAdd(request):
+
+    users_list = [str(user) for user in User.objects.all()]
+    print(len(users_list))
+
+    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Ekans", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
+                       "Mew", "Dragonite", "Charizard", "Charmander", "Geodude", "Horsea","Tangela", "Gengar", "AW", "user1", "user2"];
+
+    username_groupID = ['1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '4', '4','4', '4','5','5','5']
+
+
+    # for i in range(len(usernames_array)):
+    #     print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
+    #
+
+    #rangeVal = total number of unique gallery activities
+    rangeVal = 6;
+    for username in users_list:
+        for i in range(1, rangeVal):
+            member = groupInfo(activityID=i, group=username_groupID[usernames_array.index(username)],
+                               users=User.objects.get(username=username))
+            member.save();
+
+    return render(request, 'app/login.html', {});
+
+
+def userlog(request):
+
+    log = userLogTable(username=request.user, action=request.POST.get('action'), type=request.POST.get('type'),
+                       input=request.POST.get('input'), pagenumber=request.POST.get('pagenumber'))
+    log.save()
+
+    return HttpResponse('')
+
+def createBulkUser(request):
+
+    # 19 user for the study + 1 teacher user + 2 test user
+
+    #whiteboard-group 1
+    user = User.objects.create_user('Squirtle', '', 'study6109');
+    user.save();
+    user = User.objects.create_user('Bulbasaur', '', 'study2710');
+    user.save();
+    user = User.objects.create_user('Dragonite', '', 'study2391');
+    user.save();
+
+    #whiteboard-group 2
+    user = User.objects.create_user('Gengar', '', 'study9273');
+    user.save();
+    user = User.objects.create_user('Eevee', '', 'study3452');
+    user.save();
+    user = User.objects.create_user('Charizard', '', 'study0013');
+    user.save();
+
+    # whiteboard-group 3
+    user = User.objects.create_user('Umbreon', '', 'study3920');
+    user.save();
+    user = User.objects.create_user('Gyarados', '', 'study3525');
+    user.save();
+    user = User.objects.create_user('Charmander', '', 'study0952');
+    user.save();
+
+    #whiteboard-group 4
+    user = User.objects.create_user('Ponyta', '', 'study1259');
+    user.save();
+    user = User.objects.create_user('Lapras', '', 'study9251');
+    user.save();
+    user = User.objects.create_user('Geodude', '', 'study8525');
+    user.save();
+
+    # whiteboard-group 5
+    user = User.objects.create_user('Chansey', '', 'study0193');
+    user.save();
+    user = User.objects.create_user('Psyduck', '', 'study6123');
+    user.save();
+    user = User.objects.create_user('Horsea', '', 'study8723');
+    user.save();
+
+    #whiteboard-group 6
+    user = User.objects.create_user('Paras', '', 'study5283');
+    user.save();
+    user = User.objects.create_user('Mew', '', 'study5105');
+    user.save();
+    user = User.objects.create_user('Tangela', '', 'study6209');
+    user.save();
+    user = User.objects.create_user('Ekans', '', 'study0922');
+    user.save();
+
+
+    #group 11 - teacher/developers
+    user = User.objects.create_user('AW', '', 'AW');
+    user.save();
+    user = User.objects.create_user('user1', '', 'user1');
+    user.save();
+    user = User.objects.create_user('user2', '', 'user2');
+    user.save();
+
+
+    return render(request, 'app/login.html', {})
+
+##############################################
+##Codes used from the previous version-end##
+##############################################
+
+# def getImagePerUser(request, act_id, username):
+#     print('receiving parameter :: activity id :: username ' + act_id + '  ' + username);
+#
+#     image_list = imageModel.objects.filter(gallery_id=act_id).filter(posted_by=User.objects.get(username=username))
+#     image_data = serializers.serialize('json', image_list, use_natural_foreign_keys=True)
+#
+#     print(image_data)
+#
+#     return JsonResponse({'success': image_data})
+
+# def imageDelete(request, img_id):
+#     img = imageModel.objects.get(pk=img_id)
+#     # This will delete the image and all of its Entry objects.
+#     print(img)
+#     img.delete()
+#
+#     return HttpResponse('deleted?')
+
 # delete the following method
 # def uploadKAImage(request):
 #     #get image from html and save it in the database
@@ -860,7 +973,6 @@ def tableEntriesSave(request):
 #
 #         #insert values in the database
 #         ka_image_upload = khanAcademyAnswer(ka_id=ka_id, ka_image=request.FILES['ka_img_name'], posted_by=request.user);
-#         # TODO: check whether the insertion was successful or not, else wrong image will be shown using the last() query
 #         ka_image_upload.save();
 #
 #         latest_upload = khanAcademyAnswer.objects.filter(ka_id=ka_id).last()
@@ -880,8 +992,7 @@ def tableEntriesSave(request):
 
 # def submitKAAnswer(request):
 #     #check if any query present for that KA
-#
-#     #TODO: try update_or_create method
+
 #     if khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).exists():
 #
 #         khanAcademyAnswer.objects.filter(ka_id=request.POST.get('activity_id')).filter(pk=request.POST.get('imgID')).filter(posted_by=request.user).\
@@ -894,8 +1005,7 @@ def tableEntriesSave(request):
 #
 #     return HttpResponse('from server')
 #
-#
-#
+
 # def checkKAAnswer(request, ka_id):
 #
 #     try:
@@ -1217,20 +1327,17 @@ def tableEntriesSave(request):
 #
 #     return JsonResponse({'success': image_list});
 
-def getDashboard(request):
-    return render(request, 'app/dashboard.html');
-
-def insertBadges(request):
-    badge = badgeReceived(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
-                       platform = request.POST.get('platform'), userid = request.user)
-    badge.save()
-
-    return HttpResponse('')
+# def getDashboard(request):
+#     return render(request, 'app/dashboard.html');
+#
+# def insertBadges(request):
+#     badge = badgeReceived(badgeType = request.POST.get('badgeType'), message = request.POST.get('message'),
+#                        platform = request.POST.get('platform'), userid = request.user)
+#     badge.save()
+#
+#     return HttpResponse('')
 
 #TODO: read excel and add it to the database method
-
-
-
 
 # def pageParser(request):
 #     #CASE 4: static method - FAIL, not possible to call `cls.get` or `self.get`
@@ -1239,12 +1346,9 @@ def insertBadges(request):
 #     print(parser.activityParser(self))
 #     return HttpResponse('')
 #
-
-#
 #
 # def getAllStudentInfo(request,std_id):
 #     return HttpResponse(std_id)
-#
 #
 # def dashboardKAInfo(request,ka_id):
 #
@@ -1346,8 +1450,7 @@ def insertBadges(request):
 
 # create superuser
 # https://docs.djangoproject.com/en/2.1/topics/auth/default/
-def registerUser(request):
-    return render(request, 'app/register.html', {})
+
 
 def createUser(request):
 
@@ -1372,181 +1475,44 @@ def createUser(request):
 
     return HttpResponse('')
 
+#
+# def camera(request):
+#     return render(request, 'app/camera.html', {})
 
-def camera(request):
-    return render(request, 'app/camera.html', {})
 
-
-@csrf_exempt
-def userLogFromExtenstion(request):
-    #https://stackoverflow.com/questions/35474259/django-middleware-making-post-request-blank
-    body = request.body.decode('utf-8')  # in python 3 json.loads only accepts unicode strings
-    body = json.loads(body)
-
-    print(body)
-    username = body['username'].split(' ')[0].lower()
-    action = body['action']
-    type = body['type']
-    data = body['input']
-    pagenumber = body['pagenumber']
-
-    print(username)
-    user_pk_id = User.objects.get(username=username).pk
-    print (user_pk_id)
-
-    print('from extension?', username, action, type, data, pagenumber)
-    log = body
-    f = open("extensionLOGfile.txt", "a")
-    f.write(str(log))
-    f.write('\n')
-
-    log = userLogTable(username=User.objects.get(pk=user_pk_id), action=body['action'], type=body['type'],
-                       input=body['input'], pagenumber=body['pagenumber'])
-    log.save()
-
-    return HttpResponse('')
+# @csrf_exempt
+# def userLogFromExtenstion(request):
+#     #https://stackoverflow.com/questions/35474259/django-middleware-making-post-request-blank
+#     body = request.body.decode('utf-8')  # in python 3 json.loads only accepts unicode strings
+#     body = json.loads(body)
+#
+#     print(body)
+#     username = body['username'].split(' ')[0].lower()
+#     action = body['action']
+#     type = body['type']
+#     data = body['input']
+#     pagenumber = body['pagenumber']
+#
+#     print(username)
+#     user_pk_id = User.objects.get(username=username).pk
+#     print (user_pk_id)
+#
+#     print('from extension?', username, action, type, data, pagenumber)
+#     log = body
+#     f = open("extensionLOGfile.txt", "a")
+#     f.write(str(log))
+#     f.write('\n')
+#
+#     log = userLogTable(username=User.objects.get(pk=user_pk_id), action=body['action'], type=body['type'],
+#                        input=body['input'], pagenumber=body['pagenumber'])
+#     log.save()
+#
+#     return HttpResponse('')
 
 # hacks - start
 
 #if this method is called with users already existing in the database, will return a django error message
-def createBulkUser(request):
 
-    # 19 user for the study + 1 teacher user + 2 test user
-
-    #whiteboard-group 1
-    user = User.objects.create_user('Squirtle', '', 'study6109');
-    user.save();
-    user = User.objects.create_user('Bulbasaur', '', 'study2710');
-    user.save();
-    user = User.objects.create_user('Dragonite', '', 'study2391');
-    user.save();
-
-    #whiteboard-group 2
-    user = User.objects.create_user('Gengar', '', 'study9273');
-    user.save();
-    user = User.objects.create_user('Eevee', '', 'study3452');
-    user.save();
-    user = User.objects.create_user('Charizard', '', 'study0013');
-    user.save();
-
-    # whiteboard-group 3
-    user = User.objects.create_user('Umbreon', '', 'study3920');
-    user.save();
-    user = User.objects.create_user('Gyarados', '', 'study3525');
-    user.save();
-    user = User.objects.create_user('Charmander', '', 'study0952');
-    user.save();
-
-    #whiteboard-group 4
-    user = User.objects.create_user('Ponyta', '', 'study1259');
-    user.save();
-    user = User.objects.create_user('Lapras', '', 'study9251');
-    user.save();
-    user = User.objects.create_user('Geodude', '', 'study8525');
-    user.save();
-
-    # whiteboard-group 5
-    user = User.objects.create_user('Chansey', '', 'study0193');
-    user.save();
-    user = User.objects.create_user('Psyduck', '', 'study6123');
-    user.save();
-    user = User.objects.create_user('Horsea', '', 'study8723');
-    user.save();
-
-    #whiteboard-group 6
-    user = User.objects.create_user('Paras', '', 'study5283');
-    user.save();
-    user = User.objects.create_user('Mew', '', 'study5105');
-    user.save();
-    user = User.objects.create_user('Tangela', '', 'study6209');
-    user.save();
-    user = User.objects.create_user('Ekans', '', 'study0922');
-    user.save();
-
-
-    #group 11 - teacher/developers
-    user = User.objects.create_user('AW', '', 'AW');
-    user.save();
-    user = User.objects.create_user('user1', '', 'user1');
-    user.save();
-    user = User.objects.create_user('user2', '', 'user2');
-    user.save();
-
-
-    return render(request, 'app/login.html', {})
-
-# def platformActivityList(request):
-#     #Khan Academy activities
-#     entry = platformActivityList(platform='KA', title = 'https://www.khanacademy.org/math/pre-algebra/pre-algebra-ratios-rates/pre-algebra-ratios-intro/v/ratios-intro',
-#                             activity_id = 1, topic='Intro to Ratio');
-#     entry.save();
-#
-#     entry = platformActivityList(platform='KA',
-#                             title='https://www.khanacademy.org/math/cc-seventh-grade-math/cc-7th-ratio-proportion/7th-constant-of-proportionality/v/introduction-proportional-relationships',
-#                             activity_id=2,topic='Proportional Relationship');
-#     entry.save();
-#
-#     entry = platformActivityList(platform='KA',
-#                             title='https://www.khanacademy.org/math/algebra-basics/alg-basics-linear-equations-and-inequalities/alg-basics-write-and-solve-proportions/v/find-an-unknown-in-a-proportion',
-#                             activity_id=3, topic='Find Unknown in a proportion');
-#     entry.save();
-#
-#     entry = platformActivityList(platform='KA',
-#                             title='https://www.khanacademy.org/math/cc-eighth-grade-math/cc-8th-linear-equations-functions/cc-8th-graphing-prop-rel/v/graphing-proportional-relationships-example',
-#                             activity_id=4, topic='Graphing proportional relationship');
-#     entry.save();
-#
-#     # gallery activities
-#
-#     entry = platformActivityList(platform='MB',
-#                             title='Perfect Purple Paint',
-#                             activity_id=1, topic='ratio');
-#     entry.save();
-#
-#     entry = platformActivityList(platform="MB",
-#                             title='Ratio Assignment Discussion',
-#                             activity_id=1, topic="ratio");
-#     entry.save();
-#
-#     return HttpResponse('');
-
-
-
-
-def groupAdd(request):
-
-    users_list = [str(user) for user in User.objects.all()]
-    print(len(users_list))
-
-    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Ekans", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
-                       "Mew", "Dragonite", "Charizard", "Charmander", "Geodude", "Horsea","Tangela", "Gengar", "AW", "user1", "user2"];
-
-    username_groupID = ['1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '4', '4','4', '4','5','5','5']
-
-
-    # for i in range(len(usernames_array)):
-    #     print (usernames_array[i], ' ----- ', username_groupID[usernames_array.index(usernames_array[i])]);
-    #
-
-    #rangeVal = total number of unique gallery activities
-    rangeVal = 6;
-    for username in users_list:
-        for i in range(1, rangeVal):
-            member = groupInfo(activityID=i, group=username_groupID[usernames_array.index(username)],
-                               users=User.objects.get(username=username))
-            member.save();
-
-    return render(request, 'app/login.html', {});
-
-# hacks - end
-
-def userlog(request):
-
-    log = userLogTable(username=request.user, action=request.POST.get('action'), type=request.POST.get('type'),
-                       input=request.POST.get('input'), pagenumber=request.POST.get('pagenumber'))
-    log.save()
-
-    return HttpResponse('')
 
 # def dataToCSV(request):
 #     #get all the image objects and serialize to get the foreign key values
