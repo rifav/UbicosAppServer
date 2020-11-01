@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from .models import imageModel, imageComment, individualMsgComment, Message, brainstormNote, userLogTable, tableChartData, \
     userQuesAnswerTable, groupInfo, userLogTable, badgeReceived, badgeSelected, studentCharacteristicModel, badgeInfo, KAPostModel,\
-    participationHistory, whiteboardInfoTable
+    participationHistory, whiteboardInfoTable, khanAcademyInfoTable
 from django.contrib.auth import authenticate
 from django.http.response import JsonResponse
 from django.contrib.auth import login as auth_login
@@ -421,29 +421,50 @@ def getBadgeOptions(request, username, platform, badgeKey):
     print('line 393 /getBadgeOptions :: ', badgeKey);
 
     #get the students characteristic VALUES from the database
-    charac = getCharacteristic(request, username);
+    charac = getCharacteristic(request, username); #this is a dict
     #print('line 309 accessing charac list :: ', charac);
     #print('line 310 accessing charac value :: ', charac['social']);
 
     #separatae no participation badge vs constructive badge -- through badgeKey List
     dict = {};
+    index_list = [1, 2, 3]; #initial list
+    con2_list = []; #for con2
     for elem in badgeKey:
+        randomNO = str(random.choice(index_list))
         original_elem = elem; #msc, hsc, fam, con1, con2, social
 
         #little adjustment made to display all the three badges un the interface
         if(elem == 'con1' or elem == 'con2'):
             elem = elem.replace(elem,"con");
+            con1_random = random.choice(index_list);
+            con2_list = index_list
+            con2_list.remove(con1_random)
+            badge_item = list(badgeInfo.objects.filter(charac=elem, platform=platform,
+                                                       value=charac[elem], index=con1_random).values(
+                'badgeName', 'prompt', 'sentence_opener' + randomNO));
 
-        #handle randomization using index key
-        index_list = [1,2,3];
-        so = [1,2];
-        badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
-                                                  value=charac[elem],index=random.choice(index_list)).values('badgeName','prompt','sentence_opener1'));
+        elif(elem == 'con2'):
+            elem = elem.replace(elem, "con");
+            badge_item = list(badgeInfo.objects.filter(charac=elem, platform=platform,
+                                                       value=charac[elem], index=random.choice(con2_list)).values(
+                'badgeName', 'prompt', 'sentence_opener' + randomNO));
+        else:
+            #handle randomization using index key
+            badge_item = list(badgeInfo.objects.filter(charac=elem,platform=platform,
+                                                  value=charac[elem],index=random.choice(index_list)).values('badgeName','prompt','sentence_opener'+randomNO));
+
+        #little adjustment made based on the front-end; front-end uses 'sentence_opener1' since we are picking randomly and it
+        #can be 1,2,or3; so after picking randomly, changed the dict key to sentence_opener1
+        #https://stackoverflow.com/questions/4406501/change-the-name-of-a-key-in-dictionary
+        badge_item[0]['sentence_opener1'] = badge_item[0].pop('sentence_opener'+randomNO)
+        #print('line 444 :: ', badge_item);
+
+        # badge_item_dict = [dict(item) for item in badge_item];
+        # print('line 446 for debug purpose :: ', badge_item_dict[0]);
+
         dict[original_elem] = badge_item;
 
     print('line 418 /getbadgeOptions', dict);
-
-    #todo handle topic_variable here
 
     return dict; #goes back to computationalModel method
 
@@ -468,7 +489,20 @@ def saveKApost(request):
             ka_answer.save();
 
             #insert an entry into the participation history for this activity id
-            #entry = participationHistory(platform='KA', activity_id='', didParticipate='yes', posted_by=request.user);
+            #get the KAid from the khanAcademyInfoTable table
+            KA_id = list(khanAcademyInfoTable.objects.filter(url=pagetitle).values('KA_id'));
+            KA_id = KA_id[0]['KA_id'];
+            print('debug purpose, user participated in khan academy id :: ', KA_id);
+
+            # save into the history table once
+            if participationHistory.objects.filter(platform="KA", activity_id=KA_id,posted_by=User.objects.get(username=username)).exists():
+                # do nothing
+                print();
+            else:
+                entry = participationHistory(platform="KA", activity_id=KA_id,
+                                             didParticipate='yes', posted_by=User.objects.get(username=username));
+                entry.save();
+
         return HttpResponse('successfully inserted');
 
     return HttpResponse('');
@@ -512,17 +546,19 @@ def computationalModel(request):
         else:
             #for the other two platforms, calculate will participate variable here
             if int(activity_id) == 1:
-                willParticipate = True; #why? or we can choose it randomly
+                willParticipate = False;
             elif int(activity_id) >= 2:
-                prev_acID = int(activity_id)-1;
+                prev_actID = int(activity_id)-1;
 
-                #check if participated in the previous activity if a given platform
+                # check if participated in the previous activity if a given platform
                 # the following table should have one entry [per activity id] at any moment of time
+                #todo: check the 'did participate' table for the correct entry logics
                 didParticipate = participationHistory.objects.filter(posted_by=request.user,
-                                                                     activity_id=prev_acID,
+                                                                     activity_id=prev_actID,
                                                                      platform=platform).values('didParticipate');
 
                 print('line 496 did participate in the prev activity?', didParticipate);
+                # Todo check the chronological participation here -->
                 #if there is a queryset, means current user participated in the previous activity
                 if didParticipate:
                     willParticipate = True;
@@ -534,11 +570,12 @@ def computationalModel(request):
         if(willParticipate == True):
             #call the CP model equation here to check the likelihood of participation and log it
             #first, get students characteristic
-            charac = studentCharacteristicModel.objects.filter(user = request.user).values('has_msc', 'has_hsc', 'has_fam')
-            charac_dict = [dict(item) for item in charac]
+            #todo: write this as documentation so we know what to do/how to format the data
+            charac = studentCharacteristicModel.objects.filter(user = request.user).values('has_msc', 'has_hsc', 'has_fam');
+            charac_dict = [dict(item) for item in charac];
             #print('link 510 :: ', charac_dict);
             likelihood = binaryLogisticModel.model(None, charac_dict, platform);
-            print('from the view class, likelihood score', likelihood);
+            #print('from the view class, likelihood score', likelihood);
             # todo log this (student id, activity id, platform, likelihood)
             # later from the data will verify whether students participated or not
             badgeKey = ['msc', 'hsc', 'fam']
@@ -578,37 +615,40 @@ def matchKeywords(request):
 
     if request.method == 'POST':
         username = request.POST.get('username').split(" ")[0];
-        print('line 448 from KA', username);
+        print('line 601 from KA', username);
         activity_id = request.POST.get('activity_id');
         platform = request.POST.get('platform');
         message = request.POST.get('message');
         selected_badge = request.POST.get('selected_badge');
 
-
-
         if(platform == 'KA'):
             #get the selected badge using the URL sent
             ka_url = request.POST.get('ka_url');
 
-            entry = badgeSelected.objects.filter(userid_id=User.objects.get(username=username)).filter(platform=platform).\
-                values('activity_id','badgeTypeSelected').last();
-            print('line 463 :: ', entry);
-            activity_id = entry['activity_id'];
-            selected_badge = entry['badgeTypeSelected'];
+            #get the id using the URL
+            KA_id = list(khanAcademyInfoTable.objects.filter(url=ka_url).values('KA_id'));
+            activity_id = KA_id = KA_id[0]['KA_id'];
+            print('line 614 from matchkeywords, KAid', KA_id);
+
+            entry = badgeSelected.objects.filter(userid_id=User.objects.get(username=username)).filter(platform=platform, activity_id=KA_id).\
+                values('badgeTypeSelected').last();
+            print('line 463 badge selected for khan academy :: ', entry);
+            if entry:
+                selected_badge = entry['badgeTypeSelected'];
 
         selected_badge = selected_badge.lower();
         isMatch = keywordMatch.matchingMethod(None, message, selected_badge);
         if(isMatch):
+            print('line 635 keyword matched; user is rewarded a badge :: ', selected_badge);
+            #if there is a match, make an entry into the badgeReceived table
             entry = badgeReceived(userid_id=User.objects.get(username=username).pk, platform=platform,
                                   activity_id = activity_id, message = message, badgeTypeReceived = selected_badge);
             entry.save();
-        #isMatch = true; update badgecount #todo maintain another table for this, this will be used to update the badgeCard
-        #isMatch = false;
+        else:
+            print('line 635 keyword did not matched; user was not rewarded a badge.');
 
-        #todo think about a table with specific activity name
         #praised text generated randomly
         praiseText = praise_messages_part1 +' '+praise_message_part2_dict[selected_badge];
-
 
         return JsonResponse({'isMatch': isMatch, 'praiseText': praiseText, 'selected_badge': selected_badge});
 
@@ -617,7 +657,7 @@ def matchKeywords(request):
 def getWhiteboardURl(request, board_id):
 
     #print('line 592 :: ', board_id);
-    whiteboard = whiteboardInfoTable.objects.filter(whiteboard_acticityID = board_id, userid_id = request.user).values('whiteboard_link');
+    whiteboard = whiteboardInfoTable.objects.filter(whiteboard_activityID = board_id, userid_id = request.user).values('whiteboard_link');
     #print(whiteboard[0]['whiteboard_link']);
 
     url = whiteboard[0]['whiteboard_link'];
@@ -690,8 +730,24 @@ def insertWhiteboardInfo(request):
     for whiteboard in whiteboardInfoList:
         #print(whiteboard['user'])
 
-        entry = whiteboardInfoTable(whiteboard_acticityID = int(whiteboard['whiteboard_id']),
+        entry = whiteboardInfoTable(whiteboard_activityID = int(whiteboard['whiteboard_id']),
                                     userid_id = User.objects.get(username=whiteboard['user']).pk, whiteboard_link = whiteboard['url']);
+        entry.save();
+
+    return HttpResponse('');
+
+def insertKhanAcademyInfo(request):
+
+    #1. read the excel file (used a separate py file for this)
+    khanacademyInfoList = badgeInfoFileRead.khanAcademyfileRead(None);
+    #print(type(bagdeInfoList));
+
+    # 2. insert into the table
+    for khanacademy in khanacademyInfoList:
+        #print(whiteboard['user'])
+
+        entry = khanAcademyInfoTable(platform = khanacademy['platform'],
+                                    KA_id = khanacademy['id'], url = khanacademy['url']);
         entry.save();
 
     return HttpResponse('');
@@ -941,73 +997,8 @@ def tableEntriesSave(request):
 #     #     else:
 #     #         return HttpResponse('unable to join the group, group exceeded 6 members')
 #
-# # called from gallery.js
-# def  getMediumGroupDiscussion(request):
-#
-#     gallery_id = request.POST.get('gallery_id');
-#
-#     #first filter based on gallery since each gallery has different random group
-#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-#
-#     #get in which middle group for current user
-#     middlegroup_id = random_users_based_on_gallery.get(users_id=request.user).group #get the query first and access the group from that query
-#
-#     image_data_all = aux_method_get_img_random_list_group(middlegroup_id, gallery_id)
-#
-#     return JsonResponse({'success': image_data_all})
-#
-# def getRandomListData(request, gallery_id,group_id):
-#
-#     image_data_all = aux_method_get_img_random_list_group(group_id, gallery_id)
-#
-#     return JsonResponse({'success': image_data_all})
-#
-# def aux_method_get_img_random_list_group(middlegroup_id, gallery_id):
-#
-#     # first filter based on gallery since each gallery has different random group
-#     random_users_based_on_gallery = random_group_users.objects.filter(gallery_id=gallery_id)
-#
-#     # find other users in this group
-#     middlegroup_users = random_users_based_on_gallery.filter(group=middlegroup_id)
-#     for o in middlegroup_users: print(o.users_id)
-#
-#     # get their original group from groupinfo table
-#     image_data_all = []
-#     originalgroup_list = []
-#     for o in middlegroup_users:
-#         group_id = groupInfo.objects.filter(users_id=User.objects.get(pk=o.users_id)).order_by('group').values('group').distinct()[0]['group']
-#
-#         originalgroup_list.append(group_id);
-#
-#     # if same id twice -- image is displayed twice -- so get the distinct IDs of the image e.g., [7,7,1,4]
-#     originalgroup_list = list(set(originalgroup_list))
-#     print(originalgroup_list)
-#
-#     for oid in originalgroup_list:
-#         #for each original group id get the image posted by that group - there should one image per group atleast
-#         images = imageModel.objects.filter(gallery_id=gallery_id)
-#         images = images.filter(group_id=oid)
-#
-#         image_data = serializers.serialize('json', images, use_natural_foreign_keys=True)
-#         image_data_all.append(image_data)
-#
-#
-#     print(image_data_all)
-#
-#     return image_data_all
-#
-# # check random_group_users table for distinct group numbers, converts the query into list
-# # returns the list of groups
-# # called from digTextbook.js
-# def randomDiscussionList(request):
-#     #get total groups
-#     middlegroup_id = random_group_users.objects.values('group').distinct()
-#
-#     #convert query into list
-#     middlegroup_id_list = [int(q["group"]) for q in middlegroup_id]
-#     print('randomDiscussionList method: ', middlegroup_id_list)
-#
-#     return JsonResponse({'list': middlegroup_id_list})
+
+
 
 
 # # projection gallery dashboard
@@ -1469,7 +1460,7 @@ def createBulkUser(request):
     user.save();
     user = User.objects.create_user('Tangela', '', 'study6209');
     user.save();
-    user = User.objects.create_user('Seel', '', 'study6601');
+    user = User.objects.create_user('Ekans', '', 'study0922');
     user.save();
 
 
@@ -1527,7 +1518,7 @@ def groupAdd(request):
     users_list = [str(user) for user in User.objects.all()]
     print(len(users_list))
 
-    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Seel", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
+    usernames_array = ["Squirtle", "Umbreon", "Ponyta", "Chansey", "Ekans", "Paras", "Bulbasaur", "Eevee", "Gyarados", "Lapras", "Psyduck",
                        "Mew", "Dragonite", "Charizard", "Charmander", "Geodude", "Horsea","Tangela", "Gengar", "AW", "user1", "user2"];
 
     username_groupID = ['1', '1', '1', '1', '1', '2', '2', '2', '2', '2', '3', '3', '3', '3', '3', '4', '4','4', '4','5','5','5']
@@ -1538,7 +1529,7 @@ def groupAdd(request):
     #
 
     #rangeVal = total number of unique gallery activities
-    rangeVal = 4;
+    rangeVal = 6;
     for username in users_list:
         for i in range(1, rangeVal):
             member = groupInfo(activityID=i, group=username_groupID[usernames_array.index(username)],

@@ -54,6 +54,7 @@ urlpatterns = [
     #urls for different tool utility
     url('insertWhiteboardInfo',views.insertWhiteboardInfo),
     url('getWhiteboardURl/(?P<board_id>\d+)',views.getWhiteboardURl),
+    url('insertKhanAcademyInfo', views.insertKhanAcademyInfo),
 
     #url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
     url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1

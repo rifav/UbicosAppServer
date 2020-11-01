@@ -63,6 +63,35 @@ class badgeInfoFileRead():
 
         return whiteboardInfoList;
 
+    def khanAcademyfileRead(self):
+        filename = '/Users/isa14/Downloads/khanacademy.csv';
+
+        with open(filename) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',');
+            line_count = 0;
+            khanacademyInfoList = []; #will store the rows and will return this list of dictionaries to the server
+            for row in csv_reader:
+                dict = {};
+                if line_count == 0:
+                    #print(f'Column names are {", ".join(row)}');
+                    line_count += 1;
+                else:
+                    dict['platform'] = row[0];
+                    dict['id'] = row[1];
+                    dict['url'] = row[2];
+
+                    #print(dict);
+
+                    khanacademyInfoList.append(dict);
+                    line_count += 1;
+
+        #print(whiteboardInfoList)
+        #print(len(whiteboardInfoList));
+
+        return khanacademyInfoList;
+
+
+
 
 if __name__ == "__main__":
     badgeInfoFileRead.fileRead(None)

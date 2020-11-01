@@ -150,8 +150,13 @@ class userQuesAnswerTable(models.Model):
 
 #whiteboard table info table
 # 5 group of 3 students, one group of 4 students
+class khanAcademyInfoTable(models.Model):
+    platform = models.CharField(max_length=10)
+    KA_id = models.IntegerField(null=True)
+    url = models.CharField(max_length=300)
+
 class whiteboardInfoTable(models.Model):
-    whiteboard_acticityID = models.IntegerField(null=True)
+    whiteboard_activityID = models.IntegerField(null=True)
     userid = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     whiteboard_link = models.CharField(max_length=300)
 
