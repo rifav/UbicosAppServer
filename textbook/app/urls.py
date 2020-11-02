@@ -49,15 +49,15 @@ urlpatterns = [
 
     #url('studentID/(?P<std_id>\d+)',views.getAllStudentInfo),
     url('createUser',views.createUser),
+    url('userlog', views.userlog),
     #url('addUserToGroups',views.addUserToGroupsForm),
 
     #urls for different tool utility
     url('insertWhiteboardInfo',views.insertWhiteboardInfo),
     url('getWhiteboardURl/(?P<board_id>\d+)',views.getWhiteboardURl),
+    url('insertKhanAcademyInfo', views.insertKhanAcademyInfo),
 
-    #url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
-    url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
-    url('gallery/del/(?P<img_id>\d+)', views.imageDelete),
+
     # url('getGalleryPerID/(?P<gid>\d+)', views.getGalleryPerID),
     # url('getRandomGroupMemberList/(?P<gallery_id>\d+)', views.getRandomGroupMemberList),
     #url('brainstorm/save/',views.brainstormSave),
@@ -69,22 +69,26 @@ urlpatterns = [
     # url('submitAnswer',views.submitAnswer),
 
 
-    #url('getKAPerKAID/(?P<ka_id>[0-9]+)',views.getKAPerKAID),
-    #url('checkKAAnswer/(?P<ka_id>\d+)',views.checkKAAnswer),
-    #url('dashboardKAInfo/(?P<ka_id>\d+)',views.dashboardKAInfo),
-    #badges
-    url('insertBadges',views.insertBadges),
+
 
     # url('parser',views.pageParser),
-    url('camera',views.camera),
+    #url('camera',views.camera),
     #url('randomDiscussionGroupCreate',views.random_discussion_group_generator),
     #url('getMediumGroupDiscussion',views.getMediumGroupDiscussion),
     # url('updateDiscussionImageFeed/(?P<gallery_id>\d+)',views.updateDiscussionImageFeed),
     # url('updateDiscussionImageFeedTeacherVersion/(?P<gallery_id>\d+)/(?P<group_id>\d+)/',views.updateDiscussionImageFeedTeacherVersion),
     #url('getRandomListData/(?P<gallery_id>\d+)/(?P<group_id>\d+)/',views.getRandomListData),
     #url('randomDiscussionList',views.randomDiscussionList),
-    url('userlog', views.userlog),
-    url(r'^extensionlog/$', views.userLogFromExtenstion),
+    # url('getImageID/(?P<img_filename>[\w+._^%$#!~@,-]+)/', views.getImageID), #regular expression checker: https://regex101.com/r/iQ8gG4/1
+    # url('getImagePerUser/(?P<act_id>\d+)/(?P<username>[\w+._^%$#!~@,-]+)/', views.getImagePerUser), #regular expression checker: https://regex101.com/r/iQ8gG4/1
+    # url('gallery/del/(?P<img_id>\d+)', views.imageDelete),
+    #url('getKAPerKAID/(?P<ka_id>[0-9]+)',views.getKAPerKAID),
+    #url('checkKAAnswer/(?P<ka_id>\d+)',views.checkKAAnswer),
+    #url('dashboardKAInfo/(?P<ka_id>\d+)',views.dashboardKAInfo),
+    #badges
+    # url('insertBadges',views.insertBadges),
+
+    #url(r'^extensionlog/$', views.userLogFromExtenstion),
     # url('delete', views.deleteAllItems, name='activities'),
     #data analysis
     # url('dataToCSV',views.dataToCSV),
