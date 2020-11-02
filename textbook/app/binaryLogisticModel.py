@@ -1,5 +1,5 @@
 import csv
-import numpy as np
+#import numpy as np
 
 #HSC low=0, high=1
 #St sync=0, asycn=1
